@@ -37,9 +37,9 @@ public class BlogController {
         return "blog";
     }
 
-    @GetMapping("/myposts") // Muestra el formulario para crear un nuevo post
+    @GetMapping("/newpost") // Muestra el formulario para crear un nuevo post
     public String showMyPostsPage() {
-        return "/newposts";
+        return "/newPost";
     }
 
     @PostMapping("/newpost") // Creates a new post
