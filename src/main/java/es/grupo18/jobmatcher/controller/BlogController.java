@@ -27,7 +27,7 @@ public class BlogController {
         this.accountService = accountService;
     }
 
-    @GetMapping("") // Muestra todos los posts disponibles
+    @GetMapping("") // Shows the blog page
     public String showBlogPage(Model model) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
@@ -37,7 +37,7 @@ public class BlogController {
         return "blog";
     }
 
-    @GetMapping("/newpost") // Muestra el formulario para crear un nuevo post
+    @GetMapping("/newpost") // Shows the new post page
     public String showMyPostsPage() {
         return "/newPost";
     }
