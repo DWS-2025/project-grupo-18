@@ -2,7 +2,6 @@ package es.grupo18.jobmatcher.service;
 
 import es.grupo18.jobmatcher.model.Account;
 import es.grupo18.jobmatcher.model.Company;
-import es.grupo18.jobmatcher.model.User;
 
 import org.springframework.stereotype.Service;
 
@@ -42,30 +41,6 @@ public class AccountService {
                 .filter(account -> account.getAccountId() == id)
                 .findFirst()
                 .orElse(null);
-    }
-
-    public List<Account> getAccounts() { // Returns all accounts
-        return accounts;
-    }
-
-    public List<Account> getUsers() { // Returns all users
-        List<Account> users = new ArrayList<>();
-        for (Account account : accounts) {
-            if (account instanceof User) {
-                users.add(account);
-            }
-        }
-        return users;
-    }
-
-    public List<Account> getCompanies() { // Returns all companies
-        List<Account> companies = new ArrayList<>();
-        for (Account account : accounts) {
-            if (account instanceof Company) {
-                companies.add(account);
-            }
-        }
-        return companies;
     }
 
 }

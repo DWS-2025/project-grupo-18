@@ -10,18 +10,20 @@ public class Post {
     private String imagePath;
     private Account owner;
 
-    // Empty constructor
+    // Only generates new ID
 
     public Post() {
         this.postId = generateNewPostId();
     }
 
-    // Completo sin id, generada automaticamente
+    // Complete without ID
+
     public Post(String title, String content, String timestamp, String imagePath, Account owner) {
         this(generateNewPostId(), title, content, timestamp, imagePath, owner);
     }
 
-    // Constructor completo
+    // Complete constructor
+    
     public Post(long postId, String title, String content, String timestamp, String imagePath, Account owner) {
         this.postId = postId;
         this.title = title;

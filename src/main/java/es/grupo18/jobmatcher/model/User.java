@@ -23,7 +23,7 @@ public class User extends Account {
         this.experience = 0;
     }
 
-    // Constructor without favourite companies
+    // Complete constructor
     
     public User(Long accountId, String name, String email, String password, String phone, String location, 
                 String bio, Integer experience, List<String> degreesList, List<String> skillsList, String imagePath) {
@@ -36,18 +36,6 @@ public class User extends Account {
         this.skillsList = (skillsList != null) ? new ArrayList<>(skillsList) : new ArrayList<>();
         this.imagePath = imagePath;
         this.favouriteCompaniesList = new ArrayList<>();
-    }
-
-    // Constructor with only bio and image
-
-    public User(Long accountId, String name, String email, String password, String bio, String imagePath) {
-        super(accountId, name, email, password);
-        this.bio = bio;
-        this.imagePath = imagePath;
-        this.degreesList = new ArrayList<>();
-        this.skillsList = new ArrayList<>();
-        this.favouriteCompaniesList = new ArrayList<>();
-        this.experience = 0;
     }
 
     // Getters

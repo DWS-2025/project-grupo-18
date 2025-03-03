@@ -18,30 +18,12 @@ public abstract class Account {
         this.postsList = new ArrayList<>();
     }
 
-    public Account(String name, String email, String password){
-        this.accountId = generateNewAccountId();
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.postsList = new ArrayList<>();
-
-    }
-
     public Account(long accountId, String name, String email, String password) {
         this.accountId = accountId;
         this.name = name;
         this.email = email;
         this.password = password;
         this.postsList = new ArrayList<>();
-    }
-
-
-    public Account(long accountId, String name, String email, String password,  List<Post> postsList) {
-        this.accountId = accountId;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
     }
 
     // Getters
@@ -65,6 +47,7 @@ public abstract class Account {
     public void updatePassword(String newPassword){this.password = newPassword;}
     
     // Methods to manage posts
+
     public void addPost(Post post) {
         if (post != null && !postsList.contains(post)) {
             postsList.add(post);
@@ -76,9 +59,10 @@ public abstract class Account {
             postsList.remove(post);
         }
     }
-    public List<Post> getPosts(){return new ArrayList<>(postsList);}
 
-    // Generación segura de ID
+    public List<Post> getPosts() { return new ArrayList<>(postsList); }
+
+    // Safe ID generation
     private static synchronized long generateNewAccountId(){
         return idCounter++;
     }

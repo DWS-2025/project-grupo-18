@@ -1,6 +1,5 @@
 package es.grupo18.jobmatcher.service;
 
-import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -32,8 +31,6 @@ public class UserService {
         return user;
     }
 
-
-
     public void updateUserProfile(String name, String email, String phone, String location, String about) { // Updates the user's profile
         user.setName(name);
         user.setEmail(email);
@@ -50,16 +47,6 @@ public class UserService {
         user.setDegrees(Arrays.asList(studies.split(",\\s*")));
         user.setSkills(Arrays.asList(skills.split(",\\s*")));
         user.setExperience(experience);
-    }
-
-    public boolean toggleFavouriteCompany(Company company) {
-        if (user.getFavouriteCompanies().contains(company)) {
-            user.getFavouriteCompanies().remove(company);
-            return false; // Removed from favourites
-        } else {
-            user.getFavouriteCompanies().add(company);
-            return true; // Added to favourites
-        }
     }
     
 }

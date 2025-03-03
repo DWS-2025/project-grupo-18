@@ -6,8 +6,7 @@ public class Match {
     private Long accountId;
     private String timestamp;
 
-    public Match() {
-    }
+    public Match() {}
 
     public Match(Long userId, Long accountId) {
         this.userId = userId;

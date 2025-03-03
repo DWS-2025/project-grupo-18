@@ -9,21 +9,14 @@ public class Company extends Account {
     private String imagePath;
     private List<User> favouriteUsersList;
 
-    // Empty constructor
+    // Only initialices the list of favourite users
+
     public Company() {
         this.favouriteUsersList = new ArrayList<>();
     }
 
-    // Constructor 
-    public Company(long accountId, String name, String email, String password, String bio, String location, String imagePath) {
-        super(accountId, name, email, password);
-        this.bio = bio;
-        this.location = location;
-        this.imagePath = imagePath;
-        this.favouriteUsersList = new ArrayList<>();
-    }
+    // Complete constructor
 
-    // Constructor completo
     public Company(long accountId, String name, String email, String password, String bio, String location, String imagePath, List<User> favouriteUsersList) {
         super(accountId, name, email, password);
         this.bio = bio;
@@ -58,7 +51,7 @@ public class Company extends Account {
         }
     }
     
-    public List<User> getFavouriteUsers(){return new ArrayList<>(favouriteUsersList);}
+    public List<User> getFavouriteUsers() { return new ArrayList<>(favouriteUsersList); }
 
     // Image methods
 
