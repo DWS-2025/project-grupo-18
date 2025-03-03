@@ -16,7 +16,7 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="goBack()">⬅️ Atrás</button>
+            <button class="back-btn" onclick="location.href='/main'">⬅️ Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
@@ -111,13 +111,6 @@
         });
     </script>
 
-    <!-- Script to scroll to the bottom of the page on load -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            window.scrollTo(0, document.body.scrollHeight); // Scroll to the bottom of the page
-        });
-    </script>
-
     <footer>
         <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
         </div>
@@ -136,12 +129,6 @@
                 }
             })
             .catch(error => console.error("Connection error:", error));
-    }
-</script>
-
-<script>
-    function goBack() {
-        window.location.href = "/main";
     }
 </script>
 
