@@ -1,5 +1,9 @@
-/* Container styles */
+/* Body styles with padding at the top and minimum height */
+body {
+    padding-top: 50px;
+}
 
+/* Container styles */
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -7,6 +11,7 @@
     padding: 20px;
     margin-top: 60px;
     flex: 1;
+    padding-bottom: 40px;
 }
 
 /* Box styles for each company */
