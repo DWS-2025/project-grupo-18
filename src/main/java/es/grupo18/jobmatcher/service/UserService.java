@@ -42,9 +42,9 @@ public class UserService {
         user.setBio(about);
     }
 
-    public void updateUserImage(String imagePath) { // Updates the user's image
+    public void updateUserImage(String imagePath) {
         user.setImagePath(imagePath);
-    }
+    }    
 
     public void updateUserDetails(String studies, String skills, Integer experience) { // Updates the user's details
         user.setDegrees(Arrays.asList(studies.split(",\\s*")));

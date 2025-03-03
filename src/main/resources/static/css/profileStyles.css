@@ -37,4 +37,8 @@
 /* Button group styles with top margin for spacing */
 .button-group {
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    align-items: center;
 }

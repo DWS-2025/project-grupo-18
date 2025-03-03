@@ -37,10 +37,10 @@
             <form action="/profile/upload_image" method="post" enctype="multipart/form-data">
                 <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;"
                     onchange="this.form.submit();"> <!-- Hidden file input -->
-                <div class="button-group">
-                    <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
-                    <!-- Button to trigger file input -->
-                </div>
+                    <div class="button-group">
+                        <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
+                        <button type="button" onclick="resetProfilePhoto()">Restablecer Foto</button>
+                    </div>                    
             </form>
         </div>
 
@@ -124,6 +124,20 @@
     </footer>
 
 </body>
+
+<script>
+    function resetProfilePhoto() {
+        fetch('/profile/reset_image', { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("profilePhoto").src = "/img/profile.jpg"; 
+                } else {
+                    console.error("Error setting the profile picture.");
+                }
+            })
+            .catch(error => console.error("Connection error:", error));
+    }
+</script>
 
 <script>
     function goBack() {
