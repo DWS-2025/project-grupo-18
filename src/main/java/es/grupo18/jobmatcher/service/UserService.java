@@ -1,8 +1,7 @@
 package es.grupo18.jobmatcher.service;
 
+import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Arrays;
@@ -11,9 +10,6 @@ import java.util.Arrays;
 public class UserService {
 
     private final User user;
-
-    @Autowired
-    private CompanyService companyService;
 
     public UserService() {
         // Simulated user
@@ -32,15 +28,13 @@ public class UserService {
         );
     }
 
-    public User getUser() {
+    public User getUser() { // Returns the only user in memory
         return user;
     }
 
-    public String getCurrentUserName() {
-        return user.getName();
-    }
 
-    public void updateUserProfile(String name, String email, String phone, String location, String about) {
+
+    public void updateUserProfile(String name, String email, String phone, String location, String about) { // Updates the user's profile
         user.setName(name);
         user.setEmail(email);
         user.setPhone(phone);
@@ -48,20 +42,24 @@ public class UserService {
         user.setBio(about);
     }
 
-    public void updateUserImage(String imagePath) {
+    public void updateUserImage(String imagePath) { // Updates the user's image
         user.setImagePath(imagePath);
     }
 
-    public void updateUserDetails(String studies, String skills, Integer experience) {
+    public void updateUserDetails(String studies, String skills, Integer experience) { // Updates the user's details
         user.setDegrees(Arrays.asList(studies.split(",\\s*")));
         user.setSkills(Arrays.asList(skills.split(",\\s*")));
         user.setExperience(experience);
     }
 
-    public void addFavouriteCompanyById(Long companyId) {
-        User user = getUser();
-        user.addFavouriteCompany(companyService.getCompanyById(companyId));
-        System.out.println("Empresas favoritas de " + user.getName() + ": " + user.getfavouriteCompaniesList());
+    public boolean toggleFavouriteCompany(Company company) {
+        if (user.getFavouriteCompanies().contains(company)) {
+            user.getFavouriteCompanies().remove(company);
+            return false; // Removed from favourites
+        } else {
+            user.getFavouriteCompanies().add(company);
+            return true; // Added to favourites
+        }
     }
     
 }

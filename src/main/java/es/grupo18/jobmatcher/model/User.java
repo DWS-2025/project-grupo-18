@@ -1,7 +1,7 @@
 package es.grupo18.jobmatcher.model;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class User extends Account {
 
@@ -14,42 +14,54 @@ public class User extends Account {
     private String imagePath;
     private List<Company> favouriteCompaniesList;
 
+    // Empty constructor for initializations
+
     public User() {
+        this.degreesList = new ArrayList<>();
+        this.skillsList = new ArrayList<>();
+        this.favouriteCompaniesList = new ArrayList<>();
+        this.experience = 0;
     }
 
-    public User(Long accountId, String name, String email, String password, String phone, String location, String bio, Integer experience, List<String> degreesList, List<String> skillsList, String imagePath) {
+    // Constructor without favourite companies
+    
+    public User(Long accountId, String name, String email, String password, String phone, String location, 
+                String bio, Integer experience, List<String> degreesList, List<String> skillsList, String imagePath) {
         super(accountId, name, email, password);
         this.phone = phone;
-        this.bio = bio;
         this.location = location;
+        this.bio = bio;
         this.experience = experience;
-        this.degreesList = degreesList;
-        this.skillsList = skillsList;
+        this.degreesList = (degreesList != null) ? new ArrayList<>(degreesList) : new ArrayList<>();
+        this.skillsList = (skillsList != null) ? new ArrayList<>(skillsList) : new ArrayList<>();
         this.imagePath = imagePath;
         this.favouriteCompaniesList = new ArrayList<>();
     }
- 
+
+    // Constructor with only bio and image
+
     public User(Long accountId, String name, String email, String password, String bio, String imagePath) {
         super(accountId, name, email, password);
         this.bio = bio;
         this.imagePath = imagePath;
-        this.skillsList = new ArrayList<>();
         this.degreesList = new ArrayList<>();
+        this.skillsList = new ArrayList<>();
         this.favouriteCompaniesList = new ArrayList<>();
         this.experience = 0;
     }
 
     // Getters
 
-    public String getPhone() {return phone;}
-    public String getLocation() {return location;}
-    public String getBio() {return bio;}
-    public Integer getExperience() {return experience;}
-    public List<String> getDegrees() {return degreesList;}
-    public List<String> getSkills() {return skillsList;}
-    public String getImagePath() {return imagePath;}
-    public List<User> getfavouriteCompaniesList() { return getfavouriteCompaniesList(); }
+    public String getPhone() { return phone; }
+    public String getLocation() { return location; }
+    public String getBio() { return bio; }
+    public Integer getExperience() { return experience; }
+    public String getImagePath() { return imagePath; }
 
+    // Return copies of the lists to avoid modifications
+
+    public List<String> getDegrees() { return new ArrayList<>(degreesList); }
+    public List<String> getSkills() { return new ArrayList<>(skillsList); }
 
     // Setters
 
@@ -57,58 +69,42 @@ public class User extends Account {
     public void setLocation(String location) { this.location = location; }
     public void setBio(String bio) { this.bio = bio; }
     public void setExperience(Integer experience) { this.experience = experience; }
-    public void setDegrees(List<String> degreesList) { this.degreesList = degreesList; }
-    public void setSkills(List<String> skillsList) { this.skillsList = skillsList; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    // Update methods
+    // Secure methods to modify lists
 
-    public void updatePhone(String newPhone) {
-        this.phone = newPhone;
+    public void setDegrees(List<String> degreesList) {
+        this.degreesList = (degreesList != null) ? new ArrayList<>(degreesList) : new ArrayList<>();
     }
 
-    public void updateLocation(String newLocation) {
-        this.location = newLocation;
+    public void setSkills(List<String> skillsList) {
+        this.skillsList = (skillsList != null) ? new ArrayList<>(skillsList) : new ArrayList<>();
     }
 
-    public void updateBio(String newBio) {
-        this.bio = newBio;
+    public void setFavouriteCompanies(List<Company> favouriteCompaniesList) {
+        this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList) : new ArrayList<>();
     }
 
-    public void updateExperience(Integer newExperience) {
-        this.experience = newExperience;
+    // Methods to manage favourite companies
+
+    public void addFavouriteCompany(Company company) {
+        if (company != null && !favouriteCompaniesList.contains(company)) {
+            favouriteCompaniesList.add(company);
+        }
     }
 
-    public void updateDegrees(List<String> newDegrees) {
-        this.degreesList = newDegrees;
+    public void removeFavouriteCompany(Company company) {
+        if (company != null) {
+            favouriteCompaniesList.remove(company);
+        }
     }
 
-    public void updateSkills(List<String> newSkills) {
-        this.skillsList = newSkills;
-    }
+    public List<Company> getFavouriteCompanies() { return new ArrayList<>(favouriteCompaniesList); }
 
-    public void updateImagePath(String newImagePath) {
-        this.imagePath = newImagePath;
-    }
-
-    // Add and remove methods
-
-    public void addImage(String imagePath) {
-        this.imagePath = imagePath;
-    }
+    // Image methods
 
     public void removeImage() {
         this.imagePath = null;
     }
-
-    public void removeFavoriteUser(Company company){
-        this.favouriteCompaniesList.remove(company);
-    }
-   
-    public void addFavouriteCompany(Company company) {
-        if (company != null) {
-            this.favouriteCompaniesList.add(company);
-        }
-    }
-
+    
 }

@@ -1,5 +1,7 @@
 package es.grupo18.jobmatcher.model;
 
+// This class doesn't have any uses right now, but it will in the future
+
 public class Admin extends Account {
     
     private Role role;
@@ -27,16 +29,4 @@ public class Admin extends Account {
         this.role = newRole;
     }
 
-    // toString
-
-    @Override
-    public String toString() {
-        return "Admin{" +
-                "accountId=" + getAccountId() +
-                ", name='" + getName() + 
-                ", email='" + getEmail() + 
-                ", password='" + getPassword() + 
-                ", role='" + role + 
-                '}';
-    }
 }

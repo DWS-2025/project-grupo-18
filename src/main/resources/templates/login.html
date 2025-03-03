@@ -16,7 +16,8 @@
     <!-- Header section with back button, title, and a hidden button for layout balance -->
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="location.href='/'">⬅️ Atrás</button> <!-- Back button to return to the blog page -->
+            <button class="back-btn" onclick="location.href='/'">⬅️ Atrás</button>
+            <!-- Back button to return to the blog page -->
         </div>
         <div class="title">
             <a>JOBMATCHER</a> <!-- Link to the main page -->
@@ -29,24 +30,24 @@
     <div class="container">
         <div class="box">
             <h1>Iniciar sesión</h1>
-            
+
             <form id="loginForm" action="/login" method="post">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                     <span id="emailError" class="error-message"></span>
                 </div>
-                
+
                 <div class="input-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" required>
                     <span id="passwordError" class="error-message"></span>
                 </div>
-                
+
                 <div class="button-group">
                     <button type="submit">Iniciar sesión</button>
                 </div>
-                
+
                 <!-- Shows error messages from server -->
                 <div th:if="${error}" class="error-message" th:text="${error}"></div>
             </form>

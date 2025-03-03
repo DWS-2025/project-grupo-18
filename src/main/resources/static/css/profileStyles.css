@@ -2,11 +2,10 @@
 .container {
     display: grid;
     align-items: flex-start;
-    gap: 20px;
-    padding: 20px;
     flex-wrap: wrap;
     grid-template-columns: repeat(3, 1fr);
     align-items: stretch;
+
 }
 
 /* Box styles with fixed width, flexbox alignment, and centered content */
@@ -16,16 +15,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-/* Image styles within the box, including circular shape, border, and background */
-.box img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #0077b6;
-    background-color: #f0f0f0;
 }
 
 /* List styles within the box, removing default list styling and adding padding */

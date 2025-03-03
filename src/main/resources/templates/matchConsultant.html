@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobMatcher - Matches Realizados</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/matchConsultantStyles.css">
+    <link rel="stylesheet" href="/css/matchStyles.css">
     <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="/js/darkMode.js" defer></script>
@@ -16,7 +16,7 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="goBack()">⬅️ Atrás</button>
+            <button class="back-btn" onclick="location.href='/main'">⬅️ Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
@@ -26,77 +26,40 @@
         </div>
     </header>
 
-    <div class="container" id="matches-container">
-        <!-- Matches will be loaded here -->
+    <div class="container">
+
+        {{#mutualMatchCompanies}}
+        <div class="box">
+            <h1>{{name}}</h1>
+            <img src="{{imagePath}}" alt="Logo de {{name}}" width="100">
+            <p>{{location}}</p>
+            <p>{{bio}}</p>
+
+            <!-- Button for removing from favourites -->
+            <form action="/match/removeFavourite" method="post">
+                <input type="hidden" name="companyName" value="{{name}}">
+                <input type="hidden" name="origin" value="/match/consultant">
+
+                <button type="submit">Eliminar de Favoritos</button>
+            </form>
+        </div>
+        {{/mutualMatchCompanies}}
+
+        {{^mutualMatchCompanies}}
+        <div class="box">
+            <h1>Lo sentimos.</h1>
+            <p>No has hecho match con ninguna empresa.</p>
+            <p>Ten paciencia</p>
+            <button onclick="location.href='/main'">Volver a main</button> <!-- Button to go back to the main page -->
+        </div>
+        {{/mutualMatchCompanies}}
     </div>
-
-    <!-- Container for when there are no matches -->
-    <div id="no-matches-container" class="no-matches" style="display: none;">
-        <p>No hay matches disponibles.</p>
-        <a href="/main" class="btn">Volver al inicio</a>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('Loading matches...');
-            fetch('/match/consultant')
-                .then(response => response.json())
-                .then(matches => {
-                    const container = document.getElementById('matches-container');
-                    const noMatchesContainer = document.getElementById('no-matches-container');
-
-                    if (matches.length === 0) {
-                        // If there are no matches, shows a message and hides the content
-                        noMatchesContainer.style.display = 'block';
-                        container.style.display = 'none';
-                    } else {
-                        // If there are matches, show them
-                        matches.forEach(match => {
-                            const box = createMatchBox(match);
-                            container.appendChild(box);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading matches:', error);
-                    document.getElementById('matches-container').innerHTML = 
-                        '<p class="error-message">Error al cargar los matches</p>';
-                });
-        });
-
-        function createMatchBox(match) {
-            console.log('Match data:', match);
-            const defaultImage = '/img/default-company.png';
-            const box = document.createElement('div');
-            box.className = 'box';
-
-            box.innerHTML = `
-                <h1 class="match-name">${match.name || 'Sin nombre'}</h1>   
-                <div class="match-image-container">
-                    <img src="${match.imagePath || defaultImage}" 
-                         alt="${match.name}"
-                         class="profile-photo"
-                         onerror="this.src='${defaultImage}'">
-                </div>
-                <ul class="match-info">
-                    <li><strong>Descripción:</strong> ${match.bio || 'Sin descripción'}</li>
-                    <li><strong>Localización:</strong> 📍 ${match.location || 'Ubicación no especificada'}</li>
-                </ul>
-            `;
-            return box;
-        }
-    </script>
 
     <footer>
         <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
         </div>
     </footer>
-</body>
 
-<script>
-    function goBack() {
-        window.location.href = "/main";
-    }
-</script>
+</body>
 
 </html>

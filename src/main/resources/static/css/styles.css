@@ -70,10 +70,13 @@ footer {
 
 /* Container for centering content */
 .container {
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
+    gap: 20px; /* Espaciado entre las cajas */
+
 }
 
 /* Box styles for content sections */
@@ -84,6 +87,15 @@ footer {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
     max-width: 400px;
+}
+
+.box img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #ffffff;
+    margin-bottom: 10px;
 }
 
 /* Heading styles */

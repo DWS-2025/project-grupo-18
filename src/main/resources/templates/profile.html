@@ -16,13 +16,13 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="goBack()">⬅️ Atrás</button> 
+            <button class="back-btn" onclick="goBack()">⬅️ Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
         </div>
         <div class="header-right">
-            <button class="hidden-button"></button> 
+            <button class="hidden-button"></button>
         </div>
     </header>
 
@@ -38,7 +38,8 @@
                 <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;"
                     onchange="this.form.submit();"> <!-- Hidden file input -->
                 <div class="button-group">
-                    <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button> <!-- Button to trigger file input -->
+                    <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
+                    <!-- Button to trigger file input -->
                 </div>
             </form>
         </div>
@@ -54,7 +55,8 @@
                 <li><strong>Acerca de mí:</strong> {{user.bio}}</li> <!-- User bio -->
             </ul>
             <div class="button-group">
-                <button onclick="location.href='/profile/edit'">Editar Datos</button> <!-- Button to edit user details -->
+                <button onclick="location.href='/profile/edit'">Editar Datos</button>
+                <!-- Button to edit user details -->
             </div>
         </div>
 
@@ -117,7 +119,8 @@
     </script>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        </div>
     </footer>
 
 </body>

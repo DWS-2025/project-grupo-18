@@ -23,14 +23,13 @@ public class LoginController {
         return "login";
     }
 
-
     @PostMapping("/login") // Processes the login form
-    public String processLogin(@RequestParam String email, 
-                             @RequestParam String password,
-                             RedirectAttributes redirectAttributes) {
-        
+    public String processLogin(@RequestParam String email,
+            @RequestParam String password,
+            RedirectAttributes redirectAttributes) {
+
         User user = userService.getUser();
-        
+
         if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
             // Correct login, redirect to main page
             return "redirect:/main";

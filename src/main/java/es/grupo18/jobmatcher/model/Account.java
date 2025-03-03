@@ -4,19 +4,27 @@ import java.util.List;
 import java.util.ArrayList;
 
 public abstract class Account {
+    private static long idCounter = 1;
     private long accountId;
     private String name;
     private String email;
     private String password;
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> postsList;
 
     // Constructors
 
     public Account() {
         this.accountId = generateNewAccountId();
-        this.name = "";
-        this.email = "";
-        this.password = "";
+        this.postsList = new ArrayList<>();
+    }
+
+    public Account(String name, String email, String password){
+        this.accountId = generateNewAccountId();
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.postsList = new ArrayList<>();
+
     }
 
     public Account(long accountId, String name, String email, String password) {
@@ -24,10 +32,20 @@ public abstract class Account {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.postsList = new ArrayList<>();
+    }
+
+
+    public Account(long accountId, String name, String email, String password,  List<Post> postsList) {
+        this.accountId = accountId;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
     }
 
     // Getters
-    
+
     public long getAccountId() { return accountId; }
     public String getName() { return name; }
     public String getEmail() { return email; }
@@ -42,45 +60,27 @@ public abstract class Account {
 
     // Update methods
 
-    public void updateName(String newName){
-        this.name = newName;
-    }
-
-    public void updateEmail(String newEmail){
-        this.email = newEmail;
-    }
-
-    public void updatePassword(String newPassword){
-        this.password = newPassword;
-    }
-
-    public static long generateNewAccountId(){
-        return (long) (Math.random() * 1000);
-    }
-
-    // Nuevos métodos para gestionar posts
+    public void updateName(String newName){this.name = newName;}
+    public void updateEmail(String newEmail){this.email = newEmail;}
+    public void updatePassword(String newPassword){this.password = newPassword;}
     
-    public void addPost(Post post){
-        posts.add(post);
+    // Methods to manage posts
+    public void addPost(Post post) {
+        if (post != null && !postsList.contains(post)) {
+            postsList.add(post);
+        }
     }
 
-    public void removePost(Post post){
-        posts.remove(post);
+    public void removePost(Post post) {
+        if (post != null) {
+            postsList.remove(post);
+        }
+    }
+    public List<Post> getPosts(){return new ArrayList<>(postsList);}
+
+    // Generación segura de ID
+    private static synchronized long generateNewAccountId(){
+        return idCounter++;
     }
 
-    public List<Post> getPosts(){
-        return posts;
-    }
-
-    // toString
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "accountId=" + accountId +
-                ", name='" + name + 
-                ", email='" + email + 
-                ", password='" + password + 
-                '}';
-    }
 }

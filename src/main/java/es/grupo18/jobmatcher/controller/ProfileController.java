@@ -63,7 +63,7 @@ public class ProfileController {
 
     @PostMapping("/profile/edit") // Saves the profile changes
     public String saveProfile(@RequestParam String name, @RequestParam String email, @RequestParam String phone,
-                              @RequestParam String location, @RequestParam String bio) {
+            @RequestParam String location, @RequestParam String bio) {
         userService.updateUserProfile(name, email, phone, location, bio);
         return "redirect:/profile";
     }
@@ -80,7 +80,7 @@ public class ProfileController {
 
     @PostMapping("/profile/form") // Saves the profile info changes
     public String saveProfileInfo(@RequestParam String studies, @RequestParam String skills,
-                                  @RequestParam Integer experience) {
+            @RequestParam Integer experience) {
         userService.updateUserDetails(studies, skills, experience);
         return "redirect:/profile";
     }

@@ -16,115 +16,50 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="goBack()">⬅️ Atrás</button>
+            <button class="back-btn" onclick="location.href='/main'">⬅️ Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
         </div>
         <div class="header-right">
-            <button class="hidden-button"></button> <!-- Not to show Profile Button -->
+            <button class="hidden-button"></button>
         </div>
     </header>
 
-    <div class="container" id="companies-container">
-        <!-- Companies will be loaded here -->
+    <div class="container">
+        {{#nonFavouriteCompanies}}
+        <div class="box">
+            <h1>{{name}}</h1>
+            <img src="{{imagePath}}" alt="Logo de {{name}}" width="100">
+            <p>{{location}}</p>
+            <p>{{bio}}</p>
+
+            <!-- Button for adding to favourites -->
+            <form action="/match/addFavourite" method="post">
+                <input type="hidden" name="companyName" value="{{name}}">
+                <input type="hidden" name="origin" value="/match">
+                <button type="submit">Añadir a Favoritos</button>
+            </form>
+        </div>
+        {{/nonFavouriteCompanies}}
+
+        {{#favouriteCompanies}}
+        <div class="box">
+            <h1>{{name}}</h1>
+            <img src="{{imagePath}}" alt="Logo de {{name}}" width="100">
+            <p>{{location}}</p>
+            <p>{{bio}}</p>
+
+            <!-- Button for removing from favourites -->
+            <form action="/match/removeFavourite" method="post">
+                <input type="hidden" name="companyName" value="{{name}}">
+                <input type="hidden" name="origin" value="/match">
+                <button type="submit">Eliminar de Favoritos</button>
+            </form>
+        </div>
+        {{/favouriteCompanies}}
+
     </div>
-
-    <script>
-        // Tracks liked companies in session storage
-        const likedCompanies = new Set(JSON.parse(sessionStorage.getItem('likedCompanies') || '[]'));
-
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('Loading companies...');
-            fetch('/match/companies')
-                .then(response => response.json())
-                .then(companies => {
-                    const container = document.getElementById('companies-container');
-                    companies.forEach(company => {
-                        const card = createCompanyBox(company);
-                        container.appendChild(card);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading companies:', error);
-                    const container = document.getElementById('companies-container');
-                    container.innerHTML = '<p class="error-message">Error al cargar las empresas</p>';
-                });
-        });
-
-        function createCompanyBox(company) {
-            console.log('Company data:', company);
-            const defaultImage = '/img/default-company.png';
-            const box = document.createElement('div');
-            box.className = 'box';
-
-            const isLiked = likedCompanies.has(company.accountId);
-
-            box.innerHTML = `
-                <h1 class="company-name">${company.name || 'Sin nombre'}</h1>
-                <div class="profile-image-container">
-                    <img src="${company.imagePath || defaultImage}" 
-                        alt="${company.name}"
-                        class="profile-photo"
-                        onerror="this.src='${defaultImage}'">
-                </div>
-                <ul class="company-details">
-                    <li><strong>Descripción:</strong> ${company.bio || 'Sin descripción'}</li>
-                    <li><strong>Ubicación:</strong> 📍 ${company.location || 'Ubicación no especificada'}</li>
-                </ul>
-                <div class="button-group">
-                    <button class="like-btn ${isLiked ? 'liked' : ''}" 
-                            onclick="toggleLike(${company.accountId}, this)">
-                        ${isLiked ? '✓ Interesado' : '❤️ Me interesa'}
-                    </button>
-                </div>
-            `;
-            return box;
-        }
-
-        function toggleLike(companyId, button) {
-            console.log('Sending like to company:', companyId);
-
-            fetch(`/match/like/${companyId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin'
-            })
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Error saving the match');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        console.log('Match saved:', data);
-                        if (data.liked) {
-                            likedCompanies.add(companyId);
-                            button.classList.add('liked');
-                            button.textContent = '✓ Interesado';
-                        } else {
-                            likedCompanies.delete(companyId);
-                            button.classList.remove('liked');
-                            button.textContent = '❤️ Me interesa';
-                        }
-                        sessionStorage.setItem('likedCompanies', JSON.stringify([...likedCompanies]));
-                    } else {
-                        throw new Error(data.error || 'Unknown error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error.message);
-                });
-        }
-    </script>
 
     <footer>
         <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
@@ -132,11 +67,5 @@
     </footer>
 
 </body>
-
-<script>
-    function goBack() {
-        window.location.href = "/main";
-    }
-</script>
 
 </html>

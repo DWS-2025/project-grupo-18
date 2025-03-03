@@ -25,7 +25,7 @@ body {
 }
 
 /* Styles for images within posts, including sizing and spacing */
-.post-image {
+.box .post-image {
     width: 100%;
     height: auto;
     max-height: 300px;

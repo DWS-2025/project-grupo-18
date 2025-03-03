@@ -3,86 +3,67 @@ package es.grupo18.jobmatcher.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Company extends Account {  
+public class Company extends Account {
     private String bio;
     private String location;
     private String imagePath;
     private List<User> favouriteUsersList;
-    private int questionnaireScore;
 
-    // Constructors
+    // Empty constructor
+    public Company() {
+        this.favouriteUsersList = new ArrayList<>();
+    }
 
-    public Company() {}
-
-    public Company(long accountId, String name, String email, String password, String location, String bio, String imagePath ) {
+    // Constructor 
+    public Company(long accountId, String name, String email, String password, String bio, String location, String imagePath) {
         super(accountId, name, email, password);
-        this.location = location;
         this.bio = bio;
+        this.location = location;
         this.imagePath = imagePath;
         this.favouriteUsersList = new ArrayList<>();
+    }
+
+    // Constructor completo
+    public Company(long accountId, String name, String email, String password, String bio, String location, String imagePath, List<User> favouriteUsersList) {
+        super(accountId, name, email, password);
+        this.bio = bio;
+        this.location = location;
+        this.imagePath = imagePath;
+        this.favouriteUsersList = (favouriteUsersList != null) ? new ArrayList<>(favouriteUsersList) : new ArrayList<>();
     }
 
     // Getters
 
     public String getBio() { return bio; }
     public String getImagePath() { return imagePath; }
-    public int getQuestionnaireScore() { return this.questionnaireScore; }
     public String getLocation() { return location; }
-    public List<User> getFavoriteUsers() { return favouriteUsersList; }
 
     // Setters
 
     public void setBio(String bio) { this.bio = bio; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
-    public void setQuestionnaireScore(int score) { this.questionnaireScore = score; }
     public void setLocation(String location) { this.location = location; }
-    public void setProfilePhoto(String profilePhoto) { this.imagePath = profilePhoto; }
-    public void setFavoriteUsers(List<User> favouriteUsersList) {
-        this.favouriteUsersList = favouriteUsersList;
+
+    // Methods to manage favourite users
+
+    public void addFavouriteUser(User user) {
+        if (user != null && !favouriteUsersList.contains(user)) {
+            favouriteUsersList.add(user);
+        }
     }
 
-    // Update methods
-
-    public void updateLocation(String newLocation){
-        this.location = newLocation;
+    public void removeFavouriteUser(User user) {
+        if (user != null) {
+            favouriteUsersList.remove(user);
+        }
     }
+    
+    public List<User> getFavouriteUsers(){return new ArrayList<>(favouriteUsersList);}
 
-    public void updateBio(String newBio){
-        this.bio = newBio;
-    }
-
-    public void updateImagePath(String newImagePath){
-        this.imagePath = newImagePath;
-    }
-
-    // Add & Remove methods
-
-    public void addFavouriteUser(User user){
-        this.favouriteUsersList.add(user);
-    }
-
-    public void removeFavoriteUser(User user){
-        this.favouriteUsersList.remove(user);
-    }
-
-    public void addImage(String imagePath) {
-        this.imagePath = imagePath;
-    }
+    // Image methods
 
     public void removeImage() {
         this.imagePath = null;
     }
 
-    // toString
-
-    @Override
-    public String toString() {
-        return "Company{" + super.toString() +
-                "bio='" + bio  +
-                ", location='" + location + 
-                ", imagePath='" + imagePath + 
-                ", favouriteUsersList=" + favouriteUsersList +
-                '}';
-    }
-    
 }

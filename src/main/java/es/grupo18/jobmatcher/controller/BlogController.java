@@ -27,37 +27,38 @@ public class BlogController {
         this.accountService = accountService;
     }
 
-    @GetMapping("") // Shows all available blogs
+    @GetMapping("") // Muestra todos los posts disponibles
     public String showBlogPage(Model model) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
         model.addAttribute("posts", postService.getAllPosts());
+        model.addAttribute("timestamp", formatter);
+
         return "blog";
     }
 
-    @GetMapping("/newpost") // Shows the form to create a new post
-    public String showNewPostForm() {
-        return "newpost";
+    @GetMapping("/myposts") // Muestra el formulario para crear un nuevo post
+    public String showMyPostsPage() {
+        return "/newposts";
     }
 
     @PostMapping("/newpost") // Creates a new post
     public String createNewPost(@RequestParam String title,
-                                @RequestParam String content,
-                                @RequestParam(required = false) String imagePath) {
+            @RequestParam String content,
+            @RequestParam(required = false) String imagePath) {
 
-        Account currentUser = accountService.findAccountById(1L); // Actual user in phase 1
+        Account currentUser = accountService.findAccountById(1L); // Only user in phase 1
+        if (currentUser == null) {
+            throw new IllegalStateException("No user with ID 1L found");
+        }
 
-        Post newPost = new Post(
-            System.currentTimeMillis(),
-            title,
-            content,
-            LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
-            imagePath,
-            currentUser
-        );
+        Post newPost = new Post(title, content, LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+        imagePath, currentUser);
 
         currentUser.addPost(newPost);
         postService.addPost(newPost);
 
         return "redirect:/blog";
     }
-    
+
 }
