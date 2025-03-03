@@ -39,7 +39,7 @@ public class UserService {
         user.setBio(about);
     }
 
-    public void updateUserImage(String imagePath) {
+    public void updateUserImage(String imagePath) { // Updates the user's image
         user.setImagePath(imagePath);
     }    
 
