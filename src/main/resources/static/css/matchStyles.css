@@ -1,26 +1,19 @@
 /* Body styles with padding at the top and minimum height */
 body {
-    padding-top: 50px;
+    height: auto;
+
 }
 
 /* Container styles */
 .container {
-    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    padding: 20px;
     margin-top: 60px;
     flex: 1;
-    padding-bottom: 40px;
 }
 
 /* Box styles for each company */
 
 .box {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 10px;
     padding: 20px;
     width: 300px;
@@ -33,34 +26,12 @@ body {
     transform: translateY(-5px);
 }
 
-.box h1 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
 
-.box img {
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
 
-.box p {
-    margin: 5px 0;
-}
 
-.box form {
-    margin-top: 10px;
-}
 
-.box form button {
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-    padding: 10px 20px;
-    font-size: 1em;
-}
 
-.box form button:hover {
-    background-color: #0056b3;
-}
+
+
+
+
