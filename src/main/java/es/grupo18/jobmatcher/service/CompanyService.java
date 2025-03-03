@@ -24,7 +24,7 @@ public class CompanyService {
     @PostConstruct
     private void loadInitialCompanies() {
         if (!companies.isEmpty()){
-            return; // Evita cargar empresas si ya están en memoria
+            return; // Avoids loading the companies more than once
         }
 
         final Company c1;

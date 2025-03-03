@@ -30,7 +30,7 @@ public class ProfileController {
     public String showProfile(Model model) {
         User user = userService.getUser();
 
-        // Si no tiene imagen, asigna la imagen por defecto
+        // If the user doesn't have an image, set the default one
         if (user.getImagePath() == null || user.getImagePath().isEmpty()) {
             user.setImagePath("/img/profile.jpg");
         }
@@ -44,28 +44,27 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/upload_image")
-public String uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
-    User user = userService.getUser();
-    
-    if (!image.isEmpty()) {
-        // Asegurar que la carpeta existe
-        Files.createDirectories(IMAGES_FOLDER);
+    public String uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
+        User user = userService.getUser();
 
-        // Nombre único basado en el ID del usuario
-        String fileName = "profile_" + user.getAccountId() + ".jpg";
-        Path imagePath = IMAGES_FOLDER.resolve(fileName);
-        
-        // Guardar la imagen en el servidor
-        image.transferTo(imagePath);
+        if (!image.isEmpty()) {
+            // Ensure the images folder exists
+            Files.createDirectories(IMAGES_FOLDER);
 
-        // Actualizar la ruta en el usuario
-        String relativePath = "/img/" + fileName;
-        userService.updateUserImage(relativePath);
+            // Unique file name for the image
+            String fileName = "profile_" + user.getAccountId() + ".jpg";
+            Path imagePath = IMAGES_FOLDER.resolve(fileName);
+
+            // Saves the image in the images folder
+            image.transferTo(imagePath);
+
+            // Updates the user's image path
+            String relativePath = "/img/" + fileName;
+            userService.updateUserImage(relativePath);
+        }
+
+        return "redirect:/profile";
     }
-
-    return "redirect:/profile";
-}
-
 
     @GetMapping("/profile/edit") // Shows the profile editor
     public String editProfile(Model model) {

@@ -29,7 +29,7 @@ public class PostService {
         Account google = accountService.findAccountById(12L);
         Account apple = accountService.findAccountById(22L);
 
-        // Creación de posts directamente en memoria
+        // Creates posts directly in memory
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
         Post post1 = new Post(1L, "Programador - Microsoft",
@@ -54,7 +54,7 @@ public class PostService {
         if (google != null) google.addPost(post2);
         if (apple != null) apple.addPost(post3);
 
-        System.out.println("Posts cargados en memoria");
+        System.out.println("Posts uploaded to memory");
     }
 
     public List<Post> getAllPosts() { // Returns the posts list in reverse order
