@@ -254,7 +254,6 @@ select {
 
 .dark-mode a:hover {
     color: #0096c7;
-    text-decoration: underline;
     transform: scale(1.1);
 }
 

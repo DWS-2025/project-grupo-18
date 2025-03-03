@@ -68,8 +68,8 @@ public class CompanyService {
                 "Google",
                 "google@gmail.com",
                 "asdfg12345",
-                "California",
                 "Innovamos en tecnología y buscamos talento apasionado por la inteligencia artificial y la computación en la nube.",
+                "California",
                 "/img/google.jpg",
                 favouriteUsersList_c2);
 
@@ -78,8 +78,8 @@ public class CompanyService {
                 "Apple",
                 "apple@email.com",
                 "qwerty12345",
-                "Silicon Valley",
                 "Creamos experiencias revolucionarias con nuestros productos, buscamos diseñadores y desarrolladores visionarios.",
+                "Silicon Valley",
                 "/img/apple.jpg",
                 favouriteUsersList_c3);
 
@@ -88,8 +88,8 @@ public class CompanyService {
                 "Amazon",
                 "amazon@amazon.com",
                 "amazon123",
-                "Seattle",
                 "Lideramos el comercio electrónico y la computación en la nube, buscamos ingenieros que impulsen la innovación.",
+                "Seattle",
                 "/img/amazon.jpg",
                 favouriteUsersList_c4);
 
@@ -98,8 +98,8 @@ public class CompanyService {
                 "Tesla",
                 "tesla@gmail.com",
                 "tesla123",
-                "California",
                 "Revolucionamos la industria automotriz con tecnología eléctrica y autónoma, buscamos talento disruptivo.",
+                "California",
                 "/img/tesla_company.jpg",
                 favouriteUsersList_c5);
 
