@@ -2,6 +2,8 @@ package es.grupo18.jobmatcher.controller;
 
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.UserService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,31 +26,46 @@ public class ProfileController {
         this.userService = userService;
     }
 
-    @GetMapping("/profile") // Shows the user profile
+    @GetMapping("/profile")
     public String showProfile(Model model) {
-        User user = userService.getUser(); // Obtains the only user for simplicity
+        User user = userService.getUser();
+
+        // Si no tiene imagen, asigna la imagen por defecto
+        if (user.getImagePath() == null || user.getImagePath().isEmpty()) {
+            user.setImagePath("/img/profile.jpg");
+        }
+
         model.addAttribute("user", user);
         model.addAttribute("studies", user.getDegrees());
         model.addAttribute("skills", user.getSkills());
         model.addAttribute("experience", user.getExperience());
+
         return "profile";
     }
 
-    @PostMapping("/profile/upload_image") // Uploads a new image for the user
-    public String uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
-        User user = userService.getUser();
-        if (!image.isEmpty()) {
-            Files.createDirectories(IMAGES_FOLDER);
+    @PostMapping("/profile/upload_image")
+public String uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
+    User user = userService.getUser();
+    
+    if (!image.isEmpty()) {
+        // Asegurar que la carpeta existe
+        Files.createDirectories(IMAGES_FOLDER);
 
-            Path imagePath = IMAGES_FOLDER.resolve("profile_" + user.getAccountId() + ".jpg");
-            image.transferTo(imagePath);
+        // Nombre único basado en el ID del usuario
+        String fileName = "profile_" + user.getAccountId() + ".jpg";
+        Path imagePath = IMAGES_FOLDER.resolve(fileName);
+        
+        // Guardar la imagen en el servidor
+        image.transferTo(imagePath);
 
-            // Update the current user's image in memory
-            userService.updateUserImage("/img/profile_" + user.getAccountId() + ".jpg");
-        }
-
-        return "redirect:/profile";
+        // Actualizar la ruta en el usuario
+        String relativePath = "/img/" + fileName;
+        userService.updateUserImage(relativePath);
     }
+
+    return "redirect:/profile";
+}
+
 
     @GetMapping("/profile/edit") // Shows the profile editor
     public String editProfile(Model model) {
@@ -84,5 +101,22 @@ public class ProfileController {
         userService.updateUserDetails(studies, skills, experience);
         return "redirect:/profile";
     }
-    
+
+    @PostMapping("/profile/reset_image")
+    public ResponseEntity<Void> resetProfileImage() throws IOException {
+        User user = userService.getUser();
+
+        Path userImagePath = Paths.get("src/main/resources/static" + user.getImagePath());
+
+        // Verifies if the image exists and if is not the default one, deletes it
+        if (Files.exists(userImagePath) && !user.getImagePath().equals("/img/profile.jpg")) {
+            Files.delete(userImagePath);
+        }
+
+        // Resets the image to the default one
+        userService.updateUserImage("/img/profile.jpg");
+
+        return ResponseEntity.ok().build();
+    }
+
 }
