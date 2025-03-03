@@ -59,7 +59,7 @@ public class CompanyService {
                 "microsoft@outlook.com",
                 "password123",
                 "Buscamos programadores experimentados, ofrecemos un ambiente de trabajo flexible y beneficios de bienestar.",
-                "California",
+                "📍California",
                 "/img/microsoft.jpg",
                 favouriteUsersList_c1);
 
@@ -69,7 +69,7 @@ public class CompanyService {
                 "google@gmail.com",
                 "asdfg12345",
                 "Innovamos en tecnología y buscamos talento apasionado por la inteligencia artificial y la computación en la nube.",
-                "California",
+                "📍California",
                 "/img/google.jpg",
                 favouriteUsersList_c2);
 
@@ -79,7 +79,7 @@ public class CompanyService {
                 "apple@email.com",
                 "qwerty12345",
                 "Creamos experiencias revolucionarias con nuestros productos, buscamos diseñadores y desarrolladores visionarios.",
-                "Silicon Valley",
+                "📍Silicon Valley",
                 "/img/apple.jpg",
                 favouriteUsersList_c3);
 
@@ -89,7 +89,7 @@ public class CompanyService {
                 "amazon@amazon.com",
                 "amazon123",
                 "Lideramos el comercio electrónico y la computación en la nube, buscamos ingenieros que impulsen la innovación.",
-                "Seattle",
+                "📍Seattle",
                 "/img/amazon.jpg",
                 favouriteUsersList_c4);
 
@@ -99,7 +99,7 @@ public class CompanyService {
                 "tesla@gmail.com",
                 "tesla123",
                 "Revolucionamos la industria automotriz con tecnología eléctrica y autónoma, buscamos talento disruptivo.",
-                "California",
+                "📍California",
                 "/img/tesla_company.jpg",
                 favouriteUsersList_c5);
 
@@ -109,7 +109,7 @@ public class CompanyService {
                 "facebook@outlook.com",
                 "facebook123",
                 "Construimos la red social más grande, buscamos ingenieros para conectar el mundo.",
-                "Menlo Park",
+                "📍Menlo Park",
                 "/img/facebook_company.jpg",
                 favouriteUsersList_c6);
 
@@ -119,7 +119,7 @@ public class CompanyService {
                 "netflix@gmail.com",
                 "netflix123",
                 "Revolucionamos el entretenimiento, buscamos creativos para contenido innovador.",
-                "Los Gatos",
+                "📍Los Gatos",
                 "/img/netflix_company.jpg",
                 favouriteUsersList_c7);
 
@@ -129,7 +129,7 @@ public class CompanyService {
                 "uber@gmail.com",
                 "uber123",
                 "Transformamos la movilidad, buscamos talento en tecnología y logística.",
-                "San Francisco",
+                "📍San Francisco",
                 "/img/uber.jpg",
                 favouriteUsersList_c8);
 
