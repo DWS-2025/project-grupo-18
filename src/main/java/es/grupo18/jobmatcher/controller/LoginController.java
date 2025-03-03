@@ -35,7 +35,7 @@ public class LoginController {
             return "redirect:/main";
         } else {
             // Login failed, redirect to login page with error message
-            redirectAttributes.addFlashAttribute("error", "Email o contraseña incorrectos");
+            redirectAttributes.addFlashAttribute("error", "Incorrect email or password");
             return "redirect:/login";
         }
     }
