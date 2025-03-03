@@ -60,7 +60,7 @@ public class CompanyService {
                 "password123",
                 "Buscamos programadores experimentados, ofrecemos un ambiente de trabajo flexible y beneficios de bienestar.",
                 "California",
-                "https://static.vecteezy.com/system/resources/previews/022/100/816/non_2x/microsoft-logo-transparent-free-png.png",
+                "/img/microsoft.jpg",
                 favouriteUsersList_c1);
 
         c2 = new Company(
@@ -70,7 +70,7 @@ public class CompanyService {
                 "asdfg12345",
                 "California",
                 "Innovamos en tecnología y buscamos talento apasionado por la inteligencia artificial y la computación en la nube.",
-                "https://freelogopng.com/images/all_img/1657952440google-logo-png-transparent.png",
+                "/img/google.jpg",
                 favouriteUsersList_c2);
 
         c3 = new Company(
@@ -80,7 +80,7 @@ public class CompanyService {
                 "qwerty12345",
                 "Silicon Valley",
                 "Creamos experiencias revolucionarias con nuestros productos, buscamos diseñadores y desarrolladores visionarios.",
-                "https://wallpapers.com/images/hd/black-apple-logo-4k-yn7rtft0sl2x3dhe.jpg",
+                "/img/apple.jpg",
                 favouriteUsersList_c3);
 
         c4 = new Company(
@@ -90,7 +90,7 @@ public class CompanyService {
                 "amazon123",
                 "Seattle",
                 "Lideramos el comercio electrónico y la computación en la nube, buscamos ingenieros que impulsen la innovación.",
-                "https://images.squarespace-cdn.com/content/v1/5d04183c2027f10001d3c405/1563888556224-GD8RXHAUD6NXG36IJYQY/nogotell-amazon.png",
+                "/img/amazon.jpg",
                 favouriteUsersList_c4);
 
         c5 = new Company(
@@ -100,7 +100,7 @@ public class CompanyService {
                 "tesla123",
                 "California",
                 "Revolucionamos la industria automotriz con tecnología eléctrica y autónoma, buscamos talento disruptivo.",
-                "https://www.pngmart.com/files/22/Tesla-Logo-PNG-Transparent.png",
+                "/img/tesla_company.jpg",
                 favouriteUsersList_c5);
 
         c6 = new Company(
@@ -110,7 +110,7 @@ public class CompanyService {
                 "facebook123",
                 "Construimos la red social más grande, buscamos ingenieros para conectar el mundo.",
                 "Menlo Park",
-                "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
+                "/img/facebook_company.jpg",
                 favouriteUsersList_c6);
 
         c7 = new Company(
@@ -120,7 +120,7 @@ public class CompanyService {
                 "netflix123",
                 "Revolucionamos el entretenimiento, buscamos creativos para contenido innovador.",
                 "Los Gatos",
-                "https://upload.wikimedia.org/wikipedia/commons/7/75/Netflix_icon.svg",
+                "/img/netflix_company.jpg",
                 favouriteUsersList_c7);
 
         c8 = new Company(
@@ -130,7 +130,7 @@ public class CompanyService {
                 "uber123",
                 "Transformamos la movilidad, buscamos talento en tecnología y logística.",
                 "San Francisco",
-                "https://th.bing.com/th/id/OIP.QMOhFSBODe1KQumgVL-LqwHaHa?rs=1&pid=ImgDetMain",
+                "/img/uber.jpg",
                 favouriteUsersList_c8);
 
         companies.add(c1);
