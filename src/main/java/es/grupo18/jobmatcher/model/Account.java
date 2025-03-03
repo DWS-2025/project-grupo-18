@@ -63,6 +63,7 @@ public abstract class Account {
     public List<Post> getPosts() { return new ArrayList<>(postsList); }
 
     // Safe ID generation
+    
     private static synchronized long generateNewAccountId(){
         return idCounter++;
     }
