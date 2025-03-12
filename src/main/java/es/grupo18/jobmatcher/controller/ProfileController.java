@@ -3,6 +3,7 @@ package es.grupo18.jobmatcher.controller;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.UserService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,27 +20,12 @@ import java.nio.file.Paths;
 @Controller
 public class ProfileController {
 
-    private static final Path IMAGES_FOLDER = Paths.get("src/main/resources/static/img/");
-    private final UserService userService;
-
-    public ProfileController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/profile")
     public String showProfile(Model model) {
-        User user = userService.getUser();
-
-        // If the user doesn't have an image, set the default one
-        if (user.getImagePath() == null || user.getImagePath().isEmpty()) {
-            user.setImagePath("/img/profile.jpg");
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("studies", user.getDegrees());
-        model.addAttribute("skills", user.getSkills());
-        model.addAttribute("experience", user.getExperience());
-
+        model.addAttribute("profile", userService.getLoggedUser());
         return "profile";
     }
 
