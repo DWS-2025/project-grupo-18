@@ -36,7 +36,6 @@ public class CompanyService {
         oldCompany.setImagePath(updatedCompany.getImagePath());
         companyRepository.save(oldCompany);     
     }
-
     
     public void deleteById(long id) { // Deletes a company by its id
 

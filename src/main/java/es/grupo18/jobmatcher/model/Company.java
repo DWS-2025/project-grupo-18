@@ -23,7 +23,7 @@ public class Company {
     private String bio;
     private String imagePath;
 
-    @ManyToMany(mappedBy = "likedCompanies")
+    @ManyToMany(mappedBy = "favouriteCompaniesList")
     private List<User> favouriteUsersList;
 
     public Company() {
