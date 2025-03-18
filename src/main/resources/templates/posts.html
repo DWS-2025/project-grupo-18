@@ -22,7 +22,7 @@
             <a href="/main">JOBMATCHER</a>
         </div>
         <div class="header-right">
-            <button id="post-btn" onclick="location.href='/blog/newpost'">Nuevo post</button>
+            <button id="post-btn" onclick="location.href='/posts/new'">Nuevo post</button>
         </div>
     </header>
 
@@ -33,11 +33,10 @@
                 <!-- Loop through posts and display each one -->
                 {{#posts}}
                 <div class="box">
-                    <h1>{{title}}</h1>
+                    <a href="/posts/{{id}}"><h1>{{title}}</h1></a>
                     <img src="{{imagePath}}" alt="{{title}}" class="post-image">
-                    <p>{{content}}</p>
                     <p><strong>Fecha:</strong> {{timestamp}}</p>
-                    <p><strong>Autor: </strong>{{owner.name}}</p>
+                    <p><strong>Autor: </strong>{{author.name}}</p>  <!-- Cambiar owner por author -->
                 </div>
                 {{/posts}}
                 <!-- Display a message if there are no posts -->

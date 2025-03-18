@@ -29,6 +29,12 @@ public class PostController {
         return "posts";
     }
 
+    @GetMapping("/posts/new")
+    public String showNewPostForm(Model model) {
+        model.addAttribute("post", new Post());
+        return "new_post";
+    }
+
     @PostMapping("/posts/new")
     public String newPost(Model model, Post post) {
         postService.save(post);
