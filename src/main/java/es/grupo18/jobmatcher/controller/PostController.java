@@ -11,7 +11,6 @@ import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.model.Review;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
-import es.grupo18.jobmatcher.service.UserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

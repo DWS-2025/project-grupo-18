@@ -31,7 +31,7 @@ public class DataGeneratorService {
                 "I'm a testing user", 2, "https://www.google.com", null, null, null);
         userRepository.save(testing);
 
-        User martina = new User("Martina", "martinini@gmail.com", "soyunaguay123", "659801423", "Vicálvaro",
+        User martina = new User("Martina", "martinini@gmail.com", "martinini123", "659801423", "Vicálvaro",
                 "Busco a alguien para que haga mi trabajo", 2,
                 "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png", null, null, null);
         userRepository.save(martina);
