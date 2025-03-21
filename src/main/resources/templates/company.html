@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobMatcher - {{company.name}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/companyStyles.css"> <!-- Estilos específicos para esta página -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/match'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button class="hidden-button"></button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="company-details">
+            <!-- Nombre de la compañía -->
+            <h1>{{company.name}}</h1>
+            
+            <!-- Logo de la compañía -->
+            <img src="{{company.imagePath}}" alt="Logo de {{company.name}}" width="150">
+            
+            <!-- Ubicación de la compañía -->
+            <p><strong>Ubicación:</strong> {{company.location}}</p>
+            
+            <!-- Descripción de la compañía -->
+            <p><strong>Descripción:</strong> {{company.bio}}</p>
+            
+            <!-- Correo electrónico de la compañía -->
+            <p><strong>Email:</strong> {{company.email}}</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
+    </footer>
+
+</body>
+</html>
