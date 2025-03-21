@@ -1,16 +1,21 @@
 package es.grupo18.jobmatcher.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.CompanyService;
 import es.grupo18.jobmatcher.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
 
 @Controller
 public class MatchController {
@@ -85,4 +90,14 @@ public class MatchController {
         return "matchConsultant";
     }
 
+    @GetMapping("/company/{id}") 
+    public String getCompanyPage(@PathVariable Long id, Model model) {
+        try {
+            Company company = companyService.findById(id);
+            model.addAttribute("company", company);
+            return "company"; 
+        } catch (EntityNotFoundException e) {
+            return "error"; 
+        }
+    }
 }
