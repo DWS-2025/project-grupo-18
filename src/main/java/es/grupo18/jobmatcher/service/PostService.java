@@ -18,6 +18,11 @@ public class PostService {
     @Autowired
     private UserService userService;
 
+    public List<Post> findAllWithAuthors() { // Returns the posts list with authors
+        return postRepository.findAllWithAuthors();
+    }
+
+
     public List<Post> findAll() { // Returns the posts list in reverse order
         return postRepository.findAll();
     }

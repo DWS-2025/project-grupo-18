@@ -5,11 +5,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import java.util.List;
 
 import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.model.Review;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
+import es.grupo18.jobmatcher.service.UserService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +28,12 @@ public class PostController {
 
     @GetMapping("/posts")
     public String getPosts(Model model) {
-        model.addAttribute("posts", postService.findAll());
+        List<Post> posts = postService.findAllWithAuthors(); // Carga autor explícitamente
+        model.addAttribute("posts", posts);
         return "posts";
     }
+
+
 
     @GetMapping("/posts/new")
     public String showNewPostForm(Model model) {

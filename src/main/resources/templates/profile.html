@@ -32,7 +32,6 @@
         <div class="box">
             <h2>Foto de Perfil</h2>
             <img id="profilePhoto" src="{{user.imagePath}}" alt="Foto de perfil" class="profile-picture">
-            <!-- Profile photo -->
 
             <!-- Form for uploading a new profile photo -->
             <form action="/profile/upload_image" method="post" enctype="multipart/form-data">
@@ -49,38 +48,15 @@
         <div class="box">
             <h2>Datos del usuario</h2>
             <ul>
-                <li><strong>Nombre:</strong> {{profile.name}}</li>
-                <li><strong>Email:</strong> {{profile.email}}</li>
-                <li><strong>Teléfono:</strong> {{profile.phone}}</li>
-                <li><strong>Ubicación:</strong> {{profile.location}}</li>
-                <li><strong>Acerca de mí:</strong> {{profile.bio}}</li>
+                <li><strong>Nombre:</strong> {{user.name}}</li>
+                <li><strong>Email:</strong> {{user.email}}</li>
+                <li><strong>Teléfono:</strong> {{user.phone}}</li>
+                <li><strong>Ubicación:</strong> {{user.location}}</li>
+                <li><strong>Acerca de mí:</strong> {{user.bio}}</li>
             </ul>
             <div class="button-group">
                 <button onclick="location.href='/profile/edit'">Editar Datos</button>
                 <!-- Button to edit user details -->
-            </div>
-        </div>
-
-        <!-- Box for CV details (studies, skills, experience) -->
-        <div class="box">
-            <h2>Estudios</h2>
-            <ul>
-                {{#studies}}
-                <li>{{.}}</li> <!-- List of studies -->
-                {{/studies}}
-            </ul>
-
-            <h2>Habilidades</h2>
-            <ul>
-                {{#skills}}
-                <li>{{.}}</li> <!-- List of skills -->
-                {{/skills}}
-            </ul>
-            <h2>Experiencia</h2>
-            <span>{{experience}} años</span> <!-- Years of experience -->
-
-            <div class="button-group">
-                <button onclick="location.href='/profile/form'">Editar CV</button> <!-- Button to edit CV -->
             </div>
         </div>
 
