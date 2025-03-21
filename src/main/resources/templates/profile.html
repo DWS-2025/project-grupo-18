@@ -31,7 +31,7 @@
         <!-- Box for profile photo and upload functionality -->
         <div class="box">
             <h2>Foto de Perfil</h2>
-            <img id="profilePhoto" src="{{user.imagePath}}" alt="Foto de perfil"> <!-- Profile photo -->
+            <img id="profilePhoto" src="{{user.imagePath}}" alt="Foto de perfil" class="profile-picture">
 
             <!-- Form for uploading a new profile photo -->
             <form action="/profile/upload_image" method="post" enctype="multipart/form-data">
@@ -48,11 +48,11 @@
         <div class="box">
             <h2>Datos del usuario</h2>
             <ul>
-                <li><strong>Nombre:</strong> {{user.name}}</li> <!-- User name -->
-                <li><strong>Teléfono:</strong> {{user.phone}}</li> <!-- User phone -->
-                <li><strong>Email:</strong> {{user.email}}</li> <!-- User email -->
-                <li><strong>Ubicación:</strong> {{user.location}}</li> <!-- User location -->
-                <li><strong>Acerca de mí:</strong> {{user.bio}}</li> <!-- User bio -->
+                <li><strong>Nombre:</strong> {{user.name}}</li>
+                <li><strong>Email:</strong> {{user.email}}</li>
+                <li><strong>Teléfono:</strong> {{user.phone}}</li>
+                <li><strong>Ubicación:</strong> {{user.location}}</li>
+                <li><strong>Acerca de mí:</strong> {{user.bio}}</li>
             </ul>
             <div class="button-group">
                 <button onclick="location.href='/profile/edit'">Editar Datos</button>
@@ -60,26 +60,26 @@
             </div>
         </div>
 
-        <!-- Box for CV details (studies, skills, experience) -->
+        <!-- Box for managing companies -->
         <div class="box">
-            <h2>Estudios</h2>
+            <h2>Empresas</h2>
             <ul>
-                {{#studies}}
-                <li>{{.}}</li> <!-- List of studies -->
-                {{/studies}}
+                {{#companies}}
+                <li>
+                    <strong>Nombre:</strong> {{name}} <br>
+                    <strong>Ubicación:</strong> {{location}} <br>
+                    <strong>Descripción:</strong> {{bio}} <br>
+                    <div class="button-group">
+                        <button onclick="location.href='/companies/{{id}}/edit'">Editar</button>
+                        <form action="/companies/{{id}}/delete" method="post" style="display:inline;">
+                            <button type="submit">Eliminar</button>
+                        </form>
+                    </div>
+                </li>
+                {{/companies}}
             </ul>
-
-            <h2>Habilidades</h2>
-            <ul>
-                {{#skills}}
-                <li>{{.}}</li> <!-- List of skills -->
-                {{/skills}}
-            </ul>
-            <h2>Experiencia</h2>
-            <span>{{experience}} años</span> <!-- Years of experience -->
-
             <div class="button-group">
-                <button onclick="location.href='/profile/form'">Editar CV</button> <!-- Button to edit CV -->
+                <button onclick="location.href='/companies/new'">Añadir Empresa</button>
             </div>
         </div>
     </div>
@@ -87,7 +87,7 @@
     <!-- Script to handle profile photo upload and display -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const defaultPhoto = "/profile/profile.jpg"; // Default profile photo
+            const defaultPhoto = "/img/profile.jpg"; // Default profile photo
             const storedProfile = localStorage.getItem("profile"); // Retrieve profile data from localStorage
             let profile = storedProfile ? JSON.parse(storedProfile) : {}; // Parse profile data or initialize as empty object
 
@@ -109,6 +109,18 @@
                 }
             });
         });
+
+        function resetProfilePhoto() {
+            fetch('/profile/reset_image', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById("profilePhoto").src = "/img/profile.jpg";
+                    } else {
+                        console.error("Error setting the profile picture.");
+                    }
+                })
+                .catch(error => console.error("Connection error:", error));
+        }
     </script>
 
     <footer>
@@ -117,19 +129,5 @@
     </footer>
 
 </body>
-
-<script>
-    function resetProfilePhoto() {
-        fetch('/profile/reset_image', { method: 'POST' })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById("profilePhoto").src = "/img/profile.jpg";
-                } else {
-                    console.error("Error setting the profile picture.");
-                }
-            })
-            .catch(error => console.error("Connection error:", error));
-    }
-</script>
 
 </html>

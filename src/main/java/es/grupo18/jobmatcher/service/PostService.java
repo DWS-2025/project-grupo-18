@@ -1,73 +1,56 @@
 package es.grupo18.jobmatcher.service;
 
-import es.grupo18.jobmatcher.model.Account;
-import es.grupo18.jobmatcher.model.Post;
-import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import es.grupo18.jobmatcher.model.Post;
+import es.grupo18.jobmatcher.repository.PostRepository;
 
 @Service
 public class PostService {
 
-    private final List<Post> posts = new ArrayList<>();
-    private final AccountService accountService;
+    @Autowired
+    private PostRepository postRepository;
 
-    public PostService(AccountService accountService) {
-        this.accountService = accountService;
+    @Autowired
+    private UserService userService;
+
+    public List<Post> findAllWithAuthors() { // Returns the posts list with authors
+        return postRepository.findAllWithAuthors();
     }
 
-    @PostConstruct
-    public void loadInitialPosts() { // Uploads initial posts
 
-        // Obtains accounts from the account service
-
-        Account microsoft = accountService.findAccountById(2L);
-        Account google = accountService.findAccountById(12L);
-        Account apple = accountService.findAccountById(22L);
-
-        // Creates posts directly in memory
-        
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-        Post post1 = new Post(1L, "Programador - Microsoft",
-        "Buscamos programadores experimentados en .NET para un ambiente flexible en California.",
-        LocalDateTime.now().minusMonths(1).minusDays(1).minusHours(4).minusMinutes(12).format(dtf), "/img/coder.jpg", microsoft);
-
-        Post post2 = new Post(2L, "Ingeniero IA - Google",
-        "Oportunidad para trabajar en inteligencia artificial en California.",
-        LocalDateTime.now().minusMonths(0).minusDays(3).minusHours(6).minusMinutes(45).format(dtf), "/img/ai.jpg", google);
-
-        Post post3 = new Post(3L, "Diseñador UI/UX - Apple",
-        "Únete al equipo de diseño en Cupertino.",
-        LocalDateTime.now().minusMonths(0).minusDays(2).minusHours(1).minusMinutes(1).format(dtf), "/img/cloud_engineer.jpg", apple);
-
-        // Adds posts to the list
-
-        posts.addAll(List.of(post1, post2, post3));
-
-        // Sets posts to their respective accounts
-
-        if (microsoft != null) microsoft.addPost(post1);
-        if (google != null) google.addPost(post2);
-        if (apple != null) apple.addPost(post3);
-
-        System.out.println("Posts uploaded to memory");
+    public List<Post> findAll() { // Returns the posts list in reverse order
+        return postRepository.findAll();
     }
 
-    public List<Post> getAllPosts() { // Returns the posts list in reverse order
-        List<Post> reversedPosts = new ArrayList<>(posts);
-        Collections.reverse(reversedPosts);
-        return Collections.unmodifiableList(reversedPosts);
+    public Optional<Post> findById(long id) { // Returns a post by its id
+        return postRepository.findById(id);
     }
 
-    public void addPost(Post post) { // Adds a new post
-        if (post != null) {
-            posts.add(post);
-        }
+    public void save(Post post) { // Saves a post
+        // Asegúrate de establecer el autor antes de guardar
+        post.setAuthor(userService.getLoggedUser()); // Necesitarás inyectar UserService
+        postRepository.save(post);
     }
-    
+
+    public void update(Post oldPost, Post updatedPost) {
+        oldPost.setTitle(updatedPost.getTitle());
+        oldPost.setContent(updatedPost.getTitle());
+        oldPost.setTimestamp(updatedPost.getTimestamp());
+        oldPost.setImagePath(updatedPost.getImagePath());
+        postRepository.save(oldPost);
+    }
+
+    public void deleteById(long id) { // Deletes a post by its id
+
+    }
+
+    public void delete(Post post) { // Deletes a post
+        postRepository.deleteById(post.getId());
+    }
+
 }

@@ -4,6 +4,7 @@ import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.CompanyService;
 import es.grupo18.jobmatcher.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,24 +13,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/match")
 public class MatchController {
 
-    private final CompanyService companyService;
-    private final UserService userService;
+    @Autowired
+    private CompanyService companyService;
 
-    public MatchController(CompanyService companyService, UserService userService) {
-        this.companyService = companyService;
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
-    @GetMapping("") // Show the match page
+    @GetMapping("/match") // Show the match page
     public String showMatchPage(Model model) {
-        List<Company> companies = companyService.getCompaniesList();
-        User currentUser = userService.getUser();
+        List<Company> companies = companyService.findAll();
+        User currentUser = userService.getLoggedUser();
 
         // Creates two separated lists of companies: favourite and non-favourite
-        List<Company> favouriteCompanies = currentUser.getFavouriteCompanies();
+        List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
         List<Company> nonFavouriteCompanies = new ArrayList<>();
 
         // Evaluates which companies are not in the favourite list
@@ -46,24 +44,24 @@ public class MatchController {
     }
 
     @PostMapping("/addFavourite") // Add a company to the user's favourite list
-    public String addFavourite(@RequestParam String companyName) {
-        User currentUser = userService.getUser();
-        Company company = companyService.getCompanyByName(companyName);
+    public String addFavourite(@RequestParam long companyId) {
+        User currentUser = userService.getLoggedUser();
+        Company company = companyService.findById(companyId);
 
-        if (company != null && !currentUser.getFavouriteCompanies().contains(company)) {
-            currentUser.addFavouriteCompany(company);
+        if (company != null) {
+            userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
         }
 
         return "redirect:/match"; // Recharges the match page to show updates
     }
 
     @PostMapping("/removeFavourite") // Remove a company from the user's favourite list
-    public String removeFavourite(@RequestParam String companyName, @RequestParam String origin) {
-        User currentUser = userService.getUser();
-        Company company = companyService.getCompanyByName(companyName);
+    public String removeFavourite(@RequestParam long companyId, @RequestParam String origin) {
+        User currentUser = userService.getLoggedUser();
+        Company company = companyService.findById(companyId);
 
         if (company != null) {
-            currentUser.removeFavouriteCompany(company);
+            userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
         }
 
         return "redirect:" + origin;
@@ -71,13 +69,13 @@ public class MatchController {
 
     @GetMapping("/consultant") // Show the consultant match page
     public String showConsultantMatchPage(Model model) {
-        User currentUser = userService.getUser();
-        List<Company> favouriteCompanies = currentUser.getFavouriteCompanies();
+        User currentUser = userService.getLoggedUser();
+        List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
         List<Company> mutualMatchCompanies = new ArrayList<>();
 
         // Filters companies that have the user in their favourite list
         for (Company company : favouriteCompanies) {
-            if (company.getFavouriteUsers().contains(currentUser)) {
+            if (companyService.isUserFavourite(company.getId(), currentUser)) {
                 mutualMatchCompanies.add(company);
             }
         }

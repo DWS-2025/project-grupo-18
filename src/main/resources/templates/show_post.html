@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Otros estilos o scripts -->
+</head>
+<body>
+    <header>
+        <button onclick="location.href='/posts'">Volver</button>
+        <!-- Botones para editar y borrar -->
+        <button onclick="location.href='/posts/{{id}}/edit'">Editar</button>
+        <form action="/posts/{{id}}/delete" method="post" style="display:inline;">
+            <button type="submit">Borrar</button>
+        </form>
+    </header>
+    <main>
+        <h1>{{title}}</h1>
+        <img src="{{imagePath}}" alt="{{title}}">
+        <div>
+            <p>{{content}}</p>
+            <p><strong>Fecha:</strong> {{timestamp}}</p>
+            <p><strong>Autor:</strong> {{owner.name}}</p>
+        </div>
+
+        <!-- Sección de comentarios -->
+        <section id="comments">
+            <h2>Comentarios</h2>
+            {{#reviews}}
+            <div class="comment">
+                <p>{{text}} (rating: {{rating}})</p>
+                <p><strong>Por:</strong> {{author.name}}</p>
+                <!-- Botones para editar y borrar cada comentario -->
+                <form action="/posts/{{post.id}}/reviews/{{id}}/delete" method="post" style="display:inline;">
+                    <button type="submit">Borrar comentario</button>
+                </form>
+                <!-- Podrías incluir un enlace o formulario para editar el comentario -->
+            </div>
+            {{/reviews}}
+            <!-- Formulario para añadir un nuevo comentario -->
+            <form action="/posts/{{id}}/reviews/new" method="post">
+                <textarea name="text" placeholder="Escribe tu comentario"></textarea>
+                <input type="number" name="rating" min="1" max="5" placeholder="Rating">
+                <button type="submit">Añadir comentario</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+</body>
+</html>
