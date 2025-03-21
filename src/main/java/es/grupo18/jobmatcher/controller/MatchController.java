@@ -90,7 +90,7 @@ public class MatchController {
         return "matchConsultant";
     }
 
-    @GetMapping("/company/{id}") 
+    @GetMapping("/company/{companyId}") 
     public String getCompanyPage(@PathVariable Long id, Model model) {
         try {
             Company company = companyService.findById(id);

@@ -32,8 +32,6 @@ public class PostController {
         return "posts";
     }
 
-
-
     @GetMapping("/posts/new")
     public String showNewPostForm(Model model) {
         model.addAttribute("post", new Post());
@@ -46,7 +44,7 @@ public class PostController {
         return "saved_post";
     }
 
-    @GetMapping("/posts/{id}")
+    @GetMapping("/posts/{postId}")
     public String getPost(Model model, @PathVariable long id) {
         Optional<Post> post = postService.findById(id);
         if (post.isPresent()) {
@@ -57,7 +55,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/posts/{id}/edit")
+    @GetMapping("/posts/{postId}/edit")
     public String editPost(Model model, @PathVariable long id) {
         Optional<Post> post = postService.findById(id);
         if (post.isPresent()) {
@@ -68,7 +66,7 @@ public class PostController {
         }
     }
 
-    @PostMapping("/posts/{id}/edit")
+    @PostMapping("/posts/{postId}/edit")
     public String updatePost(Model model, @PathVariable long id, Post updatedPost) {
         Optional<Post> op = postService.findById(id);
         if (op.isPresent()) {
@@ -80,7 +78,7 @@ public class PostController {
         }
     }
 
-    @PostMapping("/posts/{id}/delete")
+    @PostMapping("/posts/{postId}/delete")
     public String deletePost(@PathVariable long id) {
         Optional<Post> op = postService.findById(id);
         if (op.isPresent()) {
