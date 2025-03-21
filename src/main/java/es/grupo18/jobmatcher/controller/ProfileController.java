@@ -95,7 +95,7 @@ public class ProfileController {
         return "redirect:/companies";
     }
 
-    @GetMapping("/companies/{id}")
+    @GetMapping("/companies/{companyId}")
     public String getCompany(Model model, @PathVariable long id) {
         Optional<Company> company = Optional.ofNullable(companyService.findById(id));
         if (company.isPresent()) {
@@ -106,7 +106,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/companies/{id}/edit")
+    @GetMapping("/companies/{companyId}/edit")
     public String editCompany(Model model, @PathVariable long id) {
         Optional<Company> company = Optional.ofNullable(companyService.findById(id));
         if (company.isPresent()) {
@@ -117,7 +117,7 @@ public class ProfileController {
         }
     }
 
-    @PostMapping("/companies/{id}/edit")
+    @PostMapping("/companies/{companyId}/edit")
     public String updateCompany(Model model, @PathVariable long id, Company updatedCompany) {
         Optional<Company> op = Optional.ofNullable(companyService.findById(id));
         if (op.isPresent()) {
@@ -129,7 +129,7 @@ public class ProfileController {
         }
     }
 
-    @PostMapping("/companies/{id}/delete")
+    @PostMapping("/companies/{companyId}/delete")
     public String deleteCompany(@PathVariable long id) {
         Optional<Company> op = Optional.ofNullable(companyService.findById(id));
         if (op.isPresent()) {

@@ -115,6 +115,12 @@
  			<artifactId>h2</artifactId>
  		</dependency>
 
+		<dependency>
+    		<groupId>com.mysql</groupId>
+    		<artifactId>mysql-connector-j</artifactId>
+    		<version>8.0.33</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
