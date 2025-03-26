@@ -1,5 +1,6 @@
 package es.grupo18.jobmatcher.model;
 
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
@@ -25,7 +27,9 @@ public class User {
     private String location;
     private String bio;
     private int experience;
-    private String imagePath;
+
+    @Lob
+    private Blob imageFile;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewsList;
@@ -42,7 +46,7 @@ public class User {
 
     // Complete constructor
 
-    public User(String name, String email, String password, String phone, String location, String bio, int experience, String imagePath,
+    public User(String name, String email, String password, String phone, String location, String bio, int experience, Blob imageFile,
     List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
         this.name = name;
         this.email = email;
@@ -51,7 +55,7 @@ public class User {
         this.location = location;
         this.bio = bio;
         this.experience = experience;
-        this.imagePath = imagePath;
+        this.imageFile = imageFile;
         this.reviewsList = (reviewsList != null) ? new ArrayList<>(reviewsList) : new ArrayList<>();
         this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
         this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList) : new ArrayList<>();
@@ -91,8 +95,8 @@ public class User {
         return experience;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public Blob getImageFile() {
+        return imageFile;
     }
 
     public List<Review> getReviews() {
@@ -141,8 +145,8 @@ public class User {
         this.experience = experience;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageFile(Blob imageFile) {
+        this.imageFile = imageFile;
     }
 
     public void setReviews(List<Review> reviewsList) {
@@ -155,6 +159,23 @@ public class User {
 
     public void setFavouriteCompaniesList(List<Company> favouriteCompaniesList) {
         this.favouriteCompaniesList = favouriteCompaniesList;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", location='" + location + '\'' +
+                ", bio='" + bio + '\'' +
+                ", experience='" + experience + '\'' +
+                ", reviewsList=" + reviewsList + '\'' +
+                ", postsList=" + postsList + '\'' +
+                ", favouriteCompaniesList=" + favouriteCompaniesList + '\'' +
+                '}';
     }
 
 }

@@ -1,9 +1,13 @@
 package es.grupo18.jobmatcher.service;
 
+import java.io.IOException;
+import java.sql.Blob;
 import java.util.List;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
@@ -35,6 +39,14 @@ public class UserService {
 
     public void save(User user) { // Saves a user
         userRepository.save(user);
+    }
+
+    public void save(User user, MultipartFile imageFile) throws IOException { // Saves a user with an image
+        if (!imageFile.isEmpty()) {
+            user.setImageFile(BlobProxy.generateProxy(imageFile.getInputStream(),
+                    imageFile.getSize()));
+        }
+        this.save(user);
     }
 
     public void update(String name, String email, String password, String phone, String location, String bio,
@@ -78,12 +90,12 @@ public class UserService {
 
     public void removeImage() {
         User user = getLoggedUser();
-        user.setImagePath(null);
+        user.setImageFile(null);
     }
 
-    public void updateUserImage(String imagePath) { // Updates the user's image
+    public void updateUserImage(MultipartFile imageFile) { // Updates the user's image
         User user = getLoggedUser();
-        user.setImagePath(imagePath);
+        user.setImageFile((Blob) imageFile);
     }
 
 }

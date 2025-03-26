@@ -28,12 +28,12 @@ public class DataGeneratorService {
     public void init() {
 
         User testing = new User("Testing", "testing@gmail.com", "password123", "666666666", "Madrid",
-                "I'm a testing user", 2, "https://www.google.com", null, null, null);
+                "I'm a testing user", 2, null, null, null, null);
         userRepository.save(testing);
 
         User martina = new User("Martina", "martinini@gmail.com", "martinini123", "659801423", "Vicálvaro",
                 "Busco a alguien para que haga mi trabajo", 2,
-                "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/025.png", null, null, null);
+                null, null, null, null);
         userRepository.save(martina);
 
         Post post = new Post("Test", "This is a test post", "12-03-2025", "https://www.google.com");

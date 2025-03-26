@@ -27,49 +27,41 @@
     <!-- Form for editing profile information -->
     <div class="container">
         <div class="box">
-            <h1>Editar perfil</h1> <!-- Form title -->
+            <h1>Editar Perfil</h1>
             <form id="profileEditorForm" method="post" action="/profile/edit">
-                <!-- Input group for name -->
                 <div class="input-group">
                     <label for="name">Nombre:</label>
-                    <input type="text" id="name" name="name" value="{{name}}" required minlength="2" maxlength="50">
-                    <!-- Name input (required, 2-50 characters) -->
+                    <input type="text" id="name" name="name" value="{{user.name}}" required minlength="2" maxlength="50">
                 </div>
-                <!-- Input group for email -->
                 <div class="input-group">
                     <label for="email">Correo Electrónico:</label>
-                    <input type="email" id="email" name="email" value="{{email}}" required>
-                    <!-- Email input (required) -->
+                    <input type="email" id="email" name="email" value="{{user.email}}" required>
                 </div>
-                <!-- Input group for phone -->
                 <div class="input-group">
                     <label for="phone">Teléfono:</label>
-                    <input type="tel" id="phone" name="phone" value="{{phone}}" pattern="^\+?[0-9\s\-]{7,15}$">
-                    <!-- Phone input (optional, with validation) -->
+                    <input type="tel" id="phone" name="phone" value="{{user.phone}}" pattern="^\+?[0-9\s\-]{7,15}$">
                 </div>
-                <!-- Input group for location -->
                 <div class="input-group">
                     <label for="location">Ubicación:</label>
-                    <input type="text" id="location" name="location" value="{{location}}" maxlength="100">
-                    <!-- Location input (optional, max 100 characters) -->
+                    <input type="text" id="location" name="location" value="{{user.location}}" maxlength="100">
                 </div>
-                <!-- Input group for bio -->
                 <div class="input-group">
                     <label for="bio">Biografía:</label>
-                    <textarea id="bio" name="bio" rows="4" required maxlength="500">{{bio}}</textarea>
-                    <!-- Bio textarea (required, max 500 characters) -->
+                    <textarea id="bio" name="bio" rows="4" required maxlength="500">{{user.bio}}</textarea>
                 </div>
-                <!-- Button to submit the form -->
+                <div class="input-group">
+                    <label for="experience">Experiencia (años):</label>
+                    <input type="number" id="experience" name="experience" value="{{user.experience}}" min="0" max="50">
+                </div>
                 <div class="button-group">
-                    <button type="submit">Guardar Cambios</button> <!-- Submit button -->
+                    <button type="submit">Guardar Cambios</button>
                 </div>
             </form>
         </div>
     </div>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
-        </div>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
     </footer>
 
 </body>
