@@ -24,21 +24,23 @@ public class Company {
     private String imagePath;
 
     @ManyToMany(mappedBy = "favouriteCompaniesList")
-    private List<User> favouriteUsersList;
+    private List<User> favouriteUsersList = new ArrayList<>();
 
     public Company() {
     }
 
     // Complete constructor
 
-    public Company(String name, String email, String password, String location, String bio, String imagePath, List<User> favouriteUsersList) {
+    public Company(String name, String email, String password, String location, String bio, String imagePath,
+            List<User> favouriteUsersList) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.location = location;
         this.bio = bio;
         this.imagePath = imagePath;
-        this.favouriteUsersList = (favouriteUsersList != null) ? new ArrayList<>(favouriteUsersList) : new ArrayList<>();
+        this.favouriteUsersList = (favouriteUsersList != null) ? new ArrayList<>(favouriteUsersList)
+                : new ArrayList<>();
     }
 
     // Getters

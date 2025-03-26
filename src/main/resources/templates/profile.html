@@ -12,7 +12,7 @@
     <script src="/js/darkMode.js" defer></script>
 </head>
 
-<body>
+<body class="page-centered">
 
     <header>
         <div class="header-left">
@@ -31,13 +31,16 @@
         <!-- Profile photo -->
         <div class="box">
             <h2>Foto de Perfil</h2>
-            <img id="profilePhoto" src="/profile/upload_image" alt="Foto de perfil" class="profile-picture">
+            <img id="profilePhoto" src="/profile/image" alt="Foto de perfil" class="profile-picture"
+                onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
             <div class="button-group">
                 <form action="/profile/reset_image" method="post" style="display:inline;">
                     <button type="submit">Restablecer Foto</button>
                 </form>
-                <form action="/profile/upload" method="post" enctype="multipart/form-data" style="display:inline;">
-                    <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;" onchange="this.form.submit();">
+                <form action="/profile/upload_image" method="post" enctype="multipart/form-data"
+                    style="display:inline;">
+                    <input type="file" id="photoInput" name="imageFile" accept="image/*" style="display:none;"
+                        onchange="this.form.submit();">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
             </div>
@@ -61,7 +64,8 @@
     </div>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        </div>
     </footer>
 
 </body>

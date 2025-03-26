@@ -1,7 +1,6 @@
 package es.grupo18.jobmatcher.service;
 
 import java.io.IOException;
-import java.sql.Blob;
 import java.util.List;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -93,9 +92,12 @@ public class UserService {
         user.setImageFile(null);
     }
 
-    public void updateUserImage(MultipartFile imageFile) { // Updates the user's image
-        User user = getLoggedUser();
-        user.setImageFile((Blob) imageFile);
+    public void updateUserImage(MultipartFile imageFile) throws IOException {
+        if (!imageFile.isEmpty()) {
+            User user = getLoggedUser();
+            user.setImageFile(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
+            save(user);
+        }
     }
 
 }

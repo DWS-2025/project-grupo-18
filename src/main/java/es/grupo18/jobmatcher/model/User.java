@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -38,16 +40,19 @@ public class User {
     private List<Post> postsList;
 
     @ManyToMany
-    private List<Company> favouriteCompaniesList;
+    @JoinTable(name = "user_company_favourites", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "company_id"))
+    private List<Company> favouriteCompaniesList = new ArrayList<>();
 
     // Empty constructor for initializations
 
-    public User() {}
+    public User() {
+    }
 
     // Complete constructor
 
-    public User(String name, String email, String password, String phone, String location, String bio, int experience, Blob imageFile,
-    List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
+    public User(String name, String email, String password, String phone, String location, String bio, int experience,
+            Blob imageFile,
+            List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -58,7 +63,8 @@ public class User {
         this.imageFile = imageFile;
         this.reviewsList = (reviewsList != null) ? new ArrayList<>(reviewsList) : new ArrayList<>();
         this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
-        this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList) : new ArrayList<>();
+        this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList)
+                : new ArrayList<>();
     }
 
     // Getters

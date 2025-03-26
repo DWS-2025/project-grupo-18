@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @Entity
 public class Review {
@@ -14,6 +16,9 @@ public class Review {
     private long id;
 
     private String text;
+
+    @Min(1)
+    @Max(5)
     private int rating;
 
     @ManyToOne
