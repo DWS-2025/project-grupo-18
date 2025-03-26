@@ -49,7 +49,7 @@ public class MatchController {
         return "match";
     }
     */
-    
+
     @PostMapping("/addFavourite") // Add a company to the user's favourite list
     public String addFavourite(@RequestParam long companyId) {
         User currentUser = userService.getLoggedUser();
@@ -102,4 +102,5 @@ public class MatchController {
             return "error"; 
         }
     }
+
 }
