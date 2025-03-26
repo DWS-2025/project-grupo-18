@@ -26,6 +26,7 @@ public class MatchController {
     @Autowired
     private UserService userService;
 
+    /*
     @GetMapping("/match") // Show the match page
     public String showMatchPage(Model model) {
         List<Company> companies = companyService.findAll();
@@ -47,7 +48,8 @@ public class MatchController {
 
         return "match";
     }
-
+    */
+    
     @PostMapping("/addFavourite") // Add a company to the user's favourite list
     public String addFavourite(@RequestParam long companyId) {
         User currentUser = userService.getLoggedUser();

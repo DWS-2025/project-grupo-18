@@ -5,9 +5,9 @@ import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.CompanyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CompanyService {
@@ -15,12 +15,20 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
-    public List<Company> findAll() {
-        return companyRepository.findAll();
+    public Page<Company> findAll(Pageable pageable) {
+        return companyRepository.findAll(pageable);
     }
 
     public Company findById(long id) {
         return companyRepository.findById(id).orElse(null);
+    }
+
+    public Page<Company> findPaginated(Pageable pageable) {
+        return companyRepository.findAll(pageable);
+    }    
+
+    public long count() {
+        return companyRepository.count();
     }
 
     public void save(Company company) { // Saves a company
@@ -30,7 +38,6 @@ public class CompanyService {
     public void update(Company oldCompany, Company updatedCompany) {
         oldCompany.setName(updatedCompany.getName());
         oldCompany.setEmail(updatedCompany.getEmail());
-        oldCompany.setPassword(updatedCompany.getPassword());
         oldCompany.setLocation(updatedCompany.getLocation());
         oldCompany.setBio(updatedCompany.getBio());
         oldCompany.setImagePath(updatedCompany.getImagePath());
@@ -38,7 +45,7 @@ public class CompanyService {
     }
     
     public void deleteById(long id) { // Deletes a company by its id
-
+        companyRepository.deleteById(id);
     }
 
     public void delete(Company company) { // Deletes a company

@@ -22,7 +22,6 @@ public class PostService {
         return postRepository.findAllWithAuthors();
     }
 
-
     public List<Post> findAll() { // Returns the posts list in reverse order
         return postRepository.findAll();
     }
@@ -32,8 +31,7 @@ public class PostService {
     }
 
     public void save(Post post) { // Saves a post
-        // Asegúrate de establecer el autor antes de guardar
-        post.setAuthor(userService.getLoggedUser()); // Necesitarás inyectar UserService
+        post.setAuthor(userService.getLoggedUser());
         postRepository.save(post);
     }
 

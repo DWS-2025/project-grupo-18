@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 
 @Entity(name = "CompanyTable")
@@ -18,12 +20,12 @@ public class Company {
 
     private String name;
     private String email;
-    private String password;
     private String location;
     private String bio;
     private String imagePath;
 
-    @ManyToMany(mappedBy = "favouriteCompaniesList")
+    @ManyToMany
+    @JoinTable(name = "user_company_favourites", joinColumns = @JoinColumn(name = "company_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> favouriteUsersList = new ArrayList<>();
 
     public Company() {
@@ -31,11 +33,10 @@ public class Company {
 
     // Complete constructor
 
-    public Company(String name, String email, String password, String location, String bio, String imagePath,
+    public Company(String name, String email, String location, String bio, String imagePath,
             List<User> favouriteUsersList) {
         this.name = name;
         this.email = email;
-        this.password = password;
         this.location = location;
         this.bio = bio;
         this.imagePath = imagePath;
@@ -55,10 +56,6 @@ public class Company {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getLocation() {
@@ -91,10 +88,6 @@ public class Company {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setLocation(String location) {
         this.location = location;
     }
@@ -117,7 +110,6 @@ public class Company {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", location='" + location + '\'' +
                 ", bio='" + bio + '\'' +
                 ", imagePath='" + imagePath + '\'' +

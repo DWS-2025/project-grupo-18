@@ -1,0 +1,112 @@
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    padding: 80px 40px 40px 40px;
+    justify-items: center;
+    align-items: stretch;
+    min-height: calc(100vh - 160px);
+    box-sizing: border-box;
+}
+
+.company-item {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 220px;
+    min-height: 180px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.company-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.company-item a {
+    color: #0077b6;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.company-item a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.company-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px;
+    padding: 0 20px 40px 20px;
+}
+
+.company-page h1 {
+    margin-bottom: 20px;
+    color: #0077b6;
+}
+
+.company-image img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+.company-details {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.company-details p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.company-delete-button {
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.company-delete-button button {
+    background-color: #e63946;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.company-delete-button button:hover {
+    background-color: #d62828;
+    transform: scale(1.05);
+}

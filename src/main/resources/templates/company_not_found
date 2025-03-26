@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresa no encontrada</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/companiesStyles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+
+<body class="page-centered">
+
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/companies'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>❌ Empresa no encontrada</h1>
+        <p>La empresa que estás buscando no existe o ha sido eliminada.</p>
+        <div class="pagination">
+            <a href="/companies">Volver al listado de empresas</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+
+</body>
+
+</html>

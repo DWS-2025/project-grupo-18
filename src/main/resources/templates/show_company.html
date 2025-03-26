@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{company.name}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/companiesStyles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+
+<body class="page-centered">
+
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/companies'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button onclick="location.href='/companies/{{company.id}}/edit'">Editar Empresa</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>{{company.name}}</h1>
+
+        <div class="company-details">
+            {{#company.imagePath}}
+            <div class="company-image">
+                <img src="{{company.imagePath}}" alt="Imagen de {{company.name}}">
+            </div>
+            {{/company.imagePath}}
+
+            <div class="company-info">
+                <p><strong>📍 Localización:</strong> {{company.location}}</p>
+                <p><strong>✉️ Email:</strong> {{company.email}}</p>
+                <p><strong>📝 Bio:</strong> {{company.bio}}</p>
+            </div>
+        </div>
+
+        <form method="post" action="/companies/{{company.id}}/delete"
+            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
+            <button class="delete-btn" type="submit">🗑️ Eliminar Empresa</button>
+        </form>
+    </main>
+
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+
+</body>
+
+</html>
