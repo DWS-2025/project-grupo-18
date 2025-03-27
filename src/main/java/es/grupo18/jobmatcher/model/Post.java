@@ -1,5 +1,7 @@
 package es.grupo18.jobmatcher.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class Post {
 
     private String title;
     private String content;
-    private String timestamp;
+    private LocalDateTime timestamp;
     private String imagePath;
 
     @ManyToOne
@@ -36,11 +38,19 @@ public class Post {
 
     // Complete without ID
 
-    public Post(String title, String content, String timestamp, String imagePath) {
+    public Post(String title, String content, LocalDateTime timestamp, String imagePath) {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
         this.imagePath = imagePath;
+    }
+
+    public Post(String title, String content, LocalDateTime timestamp, String imagePath, User author) {
+        this.title = title;
+        this.content = content;
+        this.timestamp = timestamp;
+        this.imagePath = imagePath;
+        this.author = author;
     }
 
     // Getters
@@ -57,7 +67,7 @@ public class Post {
         return content;
     }
 
-    public String getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
@@ -87,7 +97,7 @@ public class Post {
         this.content = content;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -101,6 +111,12 @@ public class Post {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getFormattedTimestamp() {
+        if (timestamp == null)
+            return "";
+        return timestamp.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
     }
 
     @Override

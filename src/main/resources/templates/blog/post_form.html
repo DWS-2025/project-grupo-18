@@ -15,7 +15,7 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="location.href='/blog'">⬅️ Atrás</button>
+            <button class="back-btn" onclick="location.href='{{#isEdit}}/blog/posts/{{post.id}}{{/isEdit}}{{^isEdit}}/blog/posts{{/isEdit}}'">⬅️ Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
@@ -29,22 +29,21 @@
     <main class="container">
         <div class="box">
             <h1>Nueva Noticia</h1> <!-- Form title -->
-            <form id="newPostForm" method="post" action="/blog/newpost">
+            <form id="postForm" method="post" action="{{#isEdit}}/blog/posts/{{post.id}}/edit{{/isEdit}}{{^isEdit}}/blog/posts/new{{/isEdit}}">
                 <!-- Input group for the post title -->
                 <div class="input-group">
                     <label for="title">Título:</label>
-                    <input type="text" id="title" name="title" required> <!-- Title input (required) -->
+                    <input name="title" value="{{#isEdit}}{{post.title}}{{/isEdit}}"> <!-- Title input (required) -->
                 </div>
                 <!-- Input group for the post content -->
                 <div class="input-group">
                     <label for="content">Contenido:</label>
-                    <textarea id="content" name="content" rows="10" required maxlength="500"></textarea>
-                    <!-- Content textarea (required, max 500 characters) -->
+                    <textarea id="content" name="content" rows="10" required maxlength="500" value="{{#isEdit}}{{post.content}}{{/isEdit}}">{{#isEdit}}{{post.content}}{{/isEdit}}</textarea> <!-- Content textarea (required, max 500 characters) -->
                 </div>
                 <!-- Input group for the post image URL -->
                 <div class="input-group">
                     <label for="imagePath">Imagen (URL):</label>
-                    <input type="text" id="imagePath" name="imagePath"> <!-- Image URL input (optional) -->
+                    <input type="text" id="imagePath" name="imagePath" value="{{#isEdit}}{{post.imagePath}}{{/isEdit}}"> <!-- Image URL input (optional) -->
                 </div>
                 <!-- Button to submit the form -->
                 <div class="button-group">

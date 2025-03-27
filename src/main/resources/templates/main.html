@@ -23,8 +23,16 @@
     <!-- Header section with options button, title, and profile button -->
     <header>
         <div class="header-left">
+
             <!-- Button to navigate to the options page -->
             <button id="companies-btn" onclick="location.href='/companies'">🏢 Empresas</button>
+
+            <!-- Toggle switch for dark mode -->
+            <label class="switch">
+                <input type="checkbox" id="darkModeSwitch"> <!-- Checkbox for the toggle -->
+                <span class="slider round"></span> <!-- Slider element -->
+            </label>
+
         </div>
         <div class="title">
             <!-- Link to the main page -->
@@ -45,9 +53,11 @@
             <!-- Button to consult matches -->
             <button onclick="location.href='/consultant'">🤝 Consulta tus match</button>
             <!-- Button to visit the blog -->
-            <button onclick="location.href='/posts'">📰 Visita nuestro blog</button>
+            <button onclick="location.href='/blog/posts'">📰 Visita nuestro blog</button>
             <!-- Button to view all users -->
             <button onclick="location.href='/users'">👥 Ver usuarios</button>
+            <!-- Button to H2 database EN DESARROLLO (BORRAR)-->
+            <button onclick="location.href='http://127.0.0.1:8080/h2-console'">Ir a H2 Console (BORRAR)</button>
         </section>
         <!-- Right section with an image -->
         <section class="right-section">

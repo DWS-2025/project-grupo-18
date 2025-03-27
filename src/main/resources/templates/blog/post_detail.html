@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{post.title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/blogStyles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+
+<body class="page-centered">
+
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/blog/posts'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button class="hidden-button"></button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="blog-posts">
+            <div class="box">
+                <h1>{{post.title}}</h1>
+                {{#post.imagePath}}
+                <img src="{{post.imagePath}}" alt="{{post.title}}" class="post-image">
+                {{/post.imagePath}}
+                <p>{{post.content}}</p>
+                <p><strong>Fecha:</strong> {{post.formattedTimestamp}}</p>
+                <p><strong>Autor:</strong> {{post.author.name}}</p>
+            </div>
+            <div class="button-group">
+                <button onclick="location.href='/blog/posts/{{post.id}}/edit'">Editar</button>
+                <form action="/blog/posts/{{post.id}}/delete" method="post" style="display:inline;">
+                    <button type="submit">Borrar</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+
+</body>
+
+</html>

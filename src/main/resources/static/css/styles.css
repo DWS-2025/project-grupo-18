@@ -146,6 +146,8 @@ button {
     text-decoration: none;
     display: inline-block;
     height: auto;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 /* Hidden button styles */

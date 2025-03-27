@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobMatcher - Blog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/blogStyles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+
+<body class="page-centered">
+
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/main'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button id="post-btn" onclick="location.href='/blog/posts/new'">Nuevo post</button>
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <form method="get" action="/blog/posts" class="filter-form box" style="margin-bottom: 2em;">
+            <h2>Filtrar publicaciones</h2>
+
+            <label for="from">Desde:</label>
+            <input type="datetime-local" id="from" name="from" value="{{from}}">
+
+
+            <label for="to">Hasta:</label>
+            <input type="datetime-local" id="to" name="to" value="{{to}}">
+
+            <label for="sort">Orden:</label>
+            <select id="sort" name="sort">
+                <option value="">-- Sin ordenar --</option>
+                <option value="asc" {{#sortIsAsc}}selected{{/sortIsAsc}}>Más antiguos primero</option>
+                <option value="desc" {{#sortIsDesc}}selected{{/sortIsDesc}}>Más recientes primero</option>
+
+            </select>
+
+            <button type="submit" class="btn">Aplicar filtros</button>
+        </form>
+
+        <section class="blog-posts">
+            {{#posts}}
+            <div class="box">
+                <a href="/blog/posts/{{id}}">
+                    <h1>{{title}}</h1>
+                </a>
+                {{#imagePath}}
+                <img src="{{imagePath}}" alt="{{title}}" class="post-image">
+                {{/imagePath}}
+                <p>{{content}}</p>
+                <p><strong>Fecha:</strong>{{formattedTimestamp}}</p>
+                <p><strong>Autor:</strong> {{author.name}}</p>
+            </div>
+            {{/posts}}
+
+            {{^posts}}
+            <div class="box">
+                <p>No hay publicaciones todavía.</p>
+            </div>
+            {{/posts}}
+        </section>
+    </main>
+
+
+
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
+    </footer>
+
+</body>
+
+</html>
