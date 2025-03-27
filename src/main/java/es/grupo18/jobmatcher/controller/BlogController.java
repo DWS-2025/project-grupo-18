@@ -12,11 +12,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.model.Review;
+import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
 
@@ -87,9 +89,14 @@ public class BlogController {
 
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
-        Optional<Post> post = postService.findById(postId);
-        if (post.isPresent()) {
-            model.addAttribute("post", post.get());
+        Optional<Post> postOpt = postService.findById(postId);
+        if (postOpt.isPresent()) {
+            Post post = postOpt.get();
+            if (post.getReviews() == null) {
+                post.setReviews(new ArrayList<>());
+            }
+            model.addAttribute("post", post);
+            model.addAttribute("postId", postId); // Añade el postId explícitamente
             return "blog/post_detail";
         } else {
             return "post_not_found";
@@ -142,6 +149,33 @@ public class BlogController {
         } else {
             return "post_not_found";
         }
+    }
+
+    @GetMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
+    public String editReview(Model model, @PathVariable long postId, @PathVariable long reviewId) {
+        Optional<Post> post = postService.findById(postId);
+        if (post.isPresent()) {
+            Optional<Review> review = reviewService.findById(reviewId);
+            if (review.isPresent()) {
+                model.addAttribute("post", post.get());
+                model.addAttribute("review", review.get());
+                return "blog/review_form";
+            }
+        }
+        return "post_not_found";
+    }
+
+    @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
+    public String updateReview(@PathVariable long postId, @PathVariable long reviewId, Review updatedReview) {
+        Optional<Review> reviewOpt = reviewService.findById(reviewId);
+        if (reviewOpt.isPresent()){
+            Review review = reviewOpt.get();
+            review.setText(updatedReview.getText());
+            review.setRating(updatedReview.getRating());
+            reviewService.update(review, updatedReview);
+            return "redirect:/blog/posts/" + postId;
+        }
+        return "post_not_found";
     }
 
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/delete")

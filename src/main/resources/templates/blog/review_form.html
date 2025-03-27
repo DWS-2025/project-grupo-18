@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Reseña</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+<body class="page-centered">
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/blog/posts/{{post.id}}'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button class="hidden-button"></button>
+        </div>
+    </header>
+    <main class="container">
+        <div class="box">
+            <h1>Editar Reseña</h1>
+            <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/edit" method="post">
+                <div class="input-group">
+                    <label for="text">Reseña:</label>
+                    <textarea id="text" name="text" required>{{review.text}}</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="rating">Rating (1-5):</label>
+                    <input id="rating" type="number" name="rating" min="1" max="5" value="{{review.rating}}" required>
+                </div>
+                <button type="submit">Actualizar reseña</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+</body>
+</html>

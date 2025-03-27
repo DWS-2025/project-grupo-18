@@ -13,7 +13,6 @@
 </head>
 
 <body class="page-centered">
-
     <header>
         <div class="header-left">
             <button class="back-btn" onclick="location.href='/blog/posts'">⬅️ Atrás</button>
@@ -44,13 +43,53 @@
                 </form>
             </div>
         </section>
-    </main>
 
+        <!-- Sección de reseñas -->
+
+    
+        <section class="reviews">
+            <h2>Reseñas</h2>
+            <!-- Listado de reseñas -->
+            {{#post.reviews}}
+            <div class="review box">
+                <p>{{text}}</p>
+                <p><strong>Rating:</strong> {{rating}} / 5</p>
+                <p><strong>Autor:</strong> {{author.name}}</p>
+                <!-- Botones para editar y borrar la reseña -->
+                <div class="button-group">
+                    <a class="button" href="/blog/posts/{{postId}}/reviews/{{id}}/edit">Editar</a>
+                    <form action="/blog/posts/{{postId}}/reviews/{{id}}/delete" method="post" style="display:inline;">
+                        <button type="submit">Borrar</button>
+                    </form>
+                </div>
+            </div>
+            {{/post.reviews}}
+            <!-- Mensaje cuando no hay reseñas -->
+            {{^post.reviews}}
+            <p>No hay reseñas aún para este post. ¡Sé el primero en comentar!</p>
+            {{/post.reviews}}
+        
+            <!-- Formulario para añadir nueva reseña -->
+            <div class="new-review box">
+                <h3>Añadir una nueva reseña</h3>
+                <form action="/blog/posts/{{post.id}}/reviews/new" method="post">
+                    <div class="input-group">
+                        <label for="text">Reseña:</label>
+                        <textarea id="text" name="text" required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="rating">Rating (1-5):</label>
+                        <input type="number" id="rating" name="rating" min="1" max="5" required>
+                    </div>
+                    <button type="submit">Enviar reseña</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
 
     <footer>
         <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
     </footer>
-
 </body>
-
 </html>

@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
@@ -21,14 +24,19 @@ public class Post {
     private long id;
 
     private String title;
+
+    @Column(length = 1000) // Aumenta la longitud de content a 1000 caracteres
     private String content;
+
     private LocalDateTime timestamp;
+
     private String imagePath;
+
 
     @ManyToOne
     private User author;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Review> reviews = new ArrayList<>();
 
     // Only generates new ID
@@ -80,6 +88,9 @@ public class Post {
     }
 
     public List<Review> getReviews() {
+        if (reviews == null) {
+            reviews = new ArrayList<>();
+        }
         return reviews;
     }
 
