@@ -56,11 +56,13 @@
                 <a href="/blog/posts/{{id}}">
                     <h1>{{title}}</h1>
                 </a>
-                {{#imagePath}}
-                <img src="{{imagePath}}" alt="{{title}}" class="post-image">
-                {{/imagePath}}
+                {{#hasImage}}
+                <div class="post-image-container">
+                    <img src="/blog/posts/{{id}}/image" alt="Imagen del post" class="post-image">
+                </div>
+                {{/hasImage}}
                 <p>{{content}}</p>
-                <p><strong>Fecha:</strong>{{formattedTimestamp}}</p>
+                <p><strong>Fecha:</strong> {{formattedTimestamp}}</p>
                 <p><strong>Autor:</strong> {{author.name}}</p>
             </div>
             {{/posts}}

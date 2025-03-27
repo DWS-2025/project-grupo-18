@@ -1,10 +1,15 @@
 package es.grupo18.jobmatcher.service;
 
 import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.Post;
@@ -28,10 +33,10 @@ public class DataGeneratorService {
     private PostRepository postRepository;
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         LocalDateTime now = LocalDateTime.now();
 
-        // Usuarios de prueba con perfiles más realistas
+        // Usuarios
         User ana = new User("Ana García", "ana.garcia@gmail.com", "password123", "666555444", "Madrid",
                 "Soy una profesional en busca de oportunidades en marketing digital.", 2, null, null, null, null);
         userRepository.save(ana);
@@ -40,57 +45,55 @@ public class DataGeneratorService {
                 "Ingeniero de software con experiencia en Java y Spring Boot.", 2, null, null, null, null);
         userRepository.save(carlos);
 
-        // Post 1: Consejos para entrevistas
+        // Load images from resources
+        byte[] interviewImage = loadImageFromResources("static/img/interview.jpg");
+        byte[] resumeImage = loadImageFromResources("static/img/curriculumDesign.avif");
+        byte[] networkingImage = loadImageFromResources("static/img/network.avif");
+
+        // Post 1 with interview image
         Post post1 = new Post(
                 "5 Consejos Clave para Triunfar en tu Entrevista de Trabajo",
                 "Prepararte para una entrevista puede ser intimidante, pero con estos consejos podrás destacar: investiga la empresa, practica tus respuestas, muestra confianza, haz preguntas inteligentes y sigue el contacto tras la entrevista. ¡Tu próximo empleo está más cerca de lo que crees!",
                 now.minusMonths(2).minusDays(5),
-                "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80",
+                interviewImage,
                 ana
         );
-        post1.getReviews().add(new Review(
-                "¡Gran artículo! Me ayudó a prepararme para mi entrevista en una startup. La parte sobre hacer preguntas al entrevistador fue clave.", 5, ana));
-        post1.getReviews().add(new Review(
-                "Muy útil, especialmente el consejo de investigar la empresa. Lo apliqué y conseguí el puesto. ¡Gracias!", 4, carlos));
-        post1.getReviews().add(new Review(
-                "Buen contenido, pero añadiría ejemplos de preguntas para practicar.", 3, ana));
+        post1.setImageContentType("image/jpeg");
+        post1.getReviews().add(new Review("¡Gran artículo! Me ayudó a prepararme para mi entrevista en una startup.", 5, ana));
+        post1.getReviews().add(new Review("Muy útil, lo apliqué y conseguí el puesto. ¡Gracias!", 4, carlos));
         postRepository.save(post1);
 
-        // Post 2: Curriculum atractivo
+        // Post 2 with resume image
         Post post2 = new Post(
                 "Cómo Diseñar un Currículum que Destaque ante los Reclutadores",
-                "Un CV bien estructurado es tu carta de presentación. Usa un diseño limpio, destaca tus logros con números, adapta tu experiencia al puesto y no olvides incluir palabras clave del sector. Aquí te contamos cómo hacerlo paso a paso.",
+                "Un CV bien estructurado es tu carta de presentación. Usa un diseño limpio, destaca tus logros con números, adapta tu experiencia al puesto y no olvides incluir palabras clave del sector.",
                 now.minusMonths(1).minusDays(3),
-                "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80",
+                resumeImage,
                 carlos
         );
-        post2.getReviews().add(new Review(
-                "Rediseñé mi CV siguiendo estos consejos y recibí más respuestas de empresas. ¡Recomendado!", 5, carlos));
-        post2.getReviews().add(new Review(
-                "El enfoque en logros cuantificables me abrió puertas. Gran aporte.", 4, ana));
+        post2.setImageContentType("image/jpeg");
+        post2.getReviews().add(new Review("Rediseñé mi CV y recibí más respuestas. ¡Recomendado!", 5, carlos));
         postRepository.save(post2);
 
-        // Post 3: Errores comunes
+        // Post 3 with networking image
         Post post3 = new Post(
                 "Errores que Debes Evitar al Buscar Trabajo en 2025",
-                "Desde enviar el mismo CV genérico a todas las ofertas hasta no seguir las instrucciones de la solicitud, estos errores pueden costarte oportunidades. Aprende a evitarlos y mejora tus posibilidades de éxito en el mercado laboral actual.",
+                "Desde enviar el mismo CV genérico a todas las ofertas hasta no seguir las instrucciones, estos errores pueden costarte oportunidades.",
                 now.minusYears(1).minusMonths(7),
-                "https://images.unsplash.com/photo-1453873531674-2151bcd01707?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80",
+                networkingImage,
                 ana
         );
-        post3.getReviews().add(new Review(
-                "Me identifiqué con lo del CV genérico. Ahora personalizo cada solicitud y noto la diferencia.", 4, carlos));
+        post3.setImageContentType("image/jpeg");
         postRepository.save(post3);
 
-        // Post 4: Networking
+        // Post 4
         Post post4 = new Post(
                 "El Poder del Networking: Construye tu Red para Encontrar Empleo",
-                "Conectar con profesionales de tu sector puede abrirte puertas inesperadas. Participa en eventos, usa LinkedIn de forma estratégica y no temas pedir recomendaciones. Descubre cómo el networking puede ser tu mejor aliado.",
+                "Conectar con profesionales de tu sector puede abrirte puertas inesperadas. Participa en eventos y usa LinkedIn estratégicamente.",
                 now.minusYears(1).minusMonths(3),
-                "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80",
+                networkingImage,
                 carlos
         );
-        // Sin reseñas para este post inicialmente
         postRepository.save(post4);
 
         // Generación de empresas
@@ -118,5 +121,15 @@ public class DataGeneratorService {
         Company company2 = new Company("JobConnect", "hr@jobconnect.es", "password123", "Barcelona",
                 "Conectamos talento con las mejores oportunidades del mercado.", null);
         companyRepository.save(company2);
+    }
+
+    private byte[] loadImageFromResources(String path) throws IOException {
+        try {
+            ClassPathResource resource = new ClassPathResource(path);
+            return FileCopyUtils.copyToByteArray(resource.getInputStream());
+        } catch (IOException e) {
+            System.err.println("Could not load image: " + path);
+            return new byte[0];
+        }
     }
 }

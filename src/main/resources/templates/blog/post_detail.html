@@ -29,9 +29,11 @@
         <section class="blog-posts">
             <div class="box">
                 <h1>{{post.title}}</h1>
-                {{#post.imagePath}}
-                <img src="{{post.imagePath}}" alt="{{post.title}}" class="post-image">
-                {{/post.imagePath}}
+                {{#post.hasImage}}
+                <div class="post-image-container">
+                    <img src="/blog/posts/{{post.id}}/image" alt="Imagen del post" class="post-image" onerror="this.style.display='none'">
+                </div>
+                {{/post.hasImage}}
                 <p>{{post.content}}</p>
                 <p><strong>Fecha:</strong> {{post.formattedTimestamp}}</p>
                 <p><strong>Autor:</strong> {{post.author.name}}</p>

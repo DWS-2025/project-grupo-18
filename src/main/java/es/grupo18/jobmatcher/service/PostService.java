@@ -45,7 +45,13 @@ public class PostService {
         oldPost.setTitle(updatedPost.getTitle());
         oldPost.setContent(updatedPost.getContent());
         oldPost.setTimestamp(updatedPost.getTimestamp());
-        oldPost.setImagePath(updatedPost.getImagePath());
+        
+        // Only update image if new one is provided
+        if (updatedPost.getImage() != null && updatedPost.getImage().length > 0) {
+            oldPost.setImage(updatedPost.getImage());
+            oldPost.setImageContentType(updatedPost.getImageContentType());
+        }
+        
         postRepository.save(oldPost);
     }
 

@@ -30,7 +30,9 @@ public class Post {
 
     private LocalDateTime timestamp;
 
-    private String imagePath;
+    @Lob // Almacena la imagen como datos binarios
+    private byte[] image; 
+    private String imageContentType;
 
 
     @ManyToOne
@@ -50,15 +52,27 @@ public class Post {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.imagePath = imagePath;
+        this.image = image;
     }
 
     public Post(String title, String content, LocalDateTime timestamp, String imagePath, User author) {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.imagePath = imagePath;
+        this.image = image;
         this.author = author;
+    }
+
+    public Post(String title, String content, LocalDateTime date, byte[] image, User user) {
+        this.title = title;
+        this.content = content;
+        this.timestamp = date;
+        this.image = image;
+        this.author = user;
+        this.reviews = new ArrayList<>();
+    }
+    public boolean hasImage() {
+        return image != null && image.length > 0 && imageContentType != null;
     }
 
     // Getters
@@ -66,7 +80,9 @@ public class Post {
     public long getId() {
         return id;
     }
-
+    public String getImageContentType() {
+        return imageContentType;
+    }
     public String getTitle() {
         return title;
     }
@@ -79,8 +95,8 @@ public class Post {
         return timestamp;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public byte[] getImage() {
+        return image;
     }
 
     public User getAuthor() {
@@ -95,6 +111,9 @@ public class Post {
     }
 
     // Setters
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
+    }
 
     public void setId(long id) {
         this.id = id;
@@ -112,8 +131,8 @@ public class Post {
         this.timestamp = timestamp;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     public void setAuthor(User author) {
@@ -134,7 +153,7 @@ public class Post {
     public String toString() {
         return "Post [id=" + id + ", title=" + title + ", content=" + content + ", timestamp=" + timestamp
                 + ", imagePath="
-                + imagePath + ", owner=" + author + ", reviews=" + reviews + "]";
+                + image + ", owner=" + author + ", reviews=" + reviews + "]";
     }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,9 +24,11 @@ import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class BlogController {
@@ -79,13 +82,20 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/new")
-    public String newPost(Model model, Post post) {
-        if (post.getTimestamp() == null) {
+    public String newPost(@RequestParam("imageFile") MultipartFile imageFile, Post post) {
+        try {
+            if (!imageFile.isEmpty()) {
+                post.setImage(imageFile.getBytes());
+                post.setImageContentType(imageFile.getContentType());
+            }
             post.setTimestamp(LocalDateTime.now());
+            postService.save(post);
+            return "redirect:/blog/posts";
+        } catch (IOException e) {
+            return "error";
         }
-        postService.save(post);
-        return "redirect:/blog/posts";
     }
+
 
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
@@ -116,16 +126,28 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/{postId}/edit")
-    public String updatePost(Model model, @PathVariable long postId, Post updatedPost) {
+    public String updatePost(@PathVariable long postId,
+                            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                            Post updatedPost) {
         Optional<Post> op = postService.findById(postId);
         if (op.isPresent()) {
             Post oldPost = op.get();
-            updatedPost.setTimestamp(LocalDateTime.now());
-            postService.update(oldPost, updatedPost);
-            return "redirect:/blog/posts/" + postId;
-        } else {
-            return "post_not_found";
+            try {
+                if (imageFile != null && !imageFile.isEmpty()) {
+                    updatedPost.setImage(imageFile.getBytes());
+                    updatedPost.setImageContentType(imageFile.getContentType());
+                } else {
+                    updatedPost.setImage(oldPost.getImage());
+                    updatedPost.setImageContentType(oldPost.getImageContentType());
+                }
+                updatedPost.setTimestamp(LocalDateTime.now());
+                postService.update(oldPost, updatedPost);
+                return "redirect:/blog/posts/" + postId;
+            } catch (IOException e) {
+                return "error";
+            }
         }
+        return "post_not_found";
     }
 
     @PostMapping("/blog/posts/{postId}/delete")
