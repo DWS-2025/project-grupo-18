@@ -29,13 +29,13 @@
     <div class="container">
 
         {{#mutualMatchCompanies}}
-        <div class="box">
+        <div class="box" onclick="location.href='/company/{{id}}'">
             <h1>{{name}}</h1>
             <img src="{{imagePath}}" alt="Logo de {{name}}" width="100">
             <p>{{location}}</p>
             <p>{{bio}}</p>
             <!-- Button for removing from favourites -->
-            <form action="/match/companies/{{id}}/removeFavourite" method="post">
+            <form action="/match/companies/{{id}}/removeFavourite" method="post" onclick="event.stopPropagation()">
                 <input type="hidden" name="companyName" value="{{name}}">
                 <input type="hidden" name="origin" value="/match/companies/matches">
                 <button type="submit">Eliminar de Favoritos</button>

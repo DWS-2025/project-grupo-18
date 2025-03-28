@@ -85,13 +85,13 @@ public class MatchController {
 
         return "/match/companies/matches";
     }
-
-    @GetMapping("/match/company/{companyId}") 
-    public String getCompanyPage(@PathVariable Long id, Model model) {
+    
+    @GetMapping("/company/{companyId}")
+    public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
         try {
-            Company company = companyService.findById(id);
+            Company company = companyService.findById(companyId);
             model.addAttribute("company", company);
-            return "match/company"; 
+            return "show_company"; 
         } catch (EntityNotFoundException e) {
             return "error"; 
         }
