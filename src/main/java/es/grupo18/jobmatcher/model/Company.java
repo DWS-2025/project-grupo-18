@@ -7,8 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 
 @Entity(name = "CompanyTable")
@@ -24,9 +22,9 @@ public class Company {
     private String bio;
     private String imagePath;
 
-    @ManyToMany
-    @JoinTable(name = "user_company_favourites", joinColumns = @JoinColumn(name = "company_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @ManyToMany(mappedBy = "favouriteCompaniesList")
     private List<User> favouriteUsersList = new ArrayList<>();
+
 
     public Company() {
     }

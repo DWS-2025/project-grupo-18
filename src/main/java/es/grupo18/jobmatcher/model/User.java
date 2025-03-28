@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -37,8 +39,14 @@ public class User {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postsList;
 
-    @ManyToMany(mappedBy = "favouriteUsersList")
+    @ManyToMany
+    @JoinTable(
+        name = "user_company_favourites",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
     private List<Company> favouriteCompaniesList = new ArrayList<>();
+    
 
     // Empty constructor for initializations
 

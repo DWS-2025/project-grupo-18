@@ -1,13 +1,15 @@
 package es.grupo18.jobmatcher.service;
 
-import es.grupo18.jobmatcher.model.Company;
-import es.grupo18.jobmatcher.model.User;
-import es.grupo18.jobmatcher.repository.CompanyRepository;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import es.grupo18.jobmatcher.model.Company;
+import es.grupo18.jobmatcher.model.User;
+import es.grupo18.jobmatcher.repository.CompanyRepository;
 
 @Service
 public class CompanyService {
@@ -17,6 +19,10 @@ public class CompanyService {
 
     public Page<Company> findAll(Pageable pageable) {
         return companyRepository.findAll(pageable);
+    }
+
+    public List<Company> findAll() {
+        return companyRepository.findAll();
     }
 
     public Company findById(long id) {
