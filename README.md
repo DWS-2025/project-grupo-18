@@ -8,12 +8,12 @@
 
 ## 👥 Development Team
 
-| Name            | Email                            | GitHub Username      |
-|-----------------|----------------------------------|----------------------|
-| Daniel Martín   | d.martinm.2023@alumnos.urjc.es   | @dmartinm2023        |
-| Carlos Marrón   | c.marron.2023@alumnos.urjc.es    | @CarlosMarronBenito  |
-| Hector Alijas   | h.julian.2023@alumnos.urjc.es    | @h-julian            |
-| Álvaro Mota     | a.mota.2023@alumnos.urjc.es      | @4lvaro18            |
+| Name                  | Email                            | GitHub Username      |
+|-----------------------|----------------------------------|----------------------|
+| Daniel Martín Muñoz   | d.martinm.2023@alumnos.urjc.es   | @dmartinm2023        |
+| Carlos Marrón Benito  | c.marron.2023@alumnos.urjc.es    | @CarlosMarronBenito  |
+| Hector Julián Alijas  | h.julian.2023@alumnos.urjc.es    | @h-julian            |
+| Álvaro Mota Lucena    | a.mota.2023@alumnos.urjc.es      | @4lvaro18            |
 
 ---
 
@@ -21,7 +21,7 @@
 
 ### 📘 Entities
 
-La aplicación gestiona las siguientes entidades principales, las cuales pueden ser creadas, editadas y eliminadas:
+La aplicación gestiona las siguientes entidades principales, las cuales pueden ser creadas, editadas, consultadas y eliminadas:
 
 - **Usuario**
 - **Empresa**
@@ -31,14 +31,14 @@ La aplicación gestiona las siguientes entidades principales, las cuales pueden 
 Relaciones destacadas:
 
 - Varios usuarios pueden dar 'like' a múltiples empresas (relación N:M).
-- Un post puede tener muchas reviews (1:N).
+- Un post puede tener varias reviews (1:N).
 - Un usuario puede tener varios posts (1:N).
 - Un usuario puede tener varias reviews (1:N).
 
 ### 🔐 User Permissions
 
-| Tipo de Usuario | Permisos                                                                 |
-|------------------|---------------------------------------------------------------------------|
+| Tipo de Usuario  | Permisos                                                                                             |
+|------------------|------------------------------------------------------------------------------------------------------|
 | Usuario base     | Puede crear, editar y eliminar empresas (si es administrador), posts, reviews y gestionar su perfil. |
 
 > *Nota:* En esta versión el administrador está simulado como un usuario base con capacidad para crear empresas.
