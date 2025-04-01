@@ -31,9 +31,8 @@ public class Post {
     private LocalDateTime timestamp;
 
     @Lob // Almacena la imagen como datos binarios
-    private byte[] image; 
+    private byte[] image;
     private String imageContentType;
-
 
     @ManyToOne
     private User author;
@@ -69,6 +68,7 @@ public class Post {
         this.author = user;
         this.reviews = new ArrayList<>();
     }
+
     public boolean hasImage() {
         return image != null && image.length > 0 && imageContentType != null;
     }
@@ -78,9 +78,11 @@ public class Post {
     public long getId() {
         return id;
     }
+
     public String getImageContentType() {
         return imageContentType;
     }
+
     public String getTitle() {
         return title;
     }
@@ -145,6 +147,23 @@ public class Post {
         if (timestamp == null)
             return "";
         return timestamp.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Post post = (Post) o;
+
+        return id == post.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
     }
 
     @Override

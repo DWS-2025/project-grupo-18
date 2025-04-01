@@ -27,7 +27,7 @@ public class ImageController {
             Post post = postOpt.get();
             byte[] imageData = post.getImage();
             String contentType = post.getImageContentType();
-            
+
             if (imageData != null && imageData.length > 0) {
                 MediaType mediaType;
                 try {
@@ -35,14 +35,15 @@ public class ImageController {
                 } catch (Exception e) {
                     mediaType = MediaType.IMAGE_JPEG;
                 }
-                
+
                 return ResponseEntity.ok()
-                    .contentType(mediaType)
-                    .contentLength(imageData.length)
-                    .cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))
-                    .body(imageData);
+                        .contentType(mediaType)
+                        .contentLength(imageData.length)
+                        .cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))
+                        .body(imageData);
             }
         }
         return ResponseEntity.notFound().build();
-}
+    }
+
 }

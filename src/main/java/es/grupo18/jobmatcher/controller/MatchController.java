@@ -44,7 +44,6 @@ public class MatchController {
         return "match/matches";
     }
 
-
     @PostMapping("/matches/{companyId}/addFavourite") // Add a company to the user's favourite list
     public String addFavourite(@PathVariable long companyId) {
         User currentUser = userService.getLoggedUser();
@@ -85,15 +84,15 @@ public class MatchController {
 
         return "match/likes";
     }
-    
+
     @GetMapping("/company/{companyId}")
     public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
         try {
             Company company = companyService.findById(companyId);
             model.addAttribute("company", company);
-            return "show_company"; 
+            return "show_company";
         } catch (EntityNotFoundException e) {
-            return "error"; 
+            return "error";
         }
     }
 

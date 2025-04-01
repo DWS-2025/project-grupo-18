@@ -90,7 +90,6 @@ public class BlogController {
         }
     }
 
-
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
         Optional<Post> postOpt = postService.findById(postId);
@@ -121,8 +120,8 @@ public class BlogController {
 
     @PostMapping("/blog/posts/{postId}/edit")
     public String updatePost(@PathVariable long postId,
-                            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                            Post updatedPost) {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            Post updatedPost) {
         Optional<Post> op = postService.findById(postId);
         if (op.isPresent()) {
             Post oldPost = op.get();
@@ -184,7 +183,7 @@ public class BlogController {
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
     public String updateReview(@PathVariable long postId, @PathVariable long reviewId, Review updatedReview) {
         Optional<Review> reviewOpt = reviewService.findById(reviewId);
-        if (reviewOpt.isPresent()){
+        if (reviewOpt.isPresent()) {
             Review review = reviewOpt.get();
             review.setText(updatedReview.getText());
             review.setRating(updatedReview.getRating());

@@ -25,7 +25,6 @@ public class Company {
     @ManyToMany(mappedBy = "favouriteCompaniesList")
     private List<User> favouriteUsersList = new ArrayList<>();
 
-
     public Company() {
     }
 
@@ -100,6 +99,23 @@ public class Company {
 
     public void setFavouriteUsersList(List<User> favouriteUsersList) {
         this.favouriteUsersList = favouriteUsersList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Company company = (Company) o;
+
+        return id == company.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
     }
 
     @Override
