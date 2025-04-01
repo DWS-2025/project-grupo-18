@@ -25,7 +25,7 @@ public class ProfileController {
     @GetMapping("/profile")
     public String showProfile(Model model) {
         model.addAttribute("user", userService.getLoggedUser());
-        return "profile";
+        return "profile/profile";
     }
 
     @GetMapping("/profile/image")
@@ -59,7 +59,7 @@ public class ProfileController {
     @GetMapping("/profile/edit")
     public String editProfileForm(Model model) {
         model.addAttribute("user", userService.getLoggedUser());
-        return "profile_form";
+        return "profile/profile_form";
     }
 
     @PostMapping("/profile/edit")
