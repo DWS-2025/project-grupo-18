@@ -61,7 +61,7 @@ public class PostService {
         postRepository.deleteById(post.getId());
     }
 
-    public List<Post> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to) {
+    public List<Post> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
         List<Post> posts = new ArrayList<>(postRepository.findAll());
 
         // FILTROS POR FECHA
@@ -76,6 +76,13 @@ public class PostService {
         } else if (to != null) {
             posts = posts.stream()
                     .filter(p -> !p.getTimestamp().isAfter(to))
+                    .collect(Collectors.toList());
+        }
+
+        //FILTRO POR TÍTULO
+        if (title != null && !title.isBlank()) {
+            posts = posts.stream()
+                    .filter(p -> p.getTitle() != null && p.getTitle().toLowerCase().contains(title.toLowerCase()))
                     .collect(Collectors.toList());
         }
 

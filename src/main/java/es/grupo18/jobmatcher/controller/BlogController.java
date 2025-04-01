@@ -38,6 +38,7 @@ public class BlogController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
+            @RequestParam(required = false) String title,
             Model model) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -54,7 +55,7 @@ public class BlogController {
         } catch (DateTimeParseException e) {
         }
 
-        List<Post> posts = postService.findFilteredPosts(sort, fromDate, toDate);
+        List<Post> posts = postService.findFilteredPosts(sort, fromDate, toDate, title);
 
         model.addAttribute("posts", posts);
         model.addAttribute("sort", sort != null ? sort : "");
@@ -62,6 +63,7 @@ public class BlogController {
         model.addAttribute("to", to != null ? to : "");
         model.addAttribute("sortIsAsc", "asc".equals(sort));
         model.addAttribute("sortIsDesc", "desc".equals(sort));
+        model.addAttribute("title", title != null ? title : "");
 
         return "blog/posts";
     }

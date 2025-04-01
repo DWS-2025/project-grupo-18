@@ -28,28 +28,32 @@
 
 
     <main class="container">
-
-        <form method="get" action="/blog/posts" class="filter-form box" style="margin-bottom: 2em;">
+        <section class="box">
             <h2>Filtrar publicaciones</h2>
 
-            <label for="from">Desde:</label>
-            <input type="datetime-local" id="from" name="from" value="{{from}}">
+            <form method="get" action="/blog/posts" style="margin-bottom: 2em;">
 
+                <label for="from">Desde:</label>
+                <input type="datetime-local" id="from" name="from" value="{{from}}">
 
-            <label for="to">Hasta:</label>
-            <input type="datetime-local" id="to" name="to" value="{{to}}">
+                <label for="to">Hasta:</label>
+                <input type="datetime-local" id="to" name="to" value="{{to}}">
 
-            <label for="sort">Orden:</label>
-            <select id="sort" name="sort">
-                <option value="">-- Sin ordenar --</option>
-                <option value="asc" {{#sortIsAsc}}selected{{/sortIsAsc}}>Más antiguos primero</option>
-                <option value="desc" {{#sortIsDesc}}selected{{/sortIsDesc}}>Más recientes primero</option>
+                <label for="sort">Orden:</label>
+                <select id="sort" name="sort">
+                    <option value="">-- Sin ordenar --</option>
+                    <option value="asc" {{#sortIsAsc}}selected{{/sortIsAsc}}>Más antiguos primero</option>
+                    <option value="desc" {{#sortIsDesc}}selected{{/sortIsDesc}}>Más recientes primero</option>
 
-            </select>
+                </select>
 
-            <button type="submit" class="btn">Aplicar filtros</button>
-        </form>
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" value="{{title}}">
 
+                <button type="submit" class="btn">Aplicar filtros</button>
+            </form>
+        </section>
+        
         <section class="blog-posts">
             {{#posts}}
             <div class="box">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobMatcher - Nuevo Post</title>
+    <title>JobMatcher - {{#isEdit}}Editar post{{/isEdit}}{{^isEdit}}Nuevo post{{/isEdit}}</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
     <!-- Form for creating a new post -->
     <main class="container">
         <div class="box">
-            <h1>Nueva Noticia</h1> <!-- Form title -->
+            <h1>{{#isEdit}}Editar post{{/isEdit}}{{^isEdit}}Nuevo post{{/isEdit}}</h1> <!-- Form title -->
             <form id="postForm" method="post" action="{{#isEdit}}/blog/posts/{{post.id}}/edit{{/isEdit}}{{^isEdit}}/blog/posts/new{{/isEdit}}" enctype="multipart/form-data">
                 <!-- Input group for the post title -->
                 <div class="input-group">
