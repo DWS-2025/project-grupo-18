@@ -2,8 +2,6 @@ package es.grupo18.jobmatcher.service;
 
 import java.util.ArrayList;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;

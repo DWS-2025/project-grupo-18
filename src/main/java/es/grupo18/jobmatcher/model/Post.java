@@ -52,14 +52,12 @@ public class Post {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.image = image;
     }
 
     public Post(String title, String content, LocalDateTime timestamp, String imagePath, User author) {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
-        this.image = image;
         this.author = author;
     }
 
