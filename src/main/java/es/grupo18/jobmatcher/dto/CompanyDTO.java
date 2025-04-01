@@ -5,6 +5,5 @@ public record CompanyDTO(
     String name,
     String email,
     String location,
-    String bio,
-    String imagePath
+    String bio
 ) {}
