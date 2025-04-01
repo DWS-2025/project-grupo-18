@@ -35,9 +35,9 @@
             <p>{{bio}}</p>
     
             <!-- Button for adding to favourites -->
-            <form action="/match/companies/{{id}}/addFavourite" method="post">
+            <form action="/matches/{{id}}/addFavourite" method="post">
                 <input type="hidden" name="companyName" value="{{name}}">
-                <input type="hidden" name="origin" value="/match">
+                <input type="hidden" name="origin" value="/matches">
                 <button type="submit">Añadir a Favoritos</button>
             </form>
         </div>
@@ -51,9 +51,9 @@
             <p>{{bio}}</p>
     
             <!-- Button for removing from favourites -->
-            <form action="/match/companies/{{id}}/removeFavourite" method="post">
+            <form action="/matches/{{id}}/removeFavourite" method="post">
                 <input type="hidden" name="companyName" value="{{name}}">
-                <input type="hidden" name="origin" value="/match/companies">
+                <input type="hidden" name="origin" value="/matches">
                 <button type="submit">Eliminar de Favoritos</button>
             </form>
         </div>

@@ -37,7 +37,7 @@
             <!-- Button for removing from favourites -->
             <form action="/match/companies/{{id}}/removeFavourite" method="post" onclick="event.stopPropagation()">
                 <input type="hidden" name="companyName" value="{{name}}">
-                <input type="hidden" name="origin" value="/match/companies/matches">
+                <input type="hidden" name="origin" value="/matches/likes">
                 <button type="submit">Eliminar de Favoritos</button>
             </form>
         </div>

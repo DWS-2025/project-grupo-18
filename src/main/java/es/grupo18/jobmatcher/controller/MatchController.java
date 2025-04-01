@@ -26,7 +26,7 @@ public class MatchController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/match/companies")
+    @GetMapping("/matches")
     public String showCompanies(Model model) {
         List<Company> allCompanies = companyService.findAll();
         User currentUser = userService.getLoggedUser();
@@ -41,11 +41,11 @@ public class MatchController {
 
         model.addAttribute("favouriteCompanies", favouriteCompanies);
         model.addAttribute("nonFavouriteCompanies", nonFavouriteCompanies);
-        return "match/companies";
+        return "match/matches";
     }
 
 
-    @PostMapping("/match/companies/{companyId}/addFavourite") // Add a company to the user's favourite list
+    @PostMapping("/matches/{companyId}/addFavourite") // Add a company to the user's favourite list
     public String addFavourite(@PathVariable long companyId) {
         User currentUser = userService.getLoggedUser();
         Company company = companyService.findById(companyId);
@@ -54,10 +54,10 @@ public class MatchController {
             userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
         }
 
-        return "redirect:/match/companies"; // Recharges the match page to show updates
+        return "redirect:/matches"; // Recharges the match page to show updates
     }
 
-    @PostMapping("/match/companies/{companyId}/removeFavourite") // Remove a company from the user's favourite list
+    @PostMapping("/matches/{companyId}/removeFavourite") // Remove a company from the user's favourite list
     public String removeFavourite(@PathVariable long companyId, @RequestParam String origin) {
         User currentUser = userService.getLoggedUser();
         Company company = companyService.findById(companyId);
@@ -65,10 +65,10 @@ public class MatchController {
         if (company != null) {
             userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
         }
-        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/match/companies");
+        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches");
     }
 
-    @GetMapping("/match/companies/matches") // Show the consultant match page
+    @GetMapping("/matches/likes") // Show the consultant match page
     public String showConsultantMatchPage(Model model) {
         User currentUser = userService.getLoggedUser();
         List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
@@ -83,7 +83,7 @@ public class MatchController {
 
         model.addAttribute("mutualMatchCompanies", mutualMatchCompanies);
 
-        return "/match/companies/matches";
+        return "match/likes";
     }
     
     @GetMapping("/company/{companyId}")
