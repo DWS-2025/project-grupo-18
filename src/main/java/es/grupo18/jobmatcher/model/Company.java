@@ -20,7 +20,6 @@ public class Company {
     private String email;
     private String location;
     private String bio;
-    private String imagePath;
 
     @ManyToMany(mappedBy = "favouriteCompaniesList")
     private List<User> favouriteUsersList = new ArrayList<>();
@@ -36,7 +35,6 @@ public class Company {
         this.email = email;
         this.location = location;
         this.bio = bio;
-        this.imagePath = imagePath;
         this.favouriteUsersList = (favouriteUsersList != null) ? new ArrayList<>(favouriteUsersList)
                 : new ArrayList<>();
     }
@@ -63,10 +61,6 @@ public class Company {
         return bio;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
     public List<User> getFavouriteUsersList() {
         return favouriteUsersList;
     }
@@ -91,10 +85,6 @@ public class Company {
 
     public void setBio(String bio) {
         this.bio = bio;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
     public void setFavouriteUsersList(List<User> favouriteUsersList) {
@@ -126,7 +116,6 @@ public class Company {
                 ", email='" + email + '\'' +
                 ", location='" + location + '\'' +
                 ", bio='" + bio + '\'' +
-                ", imagePath='" + imagePath + '\'' +
                 ", favouriteUsersList=" + favouriteUsersList +
                 '}';
     }

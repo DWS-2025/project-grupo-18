@@ -47,7 +47,6 @@ Relaciones destacadas:
 
 Las siguientes entidades tienen imágenes asociadas:
 
-- **Empresa**: Imagen de la empresa.
 - **Usuario**: Foto de perfil.
 - **Post**: Imagen destacada del post (opcional).
 

@@ -46,7 +46,6 @@ public class CompanyService {
         oldCompany.setEmail(updatedCompany.getEmail());
         oldCompany.setLocation(updatedCompany.getLocation());
         oldCompany.setBio(updatedCompany.getBio());
-        oldCompany.setImagePath(updatedCompany.getImagePath());
         companyRepository.save(oldCompany);
     }
 
