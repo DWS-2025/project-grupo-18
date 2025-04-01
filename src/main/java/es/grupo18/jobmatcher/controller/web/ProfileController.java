@@ -1,4 +1,4 @@
-package es.grupo18.jobmatcher.controller;
+package es.grupo18.jobmatcher.controller.web;
 
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.UserService;

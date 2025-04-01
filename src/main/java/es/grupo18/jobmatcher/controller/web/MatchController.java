@@ -1,4 +1,4 @@
-package es.grupo18.jobmatcher.controller;
+package es.grupo18.jobmatcher.controller.web;
 
 import java.util.ArrayList;
 import java.util.List;
