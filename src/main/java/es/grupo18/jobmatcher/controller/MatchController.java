@@ -26,7 +26,7 @@ public class MatchController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/matches")
+    @GetMapping("/matches") //Show the matches page
     public String showCompanies(Model model) {
         List<Company> allCompanies = companyService.findAll();
         User currentUser = userService.getLoggedUser();
@@ -64,10 +64,10 @@ public class MatchController {
         if (company != null) {
             userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
         }
-        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches");
+        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches"); // Recharges the matches page to show updates
     }
 
-    @GetMapping("/matches/likes") // Show the consultant match page
+    @GetMapping("/matches/likes") // Show the likes match page
     public String showConsultantMatchPage(Model model) {
         User currentUser = userService.getLoggedUser();
         List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
@@ -85,7 +85,7 @@ public class MatchController {
         return "match/likes";
     }
 
-    @GetMapping("/company/{companyId}")
+    @GetMapping("/company/{companyId}") // Show the company individual page
     public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
         try {
             Company company = companyService.findById(companyId);
@@ -95,5 +95,4 @@ public class MatchController {
             return "error";
         }
     }
-
 }
