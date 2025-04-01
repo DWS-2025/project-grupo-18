@@ -26,27 +26,33 @@
         </div>
     </header>
 
-    <main class="container">
-        <h1>{{company.name}}</h1>
+    <main class="company-page">
 
         <div class="company-details">
+
             {{#company.imagePath}}
             <div class="company-image">
                 <img src="{{company.imagePath}}" alt="Imagen de {{company.name}}">
             </div>
             {{/company.imagePath}}
 
+            <h1>{{company.name}}</h1>
+
             <div class="company-info">
-                <p><strong>📍 Localización:</strong> {{company.location}}</p>
-                <p><strong>✉️ Email:</strong> {{company.email}}</p>
-                <p><strong>📝 Bio:</strong> {{company.bio}}</p>
+                <p><strong>📍 Ubicación:</strong> {{company.location}}</p>
+                <p><strong>✉️ Email:</strong> <a href="mailto:{{company.email}}">{{company.email}}</a></p>
+                <p><strong>📝 Biografía:</strong></p>
+                <p>{{company.bio}}</p>
             </div>
         </div>
 
-        <form method="post" action="/companies/{{company.id}}/delete"
-            onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
-            <button class="delete-btn" type="submit">🗑️ Eliminar Empresa</button>
-        </form>
+        <div class="company-delete-button">
+            <form method="post" action="/companies/{{company.id}}/delete"
+                onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
+                <button type="submit">🗑️ Eliminar Empresa</button>
+            </form>
+        </div>
+
     </main>
 
     <footer>
