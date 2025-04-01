@@ -12,7 +12,7 @@ import es.grupo18.jobmatcher.repository.ReviewRepository;
 
 @Service
 public class ReviewService {
-    
+
     @Autowired
     private ReviewRepository reviewRepository;
 

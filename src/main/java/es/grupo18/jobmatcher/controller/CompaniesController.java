@@ -40,7 +40,7 @@ public class CompaniesController {
     @GetMapping("/companies/new")
     public String showCompanyForm(Model model) {
         model.addAttribute("company", new Company());
-        return "new_company_form";
+        return "company/new_company_form";
     }
 
     @PostMapping("/companies/new")
@@ -54,9 +54,9 @@ public class CompaniesController {
         Optional<Company> company = Optional.ofNullable(companyService.findById(id));
         if (company.isPresent()) {
             model.addAttribute("company", company.get());
-            return "show_company";
+            return "company/show_company";
         } else {
-            return "company_not_found";
+            return "company/company_not_found";
         }
     }
 
@@ -65,9 +65,9 @@ public class CompaniesController {
         Optional<Company> company = Optional.ofNullable(companyService.findById(id));
         if (company.isPresent()) {
             model.addAttribute("company", company.get());
-            return "company_form";
+            return "company/company_form";
         } else {
-            return "company_not_found";
+            return "company/company_not_found";
         }
     }
 
@@ -79,7 +79,7 @@ public class CompaniesController {
             companyService.update(oldCompany, updatedCompany);
             return "redirect:/companies/" + id;
         } else {
-            return "company_not_found";
+            return "company/company_not_found";
         }
     }
 
