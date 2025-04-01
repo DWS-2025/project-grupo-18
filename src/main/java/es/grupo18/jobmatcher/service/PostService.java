@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,13 +43,13 @@ public class PostService {
         oldPost.setTitle(updatedPost.getTitle());
         oldPost.setContent(updatedPost.getContent());
         oldPost.setTimestamp(updatedPost.getTimestamp());
-        
+
         // Only update image if new one is provided
         if (updatedPost.getImage() != null && updatedPost.getImage().length > 0) {
             oldPost.setImage(updatedPost.getImage());
             oldPost.setImageContentType(updatedPost.getImageContentType());
         }
-        
+
         postRepository.save(oldPost);
     }
 
@@ -63,37 +62,31 @@ public class PostService {
     }
 
     public List<Post> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to) {
-    List<Post> posts = new ArrayList<>(postRepository.findAll());
+        List<Post> posts = new ArrayList<>(postRepository.findAll());
 
-    // FILTROS POR FECHA
-    if (from != null && to != null) {
-        posts = posts.stream()
-            .filter(p -> !p.getTimestamp().isBefore(from) && !p.getTimestamp().isAfter(to))
-            .collect(Collectors.toList());
-    } else if (from != null) {
-        posts = posts.stream()
-            .filter(p -> !p.getTimestamp().isBefore(from))
-            .collect(Collectors.toList());
-    } else if (to != null) {
-        posts = posts.stream()
-            .filter(p -> !p.getTimestamp().isAfter(to))
-            .collect(Collectors.toList());
+        // FILTROS POR FECHA
+        if (from != null && to != null) {
+            posts = posts.stream()
+                    .filter(p -> !p.getTimestamp().isBefore(from) && !p.getTimestamp().isAfter(to))
+                    .collect(Collectors.toList());
+        } else if (from != null) {
+            posts = posts.stream()
+                    .filter(p -> !p.getTimestamp().isBefore(from))
+                    .collect(Collectors.toList());
+        } else if (to != null) {
+            posts = posts.stream()
+                    .filter(p -> !p.getTimestamp().isAfter(to))
+                    .collect(Collectors.toList());
+        }
+
+        // ORDEN
+        if ("desc".equals(sort)) {
+            posts.sort((p1, p2) -> p2.getTimestamp().compareTo(p1.getTimestamp()));
+        } else if ("asc".equals(sort)) {
+            posts.sort(Comparator.comparing(Post::getTimestamp));
+        }
+
+        return posts;
     }
-
-    // ORDEN
-    if ("desc".equals(sort)) {
-        posts.sort((p1, p2) -> p2.getTimestamp().compareTo(p1.getTimestamp()));
-    } else if ("asc".equals(sort)) {
-        posts.sort(Comparator.comparing(Post::getTimestamp));
-    }
-
-    return posts;
-}
-
-    
-    
-    
-    
-    
 
 }

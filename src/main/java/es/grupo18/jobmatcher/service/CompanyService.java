@@ -31,7 +31,7 @@ public class CompanyService {
 
     public Page<Company> findPaginated(Pageable pageable) {
         return companyRepository.findAll(pageable);
-    }    
+    }
 
     public long count() {
         return companyRepository.count();
@@ -40,16 +40,16 @@ public class CompanyService {
     public void save(Company company) { // Saves a company
         companyRepository.save(company);
     }
-    
+
     public void update(Company oldCompany, Company updatedCompany) {
         oldCompany.setName(updatedCompany.getName());
         oldCompany.setEmail(updatedCompany.getEmail());
         oldCompany.setLocation(updatedCompany.getLocation());
         oldCompany.setBio(updatedCompany.getBio());
         oldCompany.setImagePath(updatedCompany.getImagePath());
-        companyRepository.save(oldCompany);     
+        companyRepository.save(oldCompany);
     }
-    
+
     public void deleteById(long id) { // Deletes a company by its id
         companyRepository.deleteById(id);
     }

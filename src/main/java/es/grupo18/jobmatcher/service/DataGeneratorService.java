@@ -21,113 +21,117 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class DataGeneratorService {
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+        @Autowired
+        private CompanyRepository companyRepository;
 
-    @Autowired
-    private PostRepository postRepository;
+        @Autowired
+        private PostRepository postRepository;
 
-    @PostConstruct
-    public void init() throws IOException {
-        LocalDateTime now = LocalDateTime.now();
+        @PostConstruct
+        public void init() throws IOException {
+                LocalDateTime now = LocalDateTime.now();
 
-        // Usuarios
-        User ana = new User("Ana García", "ana.garcia@gmail.com", "password123", "666555444", "Madrid",
-                "Soy una profesional en busca de oportunidades en marketing digital.", 2, null, null, null, null);
-        userRepository.save(ana);
+                // Usuarios
+                User ana = new User("Ana García", "ana.garcia@gmail.com", "password123", "666555444", "Madrid",
+                                "Soy una profesional en busca de oportunidades en marketing digital.", 2, null, null,
+                                null, null);
+                userRepository.save(ana);
 
-        User carlos = new User("Carlos López", "carlos.lopez@gmail.com", "password123", "999888777", "Barcelona",
-                "Ingeniero de software con experiencia en Java y Spring Boot.", 2, null, null, null, null);
-        userRepository.save(carlos);
+                User carlos = new User("Carlos López", "carlos.lopez@gmail.com", "password123", "999888777",
+                                "Barcelona",
+                                "Ingeniero de software con experiencia en Java y Spring Boot.", 2, null, null, null,
+                                null);
+                userRepository.save(carlos);
 
-        // Load images from resources
-        byte[] interviewImage = loadImageFromResources("static/img/interview.jpg");
-        byte[] resumeImage = loadImageFromResources("static/img/curriculumDesign.avif");
-        byte[] networkingImage = loadImageFromResources("static/img/network.avif");
+                // Load images from resources
+                byte[] interviewImage = loadImageFromResources("static/img/interview.jpg");
+                byte[] resumeImage = loadImageFromResources("static/img/curriculumDesign.avif");
+                byte[] networkingImage = loadImageFromResources("static/img/network.avif");
 
-        // Post 1 with interview image
-        Post post1 = new Post(
-                "5 Consejos Clave para Triunfar en tu Entrevista de Trabajo",
-                "Prepararte para una entrevista puede ser intimidante, pero con estos consejos podrás destacar: investiga la empresa, practica tus respuestas, muestra confianza, haz preguntas inteligentes y sigue el contacto tras la entrevista. ¡Tu próximo empleo está más cerca de lo que crees!",
-                now.minusMonths(2).minusDays(5),
-                interviewImage,
-                ana
-        );
-        post1.setImageContentType("image/jpeg");
-        post1.getReviews().add(new Review("¡Gran artículo! Me ayudó a prepararme para mi entrevista en una startup.", 5, ana));
-        post1.getReviews().add(new Review("Muy útil, lo apliqué y conseguí el puesto. ¡Gracias!", 4, carlos));
-        postRepository.save(post1);
+                // Post 1 with interview image
+                Post post1 = new Post(
+                                "5 Consejos Clave para Triunfar en tu Entrevista de Trabajo",
+                                "Prepararte para una entrevista puede ser intimidante, pero con estos consejos podrás destacar: investiga la empresa, practica tus respuestas, muestra confianza, haz preguntas inteligentes y sigue el contacto tras la entrevista. ¡Tu próximo empleo está más cerca de lo que crees!",
+                                now.minusMonths(2).minusDays(5),
+                                interviewImage,
+                                ana);
+                post1.setImageContentType("image/jpeg");
+                post1.getReviews().add(new Review(
+                                "¡Gran artículo! Me ayudó a prepararme para mi entrevista en una startup.", 5, ana));
+                post1.getReviews().add(new Review("Muy útil, lo apliqué y conseguí el puesto. ¡Gracias!", 4, carlos));
+                postRepository.save(post1);
 
-        // Post 2 with resume image
-        Post post2 = new Post(
-                "Cómo Diseñar un Currículum que Destaque ante los Reclutadores",
-                "Un CV bien estructurado es tu carta de presentación. Usa un diseño limpio, destaca tus logros con números, adapta tu experiencia al puesto y no olvides incluir palabras clave del sector.",
-                now.minusMonths(1).minusDays(3),
-                resumeImage,
-                carlos
-        );
-        post2.setImageContentType("image/jpeg");
-        post2.getReviews().add(new Review("Rediseñé mi CV y recibí más respuestas. ¡Recomendado!", 5, carlos));
-        postRepository.save(post2);
+                // Post 2 with resume image
+                Post post2 = new Post(
+                                "Cómo Diseñar un Currículum que Destaque ante los Reclutadores",
+                                "Un CV bien estructurado es tu carta de presentación. Usa un diseño limpio, destaca tus logros con números, adapta tu experiencia al puesto y no olvides incluir palabras clave del sector.",
+                                now.minusMonths(1).minusDays(3),
+                                resumeImage,
+                                carlos);
+                post2.setImageContentType("image/jpeg");
+                post2.getReviews().add(new Review("Rediseñé mi CV y recibí más respuestas. ¡Recomendado!", 5, carlos));
+                postRepository.save(post2);
 
-        // Post 3 with networking image
-        Post post3 = new Post(
-                "Errores que Debes Evitar al Buscar Trabajo en 2025",
-                "Desde enviar el mismo CV genérico a todas las ofertas hasta no seguir las instrucciones, estos errores pueden costarte oportunidades.",
-                now.minusYears(1).minusMonths(7),
-                networkingImage,
-                ana
-        );
-        post3.setImageContentType("image/jpeg");
-        postRepository.save(post3);
+                // Post 3 with networking image
+                Post post3 = new Post(
+                                "Errores que Debes Evitar al Buscar Trabajo en 2025",
+                                "Desde enviar el mismo CV genérico a todas las ofertas hasta no seguir las instrucciones, estos errores pueden costarte oportunidades.",
+                                now.minusYears(1).minusMonths(7),
+                                networkingImage,
+                                ana);
+                post3.setImageContentType("image/jpeg");
+                postRepository.save(post3);
 
-        // Post 4
-        Post post4 = new Post(
-                "El Poder del Networking: Construye tu Red para Encontrar Empleo",
-                "Conectar con profesionales de tu sector puede abrirte puertas inesperadas. Participa en eventos y usa LinkedIn estratégicamente.",
-                now.minusYears(1).minusMonths(3),
-                networkingImage,
-                carlos
-        );
-        postRepository.save(post4);
+                // Post 4
+                Post post4 = new Post(
+                                "El Poder del Networking: Construye tu Red para Encontrar Empleo",
+                                "Conectar con profesionales de tu sector puede abrirte puertas inesperadas. Participa en eventos y usa LinkedIn estratégicamente.",
+                                now.minusYears(1).minusMonths(3),
+                                networkingImage,
+                                carlos);
+                postRepository.save(post4);
 
-        // Generación de empresas
-        for (int i = 1; i <= 30; i++) {
-            Company company = new Company();
-            company.setName("Tech Solutions " + i);
-            company.setEmail("contacto" + i + "@techsolutions.com");
-            company.setLocation(i % 2 == 0 ? "Madrid" : "Barcelona");
-            company.setBio("Somos una empresa innovadora dedicada a " + (i % 2 == 0 ? "desarrollo de software" : "consultoría tecnológica") + ". ¡Buscamos talento como tú!");
-            company.setImagePath("");
-            company.setFavouriteUsersList(new ArrayList<>());
-            companyRepository.save(company);
+                // Generación de empresas
+                for (int i = 1; i <= 30; i++) {
+                        Company company = new Company();
+                        company.setName("Tech Solutions " + i);
+                        company.setEmail("contacto" + i + "@techsolutions.com");
+                        company.setLocation(i % 2 == 0 ? "Madrid" : "Barcelona");
+                        company.setBio("Somos una empresa innovadora dedicada a "
+                                        + (i % 2 == 0 ? "desarrollo de software" : "consultoría tecnológica")
+                                        + ". ¡Buscamos talento como tú!");
+                        company.setImagePath("");
+                        company.setFavouriteUsersList(new ArrayList<>());
+                        companyRepository.save(company);
+                }
+
+                // Usuario adicional
+                User martina = new User("Martina Pérez", "martina.perez@gmail.com", "martinini123", "659801423",
+                                "Vicálvaro",
+                                "Busco oportunidades en recursos humanos o gestión de proyectos.", 2, null, null, null,
+                                null);
+                userRepository.save(martina);
+
+                // Empresas adicionales
+                Company company1 = new Company("Innovatech", "info@innovatech.com", "password123", "Madrid",
+                                "Líderes en soluciones tecnológicas para el futuro. Únete a nuestro equipo.", null);
+                companyRepository.save(company1);
+
+                Company company2 = new Company("JobConnect", "hr@jobconnect.es", "password123", "Barcelona",
+                                "Conectamos talento con las mejores oportunidades del mercado.", null);
+                companyRepository.save(company2);
         }
 
-        // Usuario adicional
-        User martina = new User("Martina Pérez", "martina.perez@gmail.com", "martinini123", "659801423", "Vicálvaro",
-                "Busco oportunidades en recursos humanos o gestión de proyectos.", 2, null, null, null, null);
-        userRepository.save(martina);
-
-        // Empresas adicionales
-        Company company1 = new Company("Innovatech", "info@innovatech.com", "password123", "Madrid",
-                "Líderes en soluciones tecnológicas para el futuro. Únete a nuestro equipo.", null);
-        companyRepository.save(company1);
-
-        Company company2 = new Company("JobConnect", "hr@jobconnect.es", "password123", "Barcelona",
-                "Conectamos talento con las mejores oportunidades del mercado.", null);
-        companyRepository.save(company2);
-    }
-
-    private byte[] loadImageFromResources(String path) throws IOException {
-        try {
-            ClassPathResource resource = new ClassPathResource(path);
-            return FileCopyUtils.copyToByteArray(resource.getInputStream());
-        } catch (IOException e) {
-            System.err.println("Could not load image: " + path);
-            return new byte[0];
+        private byte[] loadImageFromResources(String path) throws IOException {
+                try {
+                        ClassPathResource resource = new ClassPathResource(path);
+                        return FileCopyUtils.copyToByteArray(resource.getInputStream());
+                } catch (IOException e) {
+                        System.err.println("Could not load image: " + path);
+                        return new byte[0];
+                }
         }
-    }
 }

@@ -11,9 +11,4 @@ public class MainController {
         return "main";
     }
 
-    @GetMapping("/options") // Shows the options page, we decided not to create a dedicated Controller because of its simplicity
-    public String showOptionsPage() {
-        return "options";
-    }
-
 }

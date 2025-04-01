@@ -90,7 +90,7 @@ public class MatchController {
         try {
             Company company = companyService.findById(companyId);
             model.addAttribute("company", company);
-            return "show_company";
+            return "company/show_company";
         } catch (EntityNotFoundException e) {
             return "error";
         }
