@@ -33,7 +33,7 @@ public class CompanyRestController {
     public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
         Company company = companyService.findById(id);
         return (company == null) ? ResponseEntity.notFound().build()
-                                 : ResponseEntity.ok(companyMapper.toDTO(company));
+                : ResponseEntity.ok(companyMapper.toDTO(company));
     }
 
     @PostMapping
@@ -47,7 +47,8 @@ public class CompanyRestController {
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> update(@PathVariable Long id, @RequestBody CompanyDTO dto) {
         Company existing = companyService.findById(id);
-        if (existing == null) return ResponseEntity.notFound().build();
+        if (existing == null)
+            return ResponseEntity.notFound().build();
         Company updated = companyMapper.toEntity(dto);
         updated.setId(id);
         companyService.save(updated);
@@ -57,9 +58,10 @@ public class CompanyRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<CompanyDTO> delete(@PathVariable Long id) {
         Company company = companyService.findById(id);
-        if (company == null) return ResponseEntity.notFound().build();
+        if (company == null)
+            return ResponseEntity.notFound().build();
         companyService.delete(company);
         return ResponseEntity.ok(companyMapper.toDTO(company));
     }
-    
+
 }
