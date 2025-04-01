@@ -1,1 +1,49 @@
-<!-- Review_detail.html-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Reseña</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/blogStyles.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="/js/darkMode.js" defer></script>
+</head>
+<body class="page-centered">
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/blog/posts/{{post.id}}'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button class="hidden-button"></button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="box">
+            
+            <h1><p style="font-size: 25px;">Reseña para: "{{post.title}}"</p></h1>
+            <div class="review-content">
+                
+                <p>{{review.text}}</p>
+                <p><strong>Rating:</strong> {{review.rating}} / 5</p>
+                <p><strong>Autor:</strong> {{review.author.name}}</p>
+            </div>
+            <div class="button-group">
+                <button onclick="location.href='/blog/posts/{{post.id}}/reviews/{{review.id}}/edit'">Editar</button>
+                <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/delete" method="post" style="display:inline;">
+                    <button type="submit">Borrar</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
+    </footer>
+</body>
+</html>

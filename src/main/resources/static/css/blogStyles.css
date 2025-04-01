@@ -87,3 +87,22 @@ body {
     border-radius: 4px;
     cursor: pointer;
 }
+
+.review-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1em;
+    transition: background-color 0.2s;
+}
+
+.review-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.review-content {
+    margin: 1em 0;
+    padding: 1em;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+}
