@@ -94,7 +94,7 @@ public class DataGeneratorService {
                                 carlos);
                 postRepository.save(post4);
 
-                // Generación de empresas
+                // Enterprise generation
                 for (int i = 1; i <= 30; i++) {
                         Company company = new Company();
                         company.setName("Tech Solutions " + i);
@@ -108,21 +108,6 @@ public class DataGeneratorService {
                         companyRepository.save(company);
                 }
 
-                // Usuario adicional
-                User martina = new User("Martina Pérez", "martina.perez@gmail.com", "martinini123", "659801423",
-                                "Vicálvaro",
-                                "Busco oportunidades en recursos humanos o gestión de proyectos.", 2, null, null, null,
-                                null);
-                userRepository.save(martina);
-
-                // Empresas adicionales
-                Company company1 = new Company("Innovatech", "info@innovatech.com", "password123", "Madrid",
-                                "Líderes en soluciones tecnológicas para el futuro. Únete a nuestro equipo.", null);
-                companyRepository.save(company1);
-
-                Company company2 = new Company("JobConnect", "hr@jobconnect.es", "password123", "Barcelona",
-                                "Conectamos talento con las mejores oportunidades del mercado.", null);
-                companyRepository.save(company2);
         }
 
         private byte[] loadImageFromResources(String path) throws IOException {
@@ -134,4 +119,5 @@ public class DataGeneratorService {
                         return new byte[0];
                 }
         }
+
 }
