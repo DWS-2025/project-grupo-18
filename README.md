@@ -30,7 +30,7 @@ La aplicación gestiona las siguientes entidades principales, las cuales pueden 
 
 Relaciones destacadas:
 
-- Un usuario puede dar 'like' a múltiples empresas (relación N:M).
+- Varios usuarios pueden dar 'like' a múltiples empresas (relación N:M).
 - Un post puede tener muchas reviews (1:N).
 - Un usuario puede tener varios posts (1:N).
 - Un usuario puede tener varias reviews (1:N).
