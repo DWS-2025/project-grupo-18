@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
@@ -19,6 +20,7 @@ import es.grupo18.jobmatcher.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 
 @Service
+@Profile("h2")
 public class DataGeneratorService {
 
         @Autowired
