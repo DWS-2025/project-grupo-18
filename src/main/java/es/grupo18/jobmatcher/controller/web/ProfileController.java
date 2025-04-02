@@ -25,28 +25,59 @@ public class ProfileController {
     @GetMapping("/profile")
     public String showProfile(Model model) {
         model.addAttribute("user", userService.getLoggedUser());
+        model.addAttribute("currentTimeMillis", System.currentTimeMillis());
         return "profile/profile";
     }
 
     @GetMapping("/profile/image")
-    public ResponseEntity<Object> getProfileImage() throws SQLException {
+    public ResponseEntity<byte[]> getProfileImage() {
         User user = userService.getLoggedUser();
+    
         if (user.getImageFile() != null) {
-            Resource file = new InputStreamResource(user.getImageFile().getBinaryStream());
+            String contentType = user.getImageContentType();
+            if (contentType == null || contentType.isBlank()) {
+                contentType = "image/jpeg";
+            }
+    
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                    .contentLength(user.getImageFile().length())
-                    .body(file);
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(user.getImageFile());
         } else {
             return ResponseEntity.notFound().build();
         }
+
     }
+    
 
     @PostMapping("/profile/upload_image")
-    public String uploadProfileImage(@RequestParam("imageFile") MultipartFile imageFile) throws IOException {
-        userService.save(userService.getLoggedUser(), imageFile);
-        return "redirect:/profile";
+    public ResponseEntity<?> uploadProfileImage(@RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+        User user = userService.getLoggedUser();
+    
+        if (!imageFile.isEmpty()) {
+            String contentType = imageFile.getContentType();
+    
+            if (contentType != null && (contentType.equals("image/jpeg") ||
+                    contentType.equals("image/jpg") ||
+                    contentType.equals("image/png") ||
+                    contentType.equals("image/webp"))) {
+    
+                user.setImageFile(imageFile.getBytes());
+                user.setImageContentType(contentType);
+                userService.save(user);
+                return ResponseEntity.ok().build();
+    
+            } else {
+                return ResponseEntity
+                    .badRequest()
+                    .body("Formato de imagen no válido");
+            }
+        }
+    
+        return ResponseEntity
+            .badRequest()
+            .body("No se ha seleccionado ninguna imagen");
     }
+    
 
     @PostMapping("/profile/reset_image")
     public String resetProfileImage() {

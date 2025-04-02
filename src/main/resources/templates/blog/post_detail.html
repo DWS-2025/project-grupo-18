@@ -29,7 +29,7 @@
                 <h1>{{post.title}}</h1>
                 {{#post.hasImage}}
                 <div class="post-image-container">
-                    <img src="/blog/posts/{{post.id}}/image" alt="Imagen del post" class="post-image" onerror="this.style.display='none'">
+                    <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post" class="post-image" onerror="this.style.display='none'">
                 </div>
                 {{/post.hasImage}}
                 <p>{{post.content}}</p>

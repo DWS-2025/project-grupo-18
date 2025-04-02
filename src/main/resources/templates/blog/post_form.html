@@ -48,7 +48,7 @@
                     {{#post.hasImage}}
                     <div class="current-image">
                         <p>Imagen actual:</p>
-                        <img src="/blog/posts/{{post.id}}/image" alt="Imagen actual" style="max-width: 200px;">
+                        <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen actual" style="max-width: 200px;">
                     </div>
                     {{/post.hasImage}}
                     {{/isEdit}}

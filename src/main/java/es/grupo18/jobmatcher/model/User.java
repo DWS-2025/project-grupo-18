@@ -31,7 +31,8 @@ public class User {
     private int experience;
 
     @Lob
-    private Blob imageFile;
+    private byte[] imageFile;
+    private String imageContentType;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewsList;
@@ -51,7 +52,7 @@ public class User {
     // Complete constructor
 
     public User(String name, String email, String password, String phone, String location, String bio, int experience,
-            Blob imageFile,
+            byte[] imageFile,
             List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
         this.name = name;
         this.email = email;
@@ -65,6 +66,10 @@ public class User {
         this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
         this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList)
                 : new ArrayList<>();
+    }
+
+    public boolean hasImage() {
+        return imageFile != null && imageFile.length > 0 && imageContentType != null;
     }
 
     // Getters
@@ -101,10 +106,14 @@ public class User {
         return experience;
     }
 
-    public Blob getImageFile() {
+    public byte[] getImageFile() {
         return imageFile;
     }
 
+    public String getImageContentType() {
+        return imageContentType;
+    }
+    
     public List<Review> getReviews() {
         return reviewsList;
     }
@@ -151,8 +160,12 @@ public class User {
         this.experience = experience;
     }
 
-    public void setImageFile(Blob imageFile) {
+    public void setImageFile(byte[] imageFile) {
         this.imageFile = imageFile;
+    }
+
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
     }
 
     public void setReviews(List<Review> reviewsList) {
@@ -183,6 +196,7 @@ public class User {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
+    
 
     @Override
     public String toString() {

@@ -48,11 +48,12 @@ public class UserService {
 
     public void save(User user, MultipartFile imageFile) throws IOException { // Saves a user with an image
         if (!imageFile.isEmpty()) {
-            user.setImageFile(BlobProxy.generateProxy(imageFile.getInputStream(),
-                    imageFile.getSize()));
+            user.setImageFile(imageFile.getBytes()); // ← antes usabas BlobProxy
+            user.setImageContentType(imageFile.getContentType()); // ← añade esto si quieres guardar el tipo MIME
         }
         this.save(user);
     }
+    
 
     public void update(String name, String email, String password, String phone, String location, String bio,
             int experience) { // Updates the user's profile
@@ -101,9 +102,11 @@ public class UserService {
     public void updateUserImage(MultipartFile imageFile) throws IOException {
         if (!imageFile.isEmpty()) {
             User user = getLoggedUser();
-            user.setImageFile(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
+            user.setImageFile(imageFile.getBytes());
+            user.setImageContentType(imageFile.getContentType());
             save(user);
         }
     }
+    
 
 }

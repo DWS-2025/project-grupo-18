@@ -31,18 +31,15 @@
         <!-- Profile photo -->
         <div class="box">
             <h2>Foto de Perfil</h2>
-            <img id="profilePhoto" src="/profile/image" alt="Foto de perfil" class="profile-picture"
-                onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
+            <img id="profilePhoto" src="/profile/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
+                class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
             <div class="button-group">
-                <form action="/profile/reset_image" method="post" style="display:inline;">
-                    <button type="submit">Restablecer Foto</button>
-                </form>
-                <form action="/profile/upload_image" method="post" enctype="multipart/form-data"
-                    style="display:inline;">
-                    <input type="file" id="photoInput" name="imageFile" accept="image/*" style="display:none;"
-                        onchange="this.form.submit();">
+                <button id="resetPhotoButton">Restablecer Foto</button>
+                <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
+                    <input type="file" id="photoInput" name="imageFile" accept="image/*" style="display:none;">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
+
             </div>
         </div>
 
@@ -69,5 +66,58 @@
     </footer>
 
 </body>
+
+<script>
+    document.getElementById("uploadForm").addEventListener("change", function (e) {
+        const fileInput = document.getElementById("photoInput");
+        if (!fileInput.files.length) return;
+
+        const formData = new FormData();
+        formData.append("imageFile", fileInput.files[0]);
+
+        fetch('/profile/upload_image', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al subir la imagen");
+                const timestamp = Date.now();
+                const img = document.getElementById("profilePhoto");
+                img.src = `/profile/image?ts=${timestamp}`;
+            })
+            .catch(err => {
+                alert("Error: " + err.message);
+            });
+    });
+
+    document.getElementById("resetPhotoButton").addEventListener("click", function () {
+    fetch('/profile/reset_image', { method: 'POST' })
+        .then(response => {
+            if (!response.ok) throw new Error("Error al restablecer la imagen");
+
+            const timestamp = Date.now();
+            const img = document.getElementById("profilePhoto");
+
+            // Creamos una imagen temporal para comprobar si carga
+            const testImg = new Image();
+            testImg.onload = () => {
+                // Si carga, actualizamos la imagen real
+                img.src = testImg.src;
+            };
+            testImg.onerror = () => {
+                // Si falla, cargamos la imagen por defecto
+                img.src = '/img/default-profile.jpg';
+            };
+            testImg.src = `/profile/image?ts=${timestamp}`;
+        })
+        .catch(err => {
+            alert("Error: " + err.message);
+        });
+});
+
+
+
+</script>
+
 
 </html>

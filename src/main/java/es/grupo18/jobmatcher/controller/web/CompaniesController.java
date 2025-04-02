@@ -34,7 +34,7 @@ public class CompaniesController {
         model.addAttribute("hasNext", hasNext);
         model.addAttribute("next", pageable.getPageNumber() + 1);
 
-        return "companies";
+        return "company/companies";
     }
 
     @GetMapping("/companies/new")

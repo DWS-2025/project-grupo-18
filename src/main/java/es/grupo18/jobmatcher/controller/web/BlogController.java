@@ -63,7 +63,9 @@ public class BlogController {
         model.addAttribute("to", to != null ? to : "");
         model.addAttribute("sortIsAsc", "asc".equals(sort));
         model.addAttribute("sortIsDesc", "desc".equals(sort));
-        model.addAttribute("title", title != null ? title : "");
+        model.addAttribute("title", title != null ? title : "");            
+        model.addAttribute("currentTimeMillis", System.currentTimeMillis());
+
 
         return "blog/posts";
     }
@@ -84,7 +86,7 @@ public class BlogController {
 
             if (contentType != null &&
                     (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
-                            || contentType.equals("image/png"))) {
+                            || contentType.equals("image/png") || contentType.equals("image/webp"))) {
 
                 post.setImage(imageFile.getBytes());
                 post.setImageContentType(contentType);
@@ -108,7 +110,8 @@ public class BlogController {
                 post.setReviews(new ArrayList<>());
             }
             model.addAttribute("post", post);
-            model.addAttribute("postId", postId); // Añade postId explícitamente
+            model.addAttribute("postId", postId);
+            model.addAttribute("currentTimeMillis", System.currentTimeMillis());
             return "blog/post_detail";
         } else {
             return "post_not_found";
@@ -121,6 +124,7 @@ public class BlogController {
         if (post.isPresent()) {
             model.addAttribute("post", post.get());
             model.addAttribute("isEdit", true);
+            model.addAttribute("currentTimeMillis", System.currentTimeMillis());
             return "blog/post_form";
         } else {
             return "post_not_found";
