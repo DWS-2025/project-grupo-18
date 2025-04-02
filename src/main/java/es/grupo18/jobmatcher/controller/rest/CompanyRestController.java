@@ -3,7 +3,9 @@ package es.grupo18.jobmatcher.controller.rest;
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.model.Company;
+import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.CompanyService;
+import es.grupo18.jobmatcher.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ public class CompanyRestController {
 
     @Autowired
     private CompanyMapper companyMapper;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public List<CompanyDTO> getAll(Pageable pageable) {
@@ -64,4 +69,32 @@ public class CompanyRestController {
         return ResponseEntity.ok(companyMapper.toDTO(company));
     }
 
-}
+    @PostMapping("/{id}/favourites")
+    public ResponseEntity<Void> addToFavourites(@PathVariable Long id) {
+        User user = userService.getLoggedUser();
+        Company company = companyService.findById(id);
+        if (!user.getFavouriteCompaniesList().contains(company)) {
+            user.getFavouriteCompaniesList().add(company);
+            userService.save(user);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/favourites")
+    public ResponseEntity<Void> removeFromFavourites(@PathVariable Long id) {
+        User user = userService.getLoggedUser();
+        Company company = companyService.findById(id);
+        user.getFavouriteCompaniesList().remove(company);
+        userService.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/favourites")
+    public ResponseEntity<Boolean> isFavourite(@PathVariable Long id) {
+        User user = userService.getLoggedUser();
+        Company company = companyService.findById(id);
+        boolean isFav = user.getFavouriteCompaniesList().contains(company);
+        return ResponseEntity.ok(isFav);
+    }
+    
+} 
