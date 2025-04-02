@@ -1,5 +1,6 @@
 package es.grupo18.jobmatcher.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import es.grupo18.jobmatcher.dto.CompanyDTO;
+import es.grupo18.jobmatcher.dto.UserDTO;
+import es.grupo18.jobmatcher.mapper.CompanyMapper;
+import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
-import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.CompanyRepository;
 
 @Service
@@ -17,16 +21,22 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
+    @Autowired
+    private CompanyMapper companyMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
     public Page<Company> findAll(Pageable pageable) {
         return companyRepository.findAll(pageable);
     }
 
-    public List<Company> findAll() {
-        return companyRepository.findAll();
+    public Collection<CompanyDTO> findAll() {
+        return toDTOs(companyRepository.findAll());
     }
 
-    public Company findById(long id) {
-        return companyRepository.findById(id).orElse(null);
+    public CompanyDTO findById(long id) {
+        return toDTO(companyRepository.findById(id).orElse(null));
     }
 
     public Page<Company> findPaginated(Pageable pageable) {
@@ -37,41 +47,65 @@ public class CompanyService {
         return companyRepository.count();
     }
 
-    public void save(Company company) { // Saves a company
-        companyRepository.save(company);
+    public CompanyDTO save(CompanyDTO company) { // Saves a company
+        Company companyDomain = toDomain(company);
+        companyRepository.save(companyDomain);
+        return toDTO(companyDomain);
     }
 
-    public void update(Company oldCompany, Company updatedCompany) {
+    public CompanyDTO update(CompanyDTO oldCompanyDTO, CompanyDTO updatedCompanyDTO) {
+        Company oldCompany = toDomain(oldCompanyDTO);
+        Company updatedCompany = toDomain(updatedCompanyDTO);
         oldCompany.setName(updatedCompany.getName());
         oldCompany.setEmail(updatedCompany.getEmail());
         oldCompany.setLocation(updatedCompany.getLocation());
         oldCompany.setBio(updatedCompany.getBio());
         companyRepository.save(oldCompany);
+        return toDTO(oldCompany);
     }
 
     public void deleteById(long id) { // Deletes a company by its id
         companyRepository.deleteById(id);
     }
 
-    public void delete(Company company) { // Deletes a company
-        companyRepository.deleteById(company.getId());
+    public CompanyDTO delete(CompanyDTO company) { // Deletes a company
+        Company companyDomain = toDomain(company);
+        companyRepository.deleteById(companyDomain.getId());
+        return toDTO(companyDomain);
     }
 
     // Methods to manage favourite users
 
-    public void addOrRemoveFavouriteUser(long id, User user) {
-        Company company = findById(id);
-        if (company.getFavouriteUsersList().contains(user)) {
-            company.getFavouriteUsersList().remove(user);
+    public CompanyDTO addOrRemoveFavouriteUser(long id, UserDTO user) {
+        Company company = toDomain(findById(id));
+        if (company.getFavouriteUsersList().contains(userMapper.toDomain(user))) {
+            company.getFavouriteUsersList().remove(userMapper.toDomain(user));
         } else {
-            company.getFavouriteUsersList().add(user);
+            company.getFavouriteUsersList().add(userMapper.toDomain(user));
         }
         companyRepository.save(company);
+        return toDTO(company);
     }
 
-    public boolean isUserFavourite(long id, User user) {
-        Company company = findById(id);
-        return company.getFavouriteUsersList().contains(user);
+    public boolean isUserFavourite(long id, UserDTO user) {
+        Company company = toDomain(findById(id));
+        return company.getFavouriteUsersList().contains(userMapper.toDomain(user));
+    }
+
+    CompanyDTO toDTO(Company company) {
+        return companyMapper.toDTO(company);
+    }
+
+    Company toDomain(CompanyDTO dto) {
+        return companyMapper.toDomain(dto);
+    }
+
+    List<CompanyDTO> toDTOs(List<Company> companies) {
+        return companyMapper.toDTOs(companies);
+    }
+
+    List<Company> toDomains(List<CompanyDTO> dtos) {
+        return companyMapper.toDomains(dtos);
     }
 
 }

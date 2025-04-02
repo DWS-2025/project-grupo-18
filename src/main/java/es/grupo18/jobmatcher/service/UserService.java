@@ -80,7 +80,7 @@ public class UserService {
     }
 
     public void deleteById(long id) { // Deletes a user by its id
-
+        userRepository.deleteById(id);
     }
 
     public UserDTO delete(UserDTO user) { // Deletes a user

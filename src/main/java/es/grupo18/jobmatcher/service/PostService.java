@@ -5,11 +5,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import es.grupo18.jobmatcher.dto.PostDTO;
+import es.grupo18.jobmatcher.mapper.PostMapper;
+import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.repository.PostRepository;
 
@@ -20,51 +24,61 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
+    private PostMapper postMapper;
+
+    @Autowired
     private UserService userService;
 
-    public List<Post> findAllWithAuthors() { // Returns the posts list with authors
-        return postRepository.findAllWithAuthors();
+    @Autowired
+    private UserMapper userMapper;
+
+    public Collection<PostDTO> findAllWithAuthors() {
+        return toDTOs(postRepository.findAllWithAuthors());
     }
 
-    public List<Post> findAll() { // Returns the posts list in reverse order
-        return postRepository.findAll();
+    public Collection<PostDTO> findAll() {
+        return toDTOs(postRepository.findAll());
     }
 
-    public Optional<Post> findById(long id) { // Returns a post by its id
-        return postRepository.findById(id);
+    public PostDTO findById(long id) {
+        Optional<Post> post = postRepository.findById(id);
+        return post.map(this::toDTO).orElse(null);
     }
 
-    public void save(Post post) { // Saves a post
-        post.setAuthor(userService.getLoggedUser());
+    public PostDTO save(PostDTO postDTO) {
+        Post post = toDomain(postDTO);
+        post.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
         postRepository.save(post);
+        return toDTO(post);
     }
 
-    public void update(Post oldPost, Post updatedPost) {
-        oldPost.setTitle(updatedPost.getTitle());
-        oldPost.setContent(updatedPost.getContent());
-        oldPost.setTimestamp(updatedPost.getTimestamp());
+    public PostDTO update(PostDTO oldPostDTO, PostDTO updatedPostDTO) {
+        Post post = toDomain(oldPostDTO);
+        post.setTitle(updatedPostDTO.title());
+        post.setContent(updatedPostDTO.content());
+        post.setTimestamp(LocalDateTime.parse(updatedPostDTO.timestamp()));
 
-        // Only update image if new one is provided
-        if (updatedPost.getImage() != null && updatedPost.getImage().length > 0) {
-            oldPost.setImage(updatedPost.getImage());
-            oldPost.setImageContentType(updatedPost.getImageContentType());
+        if (updatedPostDTO.image() != null && updatedPostDTO.image().length > 0) {
+            post.setImage(updatedPostDTO.image());
+            post.setImageContentType(updatedPostDTO.imageContentType());
         }
 
-        postRepository.save(oldPost);
+        postRepository.save(post);
+        return toDTO(post);
     }
 
-    public void deleteById(long id) { // Deletes a post by its id
-
+    public void deleteById(long id) {
+        postRepository.deleteById(id);
     }
 
-    public void delete(Post post) { // Deletes a post
-        postRepository.deleteById(post.getId());
+    public PostDTO delete(PostDTO post) {
+        postRepository.deleteById(toDomain(post).getId());
+        return post;
     }
 
-    public List<Post> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
+    public Collection<PostDTO> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
         List<Post> posts = new ArrayList<>(postRepository.findAll());
 
-        // FILTROS POR FECHA
         if (from != null && to != null) {
             posts = posts.stream()
                     .filter(p -> !p.getTimestamp().isBefore(from) && !p.getTimestamp().isAfter(to))
@@ -79,21 +93,31 @@ public class PostService {
                     .collect(Collectors.toList());
         }
 
-        //FILTRO POR TÍTULO
         if (title != null && !title.isBlank()) {
             posts = posts.stream()
                     .filter(p -> p.getTitle() != null && p.getTitle().toLowerCase().contains(title.toLowerCase()))
                     .collect(Collectors.toList());
         }
 
-        // ORDEN
         if ("desc".equals(sort)) {
             posts.sort((p1, p2) -> p2.getTimestamp().compareTo(p1.getTimestamp()));
         } else if ("asc".equals(sort)) {
             posts.sort(Comparator.comparing(Post::getTimestamp));
         }
 
-        return posts;
+        return toDTOs(posts);
     }
 
-}
+    private PostDTO toDTO(Post post) {
+        return postMapper.toDTO(post);
+    }
+
+    private Post toDomain(PostDTO dto) {
+        return postMapper.toDomain(dto);
+    }
+
+    private List<PostDTO> toDTOs(List<Post> posts) {
+        return postMapper.toDTOs(posts);
+    }
+
+} 

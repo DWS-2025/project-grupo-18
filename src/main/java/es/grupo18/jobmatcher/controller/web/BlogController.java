@@ -1,10 +1,14 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import java.util.Optional;
-
+import es.grupo18.jobmatcher.dto.PostDTO;
+import es.grupo18.jobmatcher.dto.ReviewDTO;
+import es.grupo18.jobmatcher.service.PostService;
+import es.grupo18.jobmatcher.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -12,17 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-
-import es.grupo18.jobmatcher.model.Post;
-import es.grupo18.jobmatcher.model.Review;
-import es.grupo18.jobmatcher.service.PostService;
-import es.grupo18.jobmatcher.service.ReviewService;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class BlogController {
@@ -34,8 +27,7 @@ public class BlogController {
     private ReviewService reviewService;
 
     @GetMapping("/blog/posts")
-    public String getFilteredPosts(
-            @RequestParam(required = false) String sort,
+    public String getFilteredPosts(@RequestParam(required = false) String sort,
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
             @RequestParam(required = false) String title,
@@ -52,10 +44,10 @@ public class BlogController {
             if (to != null && !to.isBlank()) {
                 toDate = LocalDateTime.parse(to, formatter);
             }
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
         }
 
-        List<Post> posts = postService.findFilteredPosts(sort, fromDate, toDate, title);
+        List<PostDTO> posts = new ArrayList<>(postService.findFilteredPosts(sort, fromDate, toDate, title));
 
         model.addAttribute("posts", posts);
         model.addAttribute("sort", sort != null ? sort : "");
@@ -63,52 +55,47 @@ public class BlogController {
         model.addAttribute("to", to != null ? to : "");
         model.addAttribute("sortIsAsc", "asc".equals(sort));
         model.addAttribute("sortIsDesc", "desc".equals(sort));
-        model.addAttribute("title", title != null ? title : "");            
+        model.addAttribute("title", title != null ? title : "");
         model.addAttribute("currentTimeMillis", System.currentTimeMillis());
-
 
         return "blog/posts";
     }
 
     @GetMapping("/blog/posts/new")
     public String showNewPostForm(Model model) {
-        if (!model.containsAttribute("post")) {
-            model.addAttribute("post", new Post());
-        }
+        model.addAttribute("post", new PostDTO(null, "", "", LocalDateTime.now().toString(), null, null, null));
         model.addAttribute("isEdit", false);
         return "blog/post_form";
     }
 
     @PostMapping("/blog/posts/new")
-    public String newPost(@RequestParam("imageFile") MultipartFile imageFile, Post post) throws IOException {
+    public String newPost(@RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam String title,
+            @RequestParam String content) throws IOException {
+
+        byte[] imageBytes = null;
+        String contentType = null;
+
         if (!imageFile.isEmpty()) {
-            String contentType = imageFile.getContentType();
-
-            if (contentType != null &&
-                    (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
-                            || contentType.equals("image/png") || contentType.equals("image/webp"))) {
-
-                post.setImage(imageFile.getBytes());
-                post.setImageContentType(contentType);
-
+            contentType = imageFile.getContentType();
+            if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
+                    || contentType.equals("image/png") || contentType.equals("image/webp"))) {
+                imageBytes = imageFile.getBytes();
             } else {
                 return "redirect:/blog/posts/new?error=invalidImageType";
             }
         }
 
-        post.setTimestamp(LocalDateTime.now());
-        postService.save(post);
+        PostDTO postDTO = new PostDTO(null, title, content, LocalDateTime.now().toString(), null, imageBytes,
+                contentType);
+        postService.save(postDTO);
         return "redirect:/blog/posts";
     }
 
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
-        Optional<Post> postOpt = postService.findById(postId);
-        if (postOpt.isPresent()) {
-            Post post = postOpt.get();
-            if (post.getReviews() == null) {
-                post.setReviews(new ArrayList<>());
-            }
+        PostDTO post = postService.findById(postId);
+        if (post != null) {
             model.addAttribute("post", post);
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
@@ -120,9 +107,9 @@ public class BlogController {
 
     @GetMapping("/blog/posts/{postId}/edit")
     public String editPost(Model model, @PathVariable long postId) {
-        Optional<Post> post = postService.findById(postId);
-        if (post.isPresent()) {
-            model.addAttribute("post", post.get());
+        PostDTO post = postService.findById(postId);
+        if (post != null) {
+            model.addAttribute("post", post);
             model.addAttribute("isEdit", true);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
             return "blog/post_form";
@@ -134,37 +121,35 @@ public class BlogController {
     @PostMapping("/blog/posts/{postId}/edit")
     public String updatePost(@PathVariable long postId,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-            Post updatedPost) {
-        Optional<Post> op = postService.findById(postId);
-        if (op.isPresent()) {
-            Post oldPost = op.get();
-            try {
-                if (imageFile != null && !imageFile.isEmpty()) {
-                    updatedPost.setImage(imageFile.getBytes());
-                    String contentType = imageFile.getContentType();
-                    if (contentType == null || contentType.isBlank()) {
-                        contentType = "image/jpeg";
-                    }
-                    updatedPost.setImageContentType(contentType);
-                } else {
-                    updatedPost.setImage(oldPost.getImage());
-                    updatedPost.setImageContentType(oldPost.getImageContentType());
-                }
-                updatedPost.setTimestamp(LocalDateTime.now());
-                postService.update(oldPost, updatedPost);
-                return "redirect:/blog/posts/" + postId;
-            } catch (IOException e) {
-                return "error";
+            @RequestParam String title,
+            @RequestParam String content) throws IOException {
+
+        PostDTO existing = postService.findById(postId);
+        if (existing == null)
+            return "post_not_found";
+
+        byte[] image = existing.image();
+        String contentType = existing.imageContentType();
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            image = imageFile.getBytes();
+            contentType = imageFile.getContentType();
+            if (contentType == null || contentType.isBlank()) {
+                contentType = "image/jpeg";
             }
         }
-        return "post_not_found";
+
+        PostDTO updated = new PostDTO(postId, title, content, LocalDateTime.now().toString(), existing.authorId(),
+                image, contentType);
+        postService.update(existing, updated);
+        return "redirect:/blog/posts/" + postId;
     }
 
     @PostMapping("/blog/posts/{postId}/delete")
     public String deletePost(@PathVariable long postId) {
-        Optional<Post> op = postService.findById(postId);
-        if (op.isPresent()) {
-            postService.delete(op.get());
+        PostDTO post = postService.findById(postId);
+        if (post != null) {
+            postService.delete(post);
             return "redirect:/blog/posts";
         } else {
             return "post_not_found";
@@ -172,10 +157,12 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/{postId}/reviews/new")
-    public String newReview(@PathVariable long postId, Review review) {
-        Optional<Post> op = postService.findById(postId);
-        if (op.isPresent()) {
-            Post post = op.get();
+    public String newReview(@PathVariable long postId,
+            @RequestParam String text,
+            @RequestParam int rating) {
+        PostDTO post = postService.findById(postId);
+        if (post != null) {
+            ReviewDTO review = new ReviewDTO(null, text, rating, null, null);
             reviewService.save(post, review);
             return "redirect:/blog/posts/" + postId;
         } else {
@@ -185,26 +172,25 @@ public class BlogController {
 
     @GetMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
     public String editReview(Model model, @PathVariable long postId, @PathVariable long reviewId) {
-        Optional<Post> post = postService.findById(postId);
-        if (post.isPresent()) {
-            Optional<Review> review = reviewService.findById(reviewId);
-            if (review.isPresent()) {
-                model.addAttribute("post", post.get());
-                model.addAttribute("review", review.get());
-                return "blog/review_form";
-            }
+        PostDTO post = postService.findById(postId);
+        ReviewDTO review = reviewService.findById(reviewId);
+        if (post != null && review != null) {
+            model.addAttribute("post", post);
+            model.addAttribute("review", review);
+            return "blog/review_form";
         }
         return "post_not_found";
     }
 
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
-    public String updateReview(@PathVariable long postId, @PathVariable long reviewId, Review updatedReview) {
-        Optional<Review> reviewOpt = reviewService.findById(reviewId);
-        if (reviewOpt.isPresent()) {
-            Review review = reviewOpt.get();
-            review.setText(updatedReview.getText());
-            review.setRating(updatedReview.getRating());
-            reviewService.update(review, updatedReview);
+    public String updateReview(@PathVariable long postId,
+            @PathVariable long reviewId,
+            @RequestParam String text,
+            @RequestParam int rating) {
+        ReviewDTO oldReview = reviewService.findById(reviewId);
+        if (oldReview != null) {
+            ReviewDTO updated = new ReviewDTO(reviewId, text, rating, oldReview.authorId(), oldReview.postId());
+            reviewService.update(oldReview, updated);
             return "redirect:/blog/posts/" + postId;
         }
         return "post_not_found";
@@ -212,9 +198,8 @@ public class BlogController {
 
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/delete")
     public String deleteReview(@PathVariable long postId, @PathVariable long reviewId) {
-        Optional<Post> op = postService.findById(postId);
-        if (op.isPresent()) {
-            Post post = op.get();
+        PostDTO post = postService.findById(postId);
+        if (post != null) {
             reviewService.delete(reviewId, post);
             return "redirect:/blog/posts/" + postId;
         } else {
@@ -224,19 +209,13 @@ public class BlogController {
 
     @GetMapping("/blog/posts/{postId}/reviews/{reviewId}")
     public String getReview(Model model, @PathVariable long postId, @PathVariable long reviewId) {
-        Optional<Post> postOpt = postService.findById(postId);
-        if (postOpt.isPresent()) {
-            Post post = postOpt.get();
-            Optional<Review> reviewOpt = post.getReviews().stream()
-                    .filter(review -> review.getId() == reviewId)
-                    .findFirst();
-            if (reviewOpt.isPresent()) {
-                model.addAttribute("post", post);
-                model.addAttribute("review", reviewOpt.get());
-                return "blog/review_detail";
-            }
+        PostDTO post = postService.findById(postId);
+        ReviewDTO review = reviewService.findById(reviewId);
+        if (post != null && review != null) {
+            model.addAttribute("post", post);
+            model.addAttribute("review", review);
+            return "blog/review_detail";
         }
         return "post_not_found";
     }
-
 }
