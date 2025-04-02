@@ -1,4 +1,4 @@
-package es.grupo18.jobmatcher.controller;
+package es.grupo18.jobmatcher.controller.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

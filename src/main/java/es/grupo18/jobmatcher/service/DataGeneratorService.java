@@ -105,7 +105,6 @@ public class DataGeneratorService {
                         company.setBio("Somos una empresa innovadora dedicada a "
                                         + (i % 2 == 0 ? "desarrollo de software" : "consultoría tecnológica")
                                         + ". ¡Buscamos talento como tú!");
-                        company.setImagePath("");
                         company.setFavouriteUsersList(new ArrayList<>());
                         companyRepository.save(company);
                 }

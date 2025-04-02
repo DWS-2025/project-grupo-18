@@ -1,4 +1,4 @@
-package es.grupo18.jobmatcher.controller;
+package es.grupo18.jobmatcher.controller.web;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;

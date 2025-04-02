@@ -1,4 +1,4 @@
-package es.grupo18.jobmatcher.controller;
+package es.grupo18.jobmatcher.controller.web;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class MatchController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/matches") //Show the matches page
+    @GetMapping("/matches") // Show the matches page
     public String showCompanies(Model model) {
         List<Company> allCompanies = companyService.findAll();
         User currentUser = userService.getLoggedUser();
@@ -51,6 +51,7 @@ public class MatchController {
 
         if (company != null) {
             userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
+            companyService.addOrRemoveFavouriteUser(companyId, currentUser);
         }
 
         return "redirect:/matches"; // Recharges the match page to show updates
@@ -63,8 +64,10 @@ public class MatchController {
 
         if (company != null) {
             userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
+            companyService.addOrRemoveFavouriteUser(companyId, currentUser);
         }
-        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches"); // Recharges the matches page to show updates
+        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches"); // Recharges the matches page
+                                                                                          // to show updates
     }
 
     @GetMapping("/matches/likes") // Show the likes match page
