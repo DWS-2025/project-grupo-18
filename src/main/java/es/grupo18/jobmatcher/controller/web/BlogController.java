@@ -78,22 +78,25 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/new")
-    public String newPost(@RequestParam("imageFile") MultipartFile imageFile, Post post) {
-        try {
-            if (!imageFile.isEmpty()) {
+    public String newPost(@RequestParam("imageFile") MultipartFile imageFile, Post post) throws IOException {
+        if (!imageFile.isEmpty()) {
+            String contentType = imageFile.getContentType();
+
+            if (contentType != null &&
+                    (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
+                            || contentType.equals("image/png"))) {
+
                 post.setImage(imageFile.getBytes());
-                String contentType = imageFile.getContentType();
-                if(contentType == null || contentType.isBlank()){
-                    contentType = "image/jpeg";
-                }
                 post.setImageContentType(contentType);
+
+            } else {
+                return "redirect:/blog/posts/new?error=invalidImageType";
             }
-            post.setTimestamp(LocalDateTime.now());
-            postService.save(post);
-            return "redirect:/blog/posts";
-        } catch (IOException e) {
-            return "error";
         }
+
+        post.setTimestamp(LocalDateTime.now());
+        postService.save(post);
+        return "redirect:/blog/posts";
     }
 
     @GetMapping("/blog/posts/{postId}")
@@ -135,7 +138,7 @@ public class BlogController {
                 if (imageFile != null && !imageFile.isEmpty()) {
                     updatedPost.setImage(imageFile.getBytes());
                     String contentType = imageFile.getContentType();
-                    if(contentType == null || contentType.isBlank()){
+                    if (contentType == null || contentType.isBlank()) {
                         contentType = "image/jpeg";
                     }
                     updatedPost.setImageContentType(contentType);
@@ -221,15 +224,15 @@ public class BlogController {
         if (postOpt.isPresent()) {
             Post post = postOpt.get();
             Optional<Review> reviewOpt = post.getReviews().stream()
-                .filter(review -> review.getId() == reviewId)
-                .findFirst();
+                    .filter(review -> review.getId() == reviewId)
+                    .findFirst();
             if (reviewOpt.isPresent()) {
                 model.addAttribute("post", post);
                 model.addAttribute("review", reviewOpt.get());
                 return "blog/review_detail";
             }
         }
-    return "post_not_found"; 
-}
+        return "post_not_found";
+    }
 
 }
