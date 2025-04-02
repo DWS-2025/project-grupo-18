@@ -1,11 +1,8 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import es.grupo18.jobmatcher.model.User;
+import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 @Controller
 public class ProfileController {
@@ -31,59 +27,36 @@ public class ProfileController {
 
     @GetMapping("/profile/image")
     public ResponseEntity<byte[]> getProfileImage() {
-        User user = userService.getLoggedUser();
-    
-        if (user.getImageFile() != null) {
-            String contentType = user.getImageContentType();
+        UserDTO user = userService.getLoggedUser();
+        if (user.imageFile() != null) {
+            String contentType = user.imageContentType();
             if (contentType == null || contentType.isBlank()) {
                 contentType = "image/jpeg";
             }
-    
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, contentType)
-                    .body(user.getImageFile());
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(user.imageFile());
         } else {
             return ResponseEntity.notFound().build();
         }
-
     }
-    
 
     @PostMapping("/profile/upload_image")
     public ResponseEntity<?> uploadProfileImage(@RequestParam("imageFile") MultipartFile imageFile) throws IOException {
-        User user = userService.getLoggedUser();
-    
         if (!imageFile.isEmpty()) {
             String contentType = imageFile.getContentType();
-    
-            if (contentType != null && (contentType.equals("image/jpeg") ||
-                    contentType.equals("image/jpg") ||
-                    contentType.equals("image/png") ||
-                    contentType.equals("image/webp"))) {
-    
-                user.setImageFile(imageFile.getBytes());
-                user.setImageContentType(contentType);
-                userService.save(user);
+            if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
+                    || contentType.equals("image/png") || contentType.equals("image/webp"))) {
+                userService.updateUserImage(imageFile);
                 return ResponseEntity.ok().build();
-    
             } else {
-                return ResponseEntity
-                    .badRequest()
-                    .body("Formato de imagen no válido");
+                return ResponseEntity.badRequest().body("Formato de imagen no válido");
             }
         }
-    
-        return ResponseEntity
-            .badRequest()
-            .body("No se ha seleccionado ninguna imagen");
+        return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
     }
-    
 
     @PostMapping("/profile/reset_image")
     public String resetProfileImage() {
-        User user = userService.getLoggedUser();
-        user.setImageFile(null);
-        userService.save(user);
+        userService.removeImage();
         return "redirect:/profile";
     }
 
@@ -100,16 +73,8 @@ public class ProfileController {
             @RequestParam String location,
             @RequestParam String bio,
             @RequestParam int experience) {
-
-        User user = userService.getLoggedUser();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setLocation(location);
-        user.setBio(bio);
-        user.setExperience(experience);
-        userService.save(user);
+        userService.update(name, email, null, phone, location, bio, experience);
         return "redirect:/profile";
     }
-
+    
 }

@@ -24,9 +24,6 @@ public class ReviewRestController {
     @Autowired
     private PostService postService;
 
-    @Autowired
-    private ReviewMapper reviewMapper;
-
     @GetMapping
     public List<ReviewDTO> getAll() {
         return reviewMapper.toDTOs(reviewService.findAll());

@@ -10,8 +10,9 @@ import java.util.List;
 public interface UserMapper {
 
     UserDTO toDTO(User user);
-    User toEntity(UserDTO userDTO);
+    User toDomain(UserDTO userDTO);
 
     List<UserDTO> toDTOs(List<User> users);
-    List<User> toEntities(List<UserDTO> dtos);
+    List<User> toDomains(List<UserDTO> dtos);
+
 }

@@ -15,8 +15,8 @@ public interface PostMapper {
     PostDTO toDTO(Post post);
 
     @Mapping(source = "authorId", target = "author.id")
-    Post toEntity(PostDTO dto);
+    Post toDomain(PostDTO dto);
 
     List<PostDTO> toDTOs(List<Post> posts);
-    List<Post> toEntities(List<PostDTO> dtos);
+    List<Post> toDomains(List<PostDTO> dtos);
 }

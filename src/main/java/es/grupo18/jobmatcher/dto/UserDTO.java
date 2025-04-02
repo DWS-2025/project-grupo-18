@@ -7,6 +7,8 @@ public record UserDTO(
     String phone,
     String location,
     String bio,
-    int experience
+    int experience,
+    byte[] imageFile,
+    String imageContentType
 ) {}
 

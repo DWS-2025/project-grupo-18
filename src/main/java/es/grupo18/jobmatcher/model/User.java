@@ -1,6 +1,5 @@
 package es.grupo18.jobmatcher.model;
 
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,7 +195,6 @@ public class User {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
-    
 
     @Override
     public String toString() {
