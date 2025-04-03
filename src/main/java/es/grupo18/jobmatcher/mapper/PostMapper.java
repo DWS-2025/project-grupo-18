@@ -11,9 +11,11 @@ import java.util.List;
 public interface PostMapper {
 
     @Mapping(source = "author.id", target = "authorId")
+    @Mapping(source = "author.name", target = "authorName")
     @Mapping(source = "timestamp", target = "timestamp", dateFormat = "yyyy-MM-dd'T'HH:mm:ss")
     PostDTO toDTO(Post post);
 
+    @Mapping(target = "author.name", ignore = true)
     @Mapping(source = "authorId", target = "author.id")
     Post toDomain(PostDTO dto);
 
