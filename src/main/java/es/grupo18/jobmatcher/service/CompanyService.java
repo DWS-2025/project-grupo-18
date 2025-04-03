@@ -3,6 +3,7 @@ package es.grupo18.jobmatcher.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,9 @@ public class CompanyService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserService userService;
+
     public Page<CompanyDTO> findAll(Pageable pageable) {
         return companyRepository.findAll(pageable).map(this::toDTO);
     }
@@ -48,7 +52,7 @@ public class CompanyService {
         return companyRepository.count();
     }
 
-    public CompanyDTO save(CompanyDTO company) { // Saves a company
+    public CompanyDTO save(CompanyDTO company) {
         Company companyDomain = toDomain(company);
         companyRepository.save(companyDomain);
         return toDTO(companyDomain);
@@ -69,17 +73,15 @@ public class CompanyService {
         return toDTO(oldCompany);
     }
 
-    public void deleteById(long id) { // Deletes a company by its id
+    public void deleteById(long id) {
         companyRepository.deleteById(id);
     }
 
-    public CompanyDTO delete(CompanyDTO company) { // Deletes a company
+    public CompanyDTO delete(CompanyDTO company) {
         Company companyDomain = toDomain(company);
         companyRepository.deleteById(companyDomain.getId());
         return toDTO(companyDomain);
     }
-
-    // Methods to manage favourite users
 
     public CompanyDTO addOrRemoveFavouriteUser(long companyId, UserDTO userDTO) {
         Company company = companyRepository.findById(companyId)
@@ -109,9 +111,41 @@ public class CompanyService {
                 .anyMatch(u -> u.getId().equals(userId));
     }
 
-    public Collection<CompanyDTO> createEmptyCompaniesList() {
-        return new ArrayList<CompanyDTO>();
+    public List<CompanyDTO> getFavouriteCompaniesForCurrentUser() {
+        return new ArrayList<>(userService.getFavouriteCompanies());
     }
+
+    public List<CompanyDTO> getNonFavouriteCompaniesForCurrentUser() {
+        Collection<CompanyDTO> all = findAll();
+        Collection<CompanyDTO> favourites = userService.getFavouriteCompanies();
+
+        return all.stream()
+                .filter(company -> !favourites.contains(company))
+                .collect(Collectors.toList());
+    }
+
+    public List<CompanyDTO> getMutualMatchesForCurrentUser() {
+        UserDTO user = userService.getLoggedUser();
+        Collection<CompanyDTO> favourites = userService.getFavouriteCompanies();
+
+        return favourites.stream()
+                .filter(company -> isUserFavourite(company.id(), user))
+                .collect(Collectors.toList());
+    }
+
+    public void toggleFavouriteCompanyForCurrentUser(long companyId) {
+        CompanyDTO company = findById(companyId);
+        UserDTO user = userService.getLoggedUser();
+        userService.addOrRemoveFavouriteCompany(user.id(), company);
+        addOrRemoveFavouriteUser(companyId, user);
+    }
+
+    
+    public boolean isCompanyFavouriteForCurrentUser(long companyId) {
+        UserDTO user = userService.getLoggedUser();
+        return isUserFavourite(companyId, user);
+    }
+   
 
     CompanyDTO toDTO(Company company) {
         return companyMapper.toDTO(company);
@@ -128,5 +162,4 @@ public class CompanyService {
     List<Company> toDomains(List<CompanyDTO> dtos) {
         return companyMapper.toDomains(dtos);
     }
-
 }
