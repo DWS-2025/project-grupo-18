@@ -1,6 +1,7 @@
 package es.grupo18.jobmatcher.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -90,20 +91,35 @@ public class UserService {
     }
 
     public Collection<CompanyDTO> getFavouriteCompanies() {
-        return companyMapper.toDTOs(toDomain(getLoggedUser()).getFavouriteCompaniesList());
-    }    
+        Long id = getLoggedUser().id();
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        return companyMapper.toDTOs(user.getFavouriteCompaniesList());
+    }
 
     // Method to manage favourite companies
 
-    public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO company) {
-        User user = toDomain(getLoggedUser());
-        if (user.getFavouriteCompaniesList().contains(companyMapper.toDomain(company))) {
-            user.getFavouriteCompaniesList().remove(companyMapper.toDomain(company));
-        } else {
-            user.getFavouriteCompaniesList().add(companyMapper.toDomain(company));
-        }
-        userRepository.save(user);
+    public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
+    // Obtener el DTO actual desde el repositorio
+    UserDTO currentUserDTO = findById(userId);
+    List<CompanyDTO> favourites = new ArrayList<>(getFavouriteCompanies());
+
+    boolean alreadyFavourite = favourites.stream()
+        .anyMatch(c -> c.id().equals(companyDTO.id()));
+
+    if (alreadyFavourite) {
+        favourites.removeIf(c -> c.id().equals(companyDTO.id()));
+    } else {
+        favourites.add(companyDTO);
     }
+
+    // Creamos un nuevo UserDTO con la lista modificada
+    User user = toDomain(currentUserDTO);
+    user.setFavouriteCompaniesList(companyMapper.toDomains(favourites)); // nuevo método mapper
+
+    userRepository.save(user); // guardamos la entidad regenerada
+    }
+
 
     public boolean isCompanyFavourite(CompanyDTO company) {
         User user = toDomain(getLoggedUser());

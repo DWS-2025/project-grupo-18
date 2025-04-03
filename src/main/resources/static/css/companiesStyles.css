@@ -1,8 +1,8 @@
 .container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    padding: 80px 40px 40px 40px;
+    gap: 30px 20px;
+    padding: 100px 40px 80px 40px;
     justify-items: center;
     align-items: stretch;
     min-height: calc(100vh - 160px);
@@ -126,4 +126,47 @@
 
 .header-right button {
     margin-top: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    gap: 10px;
+}
+
+#page-info {
+    font-weight: bold;
+    color: #0077b6;
+    font-size: 1.1rem;
+}
+
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px 20px;
+    padding: 100px 40px 40px 40px;
+    justify-items: center;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.dark-mode .company-item {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+.dark-mode .company-details {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+.dark-mode .company-details p {
+    color: #ccc;
+}
+
+.dark-mode #page-info {
+    color: #00b4d8;
 }

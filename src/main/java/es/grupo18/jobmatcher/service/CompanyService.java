@@ -76,21 +76,35 @@ public class CompanyService {
 
     // Methods to manage favourite users
 
-    public CompanyDTO addOrRemoveFavouriteUser(long id, UserDTO user) {
-        Company company = toDomain(findById(id));
-        if (company.getFavouriteUsersList().contains(userMapper.toDomain(user))) {
-            company.getFavouriteUsersList().remove(userMapper.toDomain(user));
+    public CompanyDTO addOrRemoveFavouriteUser(long companyId, UserDTO userDTO) {
+        Company company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new RuntimeException("Company not found"));
+    
+        Long userId = userDTO.id();
+    
+        boolean alreadyFavourite = company.getFavouriteUsersList().stream()
+            .anyMatch(u -> u.getId().equals(userId));
+    
+        if (alreadyFavourite) {
+            company.getFavouriteUsersList().removeIf(u -> u.getId().equals(userId));
         } else {
-            company.getFavouriteUsersList().add(userMapper.toDomain(user));
+            company.getFavouriteUsersList().add(userMapper.toDomain(userDTO));
         }
+    
         companyRepository.save(company);
         return toDTO(company);
     }
+    
 
-    public boolean isUserFavourite(long id, UserDTO user) {
-        Company company = toDomain(findById(id));
-        return company.getFavouriteUsersList().contains(userMapper.toDomain(user));
+    public boolean isUserFavourite(long companyId, UserDTO userDTO) {
+        Company company = companyRepository.findById(companyId)
+            .orElseThrow(() -> new RuntimeException("Company not found"));
+    
+        Long userId = userDTO.id();
+        return company.getFavouriteUsersList().stream()
+            .anyMatch(u -> u.getId().equals(userId));
     }
+    
 
     CompanyDTO toDTO(Company company) {
         return companyMapper.toDTO(company);
