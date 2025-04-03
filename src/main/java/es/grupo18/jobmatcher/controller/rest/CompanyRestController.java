@@ -2,6 +2,8 @@ package es.grupo18.jobmatcher.controller.rest;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
+import es.grupo18.jobmatcher.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,9 @@ public class CompanyRestController {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public Page<CompanyDTO> getAll(Pageable pageable) {
@@ -68,8 +73,6 @@ public class CompanyRestController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
-            companyService.toggleFavouriteCompanyForCurrentUser(id);
-            return ResponseEntity.ok().build();
         }
     }
 
@@ -80,8 +83,6 @@ public class CompanyRestController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
-            companyService.toggleFavouriteCompanyForCurrentUser(id);
-            return ResponseEntity.ok().build();
         }
     }
 
@@ -91,11 +92,12 @@ public class CompanyRestController {
             return ResponseEntity.ok(userService.isCompanyFavourite(companyService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(companyService.isCompanyFavouriteForCurrentUser(id));
+        }
     }
 
     @GetMapping("/matches")
     public ResponseEntity<List<CompanyDTO>> getMutualMatches() {
         return ResponseEntity.ok(companyService.getMutualMatchesForCurrentUser());
     }
+    
 }
