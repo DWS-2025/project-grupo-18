@@ -86,7 +86,7 @@ public class ImageRestController {
 
         PostDTO updated = new PostDTO(
                 post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                file.getBytes(), file.getContentType()
+                file.getBytes(), file.getContentType(),""
         );
 
         postService.update(post, updated);
@@ -100,7 +100,7 @@ public class ImageRestController {
 
         PostDTO updated = new PostDTO(
                 post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                null, null
+                null, null,""
         );
 
         postService.update(post, updated);
