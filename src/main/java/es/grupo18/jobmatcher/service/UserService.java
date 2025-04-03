@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,13 +134,11 @@ public class UserService {
     }
 
     public Collection<CompanyDTO> getFavouriteCompanies() {
-        try {
-            UserDTO user = findById(getLoggedUser().id());
-            return companyMapper.toDTOs(userMapper.toDomain(user).getFavouriteCompaniesList());
-        } catch (NoSuchElementException e) {
-            throw new RuntimeException("User not found", e);
-        }
+        User user = userRepository.findById(getLoggedUser().id())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        return companyMapper.toDTOs(user.getFavouriteCompaniesList());
     }
+    
 
     // Image methods
 
