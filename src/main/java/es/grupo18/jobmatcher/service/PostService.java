@@ -115,7 +115,8 @@ public class PostService {
         String formattedTimestamp = post.getTimestamp().format(TIMESTAMP_FORMATTER);
         return new PostDTO(post.getId(), post.getTitle(), post.getContent(), formattedTimestamp,
                 post.getAuthor() != null ? post.getAuthor().getId() : null,
-                post.getImage(), post.getImageContentType());
+                post.getImage(), post.getImageContentType(), 
+                post.getAuthor() != null ? post.getAuthor().getName() : "");
     }
 
     Post toDomain(PostDTO dto) {

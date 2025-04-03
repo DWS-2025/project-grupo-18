@@ -63,7 +63,7 @@ public class BlogController {
 
     @GetMapping("/blog/posts/new")
     public String showNewPostForm(Model model) {
-        model.addAttribute("post", new PostDTO(null, "", "", LocalDateTime.now().toString(), null, null, null));
+        model.addAttribute("post", new PostDTO(null, "", "", LocalDateTime.now().toString(), null, null, null, ""));
         model.addAttribute("isEdit", false);
         return "blog/post_form";
     }
@@ -86,8 +86,7 @@ public class BlogController {
             }
         }
 
-        PostDTO postDTO = new PostDTO(null, title, content, LocalDateTime.now().toString(), null, imageBytes,
-                contentType);
+        PostDTO postDTO = new PostDTO(null, title, content, LocalDateTime.now().toString(), null, imageBytes, contentType, "");
         postService.save(postDTO);
         return "redirect:/blog/posts";
     }
@@ -139,8 +138,7 @@ public class BlogController {
             }
         }
 
-        PostDTO updated = new PostDTO(postId, title, content, LocalDateTime.now().toString(), existing.authorId(),
-                image, contentType);
+        PostDTO updated = new PostDTO(postId, title, content, LocalDateTime.now().toString(), existing.authorId(), image, contentType, existing.authorName());
         postService.update(existing, updated);
         return "redirect:/blog/posts/" + postId;
     }
