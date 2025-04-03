@@ -1,7 +1,6 @@
 package es.grupo18.jobmatcher.controller.rest;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.grupo18.jobmatcher.dto.PostDTO;
-import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.UserService;
 
@@ -36,16 +33,19 @@ public class ImageRestController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<Resource> getUserImage(@PathVariable Long id) {
-        UserDTO user = userService.findById(id);
-        if (user != null && user.image() != null) {
-            Resource image = new ByteArrayResource(user.image());
-            return ResponseEntity.ok()
-                    .contentLength(user.image().length)
-                    .contentType(MediaType.parseMediaType(user.imageContentType() != null
-                            ? user.imageContentType()
-                            : "image/jpeg"))
-                    .body(image);
-        } else {
+        try {
+            if (userService.findById(id) != null && userService.findById(id).image() != null) {
+                Resource image = new ByteArrayResource(userService.findById(id).image());
+                return ResponseEntity.ok()
+                        .contentLength(userService.findById(id).image().length)
+                        .contentType(MediaType.parseMediaType(userService.findById(id).imageContentType() != null
+                                ? userService.findById(id).imageContentType()
+                                : "image/jpeg"))
+                        .body(image);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -53,70 +53,68 @@ public class ImageRestController {
     @PostMapping("/users/{id}")
     public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
             throws IOException {
-        UserDTO user = userService.findById(id);
-        if (user == null)
+        try {
+            userService.save(userService.findById(id), file);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
             return ResponseEntity.notFound().build();
-        if (file.isEmpty())
-            return ResponseEntity.badRequest().body("Empty image file");
-
-        userService.save(user, file);
-        return ResponseEntity.ok().build();
+        }
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUserImage(@PathVariable Long id) {
-        UserDTO user = userService.findById(id);
-        if (user == null)
+        try {
+            userService.removeImage();
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-
-        userService.removeImage();
-        return ResponseEntity.noContent().build();
+        }
     }
 
     // === POST IMAGE ===
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<byte[]> getPostImage(@PathVariable Long id) {
-        PostDTO post = postService.findById(id);
-        if (post != null && post.image() != null && post.image().length > 0) {
-            MediaType contentType = MediaType.parseMediaType(
-                    post.imageContentType() != null ? post.imageContentType() : "image/jpeg");
-            return ResponseEntity.ok()
-                    .contentType(contentType)
-                    .contentLength(post.image().length)
-                    .body(post.image());
+        try {
+            if (postService.findById(id) != null && postService.findById(id).image() != null
+                    && postService.findById(id).image().length > 0) {
+                MediaType contentType = MediaType.parseMediaType(
+                        postService.findById(id).imageContentType() != null
+                                ? postService.findById(id).imageContentType()
+                                : "image/jpeg");
+                return ResponseEntity.ok()
+                        .contentType(contentType)
+                        .contentLength(postService.findById(id).image().length)
+                        .body(postService.findById(id).image());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/posts/{id}")
     public ResponseEntity<?> uploadPostImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
             throws IOException {
-        PostDTO post = postService.findById(id);
-        if (post == null)
+        try {
+            postService.update(id, postService.findById(id).title(),
+                    postService.findById(id).content(), file);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
             return ResponseEntity.notFound().build();
-        if (file.isEmpty())
-            return ResponseEntity.badRequest().body("Empty image file");
-
-        PostDTO updated = new PostDTO(
-                post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                file.getBytes(), file.getContentType(), post.authorName(), List.of());
-
-        postService.update(post, updated);
-        return ResponseEntity.ok().build();
+        }
     }
 
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<?> deletePostImage(@PathVariable Long id) {
-        PostDTO post = postService.findById(id);
-        if (post == null)
+        try {
+            postService.update(id, postService.findById(id).title(),
+                    postService.findById(id).content(), null);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-
-        PostDTO updated = new PostDTO(
-                post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                null, null, post.authorName(), List.of());
-
-        postService.update(post, updated);
-        return ResponseEntity.noContent().build();
+        }
     }
+    
 }
