@@ -2,6 +2,9 @@ package es.grupo18.jobmatcher.controller.web;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
+
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +39,7 @@ public class CompaniesController {
 
     @GetMapping("/companies/new")
     public String showCompanyForm(Model model) {
-        model.addAttribute("company", new CompanyDTO(null, "", "", "", ""));
+        model.addAttribute("company", companyService.createEmpty());
         return "company/new_company_form";
     }
 
@@ -48,44 +51,46 @@ public class CompaniesController {
 
     @GetMapping("/companies/{companyId}")
     public String getCompany(Model model, @PathVariable("companyId") long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company != null) {
+        try {
+            CompanyDTO company = companyService.findById(id);
             model.addAttribute("company", company);
             return "company/show_company";
-        } else {
+        } catch (NoSuchElementException e) {
             return "company/company_not_found";
+
         }
     }
 
     @GetMapping("/companies/{companyId}/edit")
     public String editCompany(Model model, @PathVariable("companyId") long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company != null) {
+        try {
+            CompanyDTO company = companyService.findById(id);
             model.addAttribute("company", company);
             return "company/company_form";
-        } else {
+        } catch (NoSuchElementException e) {
             return "company/company_not_found";
+
         }
     }
 
     @PostMapping("/companies/{companyId}/edit")
     public String updateCompany(@PathVariable("companyId") long id, @ModelAttribute CompanyDTO updatedCompany) {
-        CompanyDTO oldCompany = companyService.findById(id);
-        if (oldCompany != null) {
-            companyService.update(oldCompany, updatedCompany);
+        try {
+            companyService.update(companyService.findById(id), updatedCompany);
             return "redirect:/companies/" + id;
-        } else {
+        } catch (NoSuchElementException e) {
             return "company/company_not_found";
         }
     }
 
     @PostMapping("/companies/{companyId}/delete")
     public String deleteCompany(@PathVariable("companyId") long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company != null) {
-            companyService.delete(company);
+        try {
+            companyService.deleteById(id);
+            return "redirect:/companies";
+        } catch (NoSuchElementException e) {
+            return "company/company_not_found";
         }
-        return "redirect:/companies";
     }
 
 }

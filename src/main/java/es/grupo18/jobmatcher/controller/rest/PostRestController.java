@@ -28,37 +28,40 @@ public class PostRestController {
 
     @GetMapping("/{id}")
     public PostDTO getPost(@PathVariable long id) {
-        PostDTO post = postService.findById(id);
-        if (post == null)
+        try {
+            return postService.findById(id);
+        } catch (NoSuchElementException e) {
             throw new NoSuchElementException("Post not found with id: " + id);
-        return post;
+        }
     }
 
     @PostMapping("/")
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
-        PostDTO created = postService.save(postDTO);
+        postDTO = postService.save(postDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(created.id())
+                .buildAndExpand(postDTO.id())
                 .toUri();
-        return ResponseEntity.created(location).body(created);
+        return ResponseEntity.created(location).body(postDTO);
     }
 
     @PutMapping("/{id}")
     public PostDTO updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
-        PostDTO existing = postService.findById(id);
-        if (existing == null)
+        try {
+            return postService.update(postService.findById(id), postDTO);
+        } catch (NoSuchElementException e) {
             throw new NoSuchElementException("Post not found with id: " + id);
-        return postService.update(existing, postDTO);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable long id) {
-        PostDTO post = postService.findById(id);
-        if (post == null)
+        try {
+            postService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
             throw new NoSuchElementException("Post not found with id: " + id);
-        postService.delete(post);
-        return ResponseEntity.noContent().build();
+        }
     }
 
     @GetMapping("/filter")

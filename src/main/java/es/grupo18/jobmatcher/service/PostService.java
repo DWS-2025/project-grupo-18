@@ -3,6 +3,7 @@ package es.grupo18.jobmatcher.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
 import es.grupo18.jobmatcher.dto.ReviewDTO;
@@ -57,6 +59,17 @@ public class PostService {
         return toDTO(post);
     }
 
+    public PostDTO create(String title, String content, MultipartFile image) throws IOException { // Creates a post
+        Post post = new Post(title, content, LocalDateTime.now(), image.getBytes(), userMapper.toDomain(userService.getLoggedUser()));
+        post.setImageContentType(image.getContentType());
+        postRepository.save(post);
+        return toDTO(post);
+    }
+
+    public PostDTO createEmpty() {
+        return new PostDTO(null, "", "", LocalDateTime.now(), null, null, null, "", List.of());
+    }
+
     public PostDTO update(PostDTO oldPostDTO, PostDTO updatedPostDTO) {
         Post post = toDomain(oldPostDTO);
         post.setTitle(updatedPostDTO.title());
@@ -66,6 +79,21 @@ public class PostService {
         if (updatedPostDTO.image() != null && updatedPostDTO.image().length > 0) {
             post.setImage(updatedPostDTO.image());
             post.setImageContentType(updatedPostDTO.imageContentType());
+        }
+
+        postRepository.save(post);
+        return toDTO(post);
+    }
+
+    public PostDTO update(long id, String title, String content, MultipartFile image) throws IOException {
+        Post post = toDomain(findById(id));
+        post.setTitle(title);
+        post.setContent(content);
+        post.setTimestamp(LocalDateTime.now());
+
+        if (image != null && !image.isEmpty()) {
+            post.setImage(image.getBytes());
+            post.setImageContentType(image.getContentType());
         }
 
         postRepository.save(post);
@@ -127,7 +155,6 @@ public class PostService {
         reviews 
     );
     }
-
 
     Post toDomain(PostDTO dto) {
         return postMapper.toDomain(dto);

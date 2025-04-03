@@ -27,14 +27,13 @@ public class ProfileController {
 
     @GetMapping("/profile/image")
     public ResponseEntity<byte[]> getProfileImage() {
-        UserDTO user = userService.getLoggedUser();
-        if (user.image() != null) {
-            String contentType = user.imageContentType();
+        try {
+            String contentType = userService.getLoggedUser().imageContentType();
             if (contentType == null || contentType.isBlank()) {
                 contentType = "image/jpeg";
             }
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(user.image());
-        } else {
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(userService.getLoggedUser().image());
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -67,29 +66,13 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/edit")
-    public String updateProfile(@RequestParam String name,
-            @RequestParam String email,
-            @RequestParam(required = false) String password,
-            @RequestParam String phone,
-            @RequestParam String location,
-            @RequestParam String bio,
-            @RequestParam int experience) {
-
-        UserDTO current = userService.getLoggedUser();
-
-        UserDTO updated = new UserDTO(
-                current.id(),
-                name,
-                email,
-                phone,
-                location,
-                bio,
-                experience,
-                current.image(),
-                current.imageContentType());
-
-        userService.updateProfile(updated);
-        return "redirect:/profile";
+    public String updateProfile(@ModelAttribute UserDTO updatedUser) {
+        try {
+            userService.updateProfile(updatedUser);
+            return "redirect:/profile";
+        } catch (Exception e) {
+            return "redirect:/profile/edit?error=" + e.getMessage();
+        }
     }
 
 }

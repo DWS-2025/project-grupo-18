@@ -1,5 +1,6 @@
 package es.grupo18.jobmatcher.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -53,6 +54,10 @@ public class CompanyService {
         return toDTO(companyDomain);
     }
 
+    public CompanyDTO createEmpty() {
+        return new CompanyDTO(null, "", "", "", "");
+    }
+
     public CompanyDTO update(CompanyDTO oldCompanyDTO, CompanyDTO updatedCompanyDTO) {
         Company oldCompany = toDomain(oldCompanyDTO);
         Company updatedCompany = toDomain(updatedCompanyDTO);
@@ -102,6 +107,10 @@ public class CompanyService {
         Long userId = userDTO.id();
         return company.getFavouriteUsersList().stream()
                 .anyMatch(u -> u.getId().equals(userId));
+    }
+
+    public Collection<CompanyDTO> createEmptyCompaniesList() {
+        return new ArrayList<CompanyDTO>();
     }
 
     CompanyDTO toDTO(Company company) {

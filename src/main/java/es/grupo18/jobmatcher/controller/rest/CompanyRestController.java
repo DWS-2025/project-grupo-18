@@ -30,61 +30,67 @@ public class CompanyRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
-        CompanyDTO company = companyService.findById(id);
-        return (company == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(company);
+        try {
+            return ResponseEntity.ok(companyService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
     public ResponseEntity<CompanyDTO> create(@RequestBody CompanyDTO dto) {
-        CompanyDTO created = companyService.save(dto);
-        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(created.id()).toUri();
-        return ResponseEntity.created(location).body(created);
+        dto = companyService.save(dto);
+        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(location).body(dto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> update(@PathVariable Long id, @RequestBody CompanyDTO dto) {
-        CompanyDTO existing = companyService.findById(id);
-        if (existing == null)
+        try {
+            dto = companyService.update(companyService.findById(id), dto);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        CompanyDTO updated = new CompanyDTO(id, dto.name(), dto.email(), dto.location(), dto.bio());
-        updated = companyService.update(existing, updated);
-        return ResponseEntity.ok(updated);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<CompanyDTO> delete(@PathVariable Long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company == null)
+        try {
+            companyService.deleteById(id);
+            return ResponseEntity.ok(companyService.findById(id));
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        companyService.delete(company);
-        return ResponseEntity.ok(company);
+        }
     }
 
     @PostMapping("/{id}/favourites")
     public ResponseEntity<Void> addToFavourites(@PathVariable Long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company == null)
+        try {
+            userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), companyService.findById(id));
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), company);
-        return ResponseEntity.ok().build();
+        }
     }
 
     @DeleteMapping("/{id}/favourites")
     public ResponseEntity<Void> removeFromFavourites(@PathVariable Long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company == null)
+        try {
+            userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), companyService.findById(id));
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), company);
-        return ResponseEntity.ok().build();
+        }
     }
 
     @GetMapping("/{id}/favourites")
     public ResponseEntity<Boolean> isFavourite(@PathVariable Long id) {
-        CompanyDTO company = companyService.findById(id);
-        if (company == null)
+        try {
+            return ResponseEntity.ok(userService.isCompanyFavourite(companyService.findById(id)));
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        boolean isFav = userService.isCompanyFavourite(company);
-        return ResponseEntity.ok(isFav);
+        }
     }
 
 }

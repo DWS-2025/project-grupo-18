@@ -1,6 +1,5 @@
 package es.grupo18.jobmatcher.controller.rest;
 
-import es.grupo18.jobmatcher.dto.PostDTO;
 import es.grupo18.jobmatcher.dto.ReviewDTO;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
@@ -30,46 +29,43 @@ public class ReviewRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ReviewDTO> getById(@PathVariable Long id) {
-        ReviewDTO review = reviewService.findById(id);
-        return (review == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(review);
+        try {
+            reviewService.findById(id);
+            return ResponseEntity.ok(reviewService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/post/{postId}")
     public ResponseEntity<ReviewDTO> create(@PathVariable Long postId, @RequestBody ReviewDTO dto) {
-        PostDTO post = postService.findById(postId);
-        if (post == null)
+        try {
+            dto = reviewService.save(postService.findById(postId), dto);
+            URI location = fromCurrentRequest().path("/{id}").buildAndExpand(dto.id()).toUri();
+            return ResponseEntity.created(location).body(dto);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        ReviewDTO created = reviewService.save(post, dto);
-        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(created.id()).toUri();
-        return ResponseEntity.created(location).body(created);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ReviewDTO> update(@PathVariable Long id, @RequestBody ReviewDTO dto) {
-        ReviewDTO existing = reviewService.findById(id);
-        if (existing == null)
+        try {
+            reviewService.update(reviewService.findById(id), dto);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-
-        ReviewDTO updated = new ReviewDTO(
-                id,
-                dto.text(),
-                dto.rating(),
-                existing.authorId(),
-                existing.postId(),
-                existing.authorName() 
-        );
-
-        reviewService.update(existing, updated);
-        return ResponseEntity.ok(updated);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ReviewDTO> delete(@PathVariable Long id) {
-        ReviewDTO review = reviewService.findById(id);
-        if (review == null)
+        try {
+            reviewService.deleteById(id);
+            return ResponseEntity.ok(reviewService.findById(id));
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
-        PostDTO post = postService.findById(review.postId());
-        reviewService.delete(id, post);
-        return ResponseEntity.ok(review);
+        }
     }
+
 }

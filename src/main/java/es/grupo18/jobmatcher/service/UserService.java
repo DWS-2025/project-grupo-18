@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,19 +56,33 @@ public class UserService {
 
     public UserDTO save(UserDTO userDTO, MultipartFile image) throws IOException {
         User existingUser = userRepository.findById(userDTO.id())
-            .orElseThrow(() -> new RuntimeException("User not found"));
-    
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         if (!image.isEmpty()) {
             existingUser.setImage(image.getBytes());
             existingUser.setImageContentType(image.getContentType());
         }
-    
+
         userRepository.save(existingUser);
         return toDTO(existingUser);
     }
-    
 
-    public void updateProfile(UserDTO updatedDto) {
+    public UserDTO update(long id, UserDTO dto) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        existingUser.setName(dto.name());
+        existingUser.setEmail(dto.email());
+        existingUser.setPhone(dto.phone());
+        existingUser.setLocation(dto.location());
+        existingUser.setBio(dto.bio());
+        existingUser.setExperience(dto.experience());
+
+        userRepository.save(existingUser);
+        return toDTO(existingUser);
+    }
+
+    public UserDTO updateProfile(UserDTO updatedDto) {
         User currentUser = userRepository.findById(getLoggedUser().id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -79,9 +94,9 @@ public class UserService {
         currentUser.setExperience(updatedDto.experience());
 
         userRepository.save(currentUser);
-    }
 
-    
+        return toDTO(currentUser);
+    }
 
     public void deleteById(long id) { // Deletes a user by its id
         userRepository.deleteById(id);
@@ -92,17 +107,10 @@ public class UserService {
         return user;
     }
 
-    public Collection<CompanyDTO> getFavouriteCompanies() {
-        Long id = getLoggedUser().id();
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return companyMapper.toDTOs(user.getFavouriteCompaniesList());
-    }
-
     // Method to manage favourite companies
 
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
-        // Obtener el DTO actual desde el repositorio
+
         UserDTO currentUserDTO = findById(userId);
         List<CompanyDTO> favourites = new ArrayList<>(getFavouriteCompanies());
 
@@ -115,16 +123,24 @@ public class UserService {
             favourites.add(companyDTO);
         }
 
-        // Creamos un nuevo UserDTO con la lista modificada
         User user = toDomain(currentUserDTO);
-        user.setFavouriteCompaniesList(companyMapper.toDomains(favourites)); // nuevo método mapper
+        user.setFavouriteCompaniesList(companyMapper.toDomains(favourites));
 
-        userRepository.save(user); // guardamos la entidad regenerada
+        userRepository.save(user);
     }
 
     public boolean isCompanyFavourite(CompanyDTO company) {
         User user = toDomain(getLoggedUser());
         return user.getFavouriteCompaniesList().contains(companyMapper.toDomain(company));
+    }
+
+    public Collection<CompanyDTO> getFavouriteCompanies() {
+        try {
+            UserDTO user = findById(getLoggedUser().id());
+            return companyMapper.toDTOs(userMapper.toDomain(user).getFavouriteCompaniesList());
+        } catch (NoSuchElementException e) {
+            throw new RuntimeException("User not found", e);
+        }
     }
 
     // Image methods
@@ -133,27 +149,25 @@ public class UserService {
         UserDTO dto = getLoggedUser();
         User existingUser = userRepository.findById(dto.id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
         existingUser.setImage(null);
         existingUser.setImageContentType(null);
-    
+
         userRepository.save(existingUser);
     }
-    
 
     public void updateUserImage(MultipartFile image) throws IOException {
         if (!image.isEmpty()) {
             UserDTO dto = getLoggedUser();
             User existingUser = userRepository.findById(dto.id())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
             existingUser.setImage(image.getBytes());
             existingUser.setImageContentType(image.getContentType());
-    
+
             userRepository.save(existingUser);
         }
     }
-    
 
     private UserDTO toDTO(User user) {
         return userMapper.toDTO(user);

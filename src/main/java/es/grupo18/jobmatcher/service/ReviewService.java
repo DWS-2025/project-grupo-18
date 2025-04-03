@@ -52,6 +52,13 @@ public class ReviewService {
         return toDTO(review);
     }
 
+    public ReviewDTO create(long id, String text, int rating) { // Creates a review
+        Review review = new Review(text, rating);
+        review.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
+        reviewRepository.save(review);
+        return toDTO(review);
+    }
+
     public ReviewDTO update(ReviewDTO oldReviewDTO, ReviewDTO updatedReviewDTO) {
         Review oldReview = toDomain(oldReviewDTO);
         Review updatedReview = toDomain(updatedReviewDTO);
@@ -59,6 +66,14 @@ public class ReviewService {
         oldReview.setRating(updatedReview.getRating());
         reviewRepository.save(oldReview);
         return toDTO(oldReview);
+    }
+
+    public ReviewDTO update(long reviewId, String text, int rating) { // Updates a review
+        Review review = toDomain(findById(reviewId));
+        review.setText(text);
+        review.setRating(rating);
+        reviewRepository.save(review);
+        return toDTO(review);
     }
 
     public void deleteById(long id) { // Deletes a review by its id
