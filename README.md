@@ -2,55 +2,163 @@
 
 # 🌐 JobMatcher
 
-> JobMatcher es una aplicación web que conecta usuarios con empresas mediante un sistema de 'likes', publicaciones y reseñas. Cada usuario puede explorar compañías y  descubrir oportunidades. Ideal para mejorar la visibilidad empresarial y fomentar el contacto directo entre usuarios y organizaciones.
+> JobMatcher is a web application that connects users with companies through a system of likes, posts, and reviews. Each user can explore companies and discover opportunities. It is designed to boost business visibility and encourage direct engagement between users and organizations.
+
+---
+
+## 📘 Entities
+
+The application manages the following main entities, which can be created, edited, viewed, and deleted:
+
+- **User**
+- **Company**
+- **Post**
+- **Review**
+
+---
+
+### 🔄 Key Relationships
+
+- **User** ⇄ **Company** through 'likes' → N:M relationship  
+- **User** → creates multiple **Posts** → 1:N relationship  
+- **User** → writes multiple **Reviews** → 1:N relationship  
+- **Post** → can have multiple **Reviews** → 1:N relationship
+
+---
+
+### 🔐 User Permissions
+
+| User Type   | Permissions                                                                                         |
+|-------------|-----------------------------------------------------------------------------------------------------|
+| Basic User  | Can create, edit, and delete companies (if acting as admin), posts, reviews, and manage their profile. |
+
+> *Note:* In this phase, the admin is simulated as a basic user with company creation privileges.
+
+---
+
+### 🖼️ Images
+
+The following entities include associated images:
+
+- **User**: Profile picture  
+- **Post**: Main post image  
+
+---
+
+### 🗂️ Database Schema
+
+![Database diagram](db/db-diagram.png)
+
+This diagram illustrates the main entities of the application and their relationships, including a many-to-many association between users and companies through likes.
+
 
 ---
 
 ## 👥 Development Team
 
-| Name                  | Email                            | GitHub Username      |
-|-----------------------|----------------------------------|----------------------|
-| Daniel Martín Muñoz   | d.martinm.2023@alumnos.urjc.es   | @dmartinm2023        |
-| Carlos Marrón Benito  | c.marron.2023@alumnos.urjc.es    | @CarlosMarronBenito  |
-| Hector Julián Alijas  | h.julian.2023@alumnos.urjc.es    | @h-julian            |
-| Álvaro Mota Lucena    | a.mota.2023@alumnos.urjc.es      | @4lvaro18            |
+| Name                 | University Email                    | GitHub Username      |
+|----------------------|-------------------------------------|----------------------|
+| Daniel Martín Muñoz  | d.martinm.2023@alumnos.urjc.es      | @dmartinm2023        |
+| Carlos Marrón Benito | c.marron.2023@alumnos.urjc.es       | @CarlosMarronBenito  |
+| Hector Julián Alijas | h.julian.2023@alumnos.urjc.es       | @h-julian            |
+| Álvaro Mota Lucena   | a.mota.2023@alumnos.urjc.es         | @4lvaro18            |
 
 ---
 
-## 📦 Main Features
+### 👤 Daniel Martín Muñoz
 
-### 📘 Entities
+#### Tasks completed:
+- [Short and clear bullet point describing a task]
+- [Another one, preferably technical or relevant]
+- [Can include frontend, backend, database, logic, etc.]
 
-La aplicación gestiona las siguientes entidades principales, las cuales pueden ser creadas, editadas, consultadas y eliminadas:
+#### Top 5 commits:
+1. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+2. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+3. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+4. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+5. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
 
-- **Usuario**
-- **Empresa**
-- **Post**
-- **Review**
+#### Top 5 files contributed to:
+- `src/main/java/com/example/controller/[FileName].java`
+- `src/main/java/com/example/service/[FileName].java`
+- `src/main/resources/templates/[FileName].html`
+- `src/main/resources/static/js/[FileName].js`
+- `src/main/java/com/example/repository/[FileName].java`
 
-Relaciones destacadas:
 
-- Varios usuarios pueden dar 'like' a múltiples empresas (relación N:M).
-- Un post puede tener varias reviews (1:N).
-- Un usuario puede tener varios posts (1:N).
-- Un usuario puede tener varias reviews (1:N).
+### 👤 Carlos Marrón Benito
 
-### 🔐 User Permissions
+#### Tasks completed:
+- [Short and clear bullet point describing a task]
+- [Another one, preferably technical or relevant]
+- [Can include frontend, backend, database, logic, etc.]
 
-| Tipo de Usuario  | Permisos                                                                                             |
-|------------------|------------------------------------------------------------------------------------------------------|
-| Usuario base     | Puede crear, editar y eliminar empresas (si es administrador), posts, reviews y gestionar su perfil. |
+#### Top 5 commits:
+1. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+2. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+3. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+4. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+5. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
 
-> *Nota:* En esta versión el administrador está simulado como un usuario base con capacidad para crear empresas.
+#### Top 5 files contributed to:
+- `src/main/java/com/example/controller/[FileName].java`
+- `src/main/java/com/example/service/[FileName].java`
+- `src/main/resources/templates/[FileName].html`
+- `src/main/resources/static/js/[FileName].js`
+- `src/main/java/com/example/repository/[FileName].java`
 
-### 🖼️ Images
 
-Las siguientes entidades tienen imágenes asociadas:
+### 👤 Héctor Julián Alijas
 
-- **Usuario**: Foto de perfil.
-- **Post**: Imagen destacada del post (opcional).
+#### Tasks completed:
+- [Short and clear bullet point describing a task]
+- [Another one, preferably technical or relevant]
+- [Can include frontend, backend, database, logic, etc.]
+
+#### Top 5 commits:
+1. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+2. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+3. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+4. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+5. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+
+#### Top 5 files contributed to:
+- `src/main/java/com/example/controller/[FileName].java`
+- `src/main/java/com/example/service/[FileName].java`
+- `src/main/resources/templates/[FileName].html`
+- `src/main/resources/static/js/[FileName].js`
+- `src/main/java/com/example/repository/[FileName].java`
+
+
+### 👤 Álvaro Mota Lucena
+
+#### Tasks completed:
+- [Short and clear bullet point describing a task]
+- [Another one, preferably technical or relevant]
+- [Can include frontend, backend, database, logic, etc.]
+
+#### Top 5 commits:
+1. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+2. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+3. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+4. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+5. [`[Short description]`](https://gitdiagram.com/DWS-2025/project-grupo-18/commit/[commit_hash])
+
+#### Top 5 files contributed to:
+- `src/main/java/com/example/controller/[FileName].java`
+- `src/main/java/com/example/service/[FileName].java`
+- `src/main/resources/templates/[FileName].html`
+- `src/main/resources/static/js/[FileName].js`
+- `src/main/java/com/example/repository/[FileName].java`
 
 ---
 
-## 🗂️ Database Schema
+## 📬 Postman Collection
 
+You can test the API using the included Postman collection:  
+[`api.postman_collection.json`](./api.postman_collection.json)
+
+This file contains sample requests for:
+- Creating, editing, deleting and retrieving users, posts, reviews, companies
+- Pagination and dynamic filtering
