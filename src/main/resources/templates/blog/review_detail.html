@@ -27,20 +27,27 @@
 
     <main class="container">
         <div class="box">
-
             <h1>
                 <p style="font-size: 25px;">Reseña para: "{{post.title}}"</p>
             </h1>
-            <div class="review-content">
 
+            <div class="review-content">
                 <p>{{review.text}}</p>
                 <p><strong>Rating:</strong> {{review.rating}} / 5</p>
-                <p><strong>Autor:</strong> {{review.author.name}}</p>
+
+                {{#review.authorName}}
+                <p><strong>Autor:</strong> {{review.authorName}}</p>
+                {{/review.authorName}}
+
+                {{^review.authorName}}
+                <p><strong>Autor:</strong> Anónimo</p>
+                {{/review.authorName}}
             </div>
+
             <div class="button-group">
                 <button onclick="location.href='/blog/posts/{{post.id}}/reviews/{{review.id}}/edit'">Editar</button>
                 <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/delete" method="post"
-                    style="display:inline;">
+                      style="display:inline;">
                     <button type="submit">Borrar</button>
                 </form>
             </div>
