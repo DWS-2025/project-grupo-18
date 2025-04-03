@@ -27,21 +27,17 @@
     </header>
 
     <main class="container">
-
-        {{#companies}}
-        <div class="company-item">
-            <a href="/companies/{{id}}">{{name}}</a>
-        </div>
-        {{/companies}}
-
+        <div id="company-list"></div>
         <div class="pagination">
-            <nobr>
-                {{#hasPrev}}<a href="/companies?page={{prev}}">Anterior</a>&nbsp;&nbsp;&nbsp;{{/hasPrev}}
-                {{#hasNext}}<a href="/companies?page={{next}}">Siguiente</a>{{/hasNext}}
-            </nobr>
+            <div class="pagination">
+                <button id="prev-button" style="display: none;">Anterior</button>
+                <span id="page-info" style="margin: 0 10px;"></span>
+                <button id="next-button" style="display: none;">Siguiente</button>
+            </div>            
         </div>
-
     </main>
+
+    <script type="module" src="/js/companiesAjax.js"></script>
 
     <footer>
         <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
