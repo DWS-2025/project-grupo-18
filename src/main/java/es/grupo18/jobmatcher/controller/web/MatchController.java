@@ -26,7 +26,6 @@ public class MatchController {
     @GetMapping("/matches")
     public String showCompanies(Model model) {
         Collection<CompanyDTO> allCompanies = companyService.findAll();
-        UserDTO currentUser = userService.getLoggedUser();
         Collection<CompanyDTO> favouriteCompanies = userService.getFavouriteCompanies();
 
         List<CompanyDTO> nonFavouriteCompanies = new ArrayList<>();
@@ -97,5 +96,5 @@ public class MatchController {
             return "error";
         }
     }
-    
+
 }
