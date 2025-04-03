@@ -42,7 +42,7 @@ public class UserRestController {
         if (existing == null)
             return ResponseEntity.notFound().build();
         UserDTO updated = new UserDTO(id, dto.name(), dto.email(), dto.phone(), dto.location(), dto.bio(),
-                dto.experience(), dto.imageFile(), dto.imageContentType());
+                dto.experience(), dto.image(), dto.imageContentType());
         updated = userService.save(updated);
         return ResponseEntity.ok(updated);
     }

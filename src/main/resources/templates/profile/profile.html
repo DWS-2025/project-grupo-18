@@ -36,7 +36,7 @@
             <div class="button-group">
                 <button id="resetPhotoButton">Restablecer Foto</button>
                 <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
-                    <input type="file" id="photoInput" name="imageFile" accept="image/*" style="display:none;">
+                    <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
 
@@ -73,7 +73,7 @@
         if (!fileInput.files.length) return;
 
         const formData = new FormData();
-        formData.append("imageFile", fileInput.files[0]);
+        formData.append("image", fileInput.files[0]);
 
         fetch('/profile/upload_image', {
             method: 'POST',

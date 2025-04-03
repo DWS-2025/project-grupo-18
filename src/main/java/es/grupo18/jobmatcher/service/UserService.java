@@ -53,33 +53,35 @@ public class UserService {
         return user;
     }
 
-    void save(User user) {
-
-    }
-
-    public UserDTO save(UserDTO userDTO, MultipartFile imageFile) throws IOException { // Saves a user with an image
-        User user = toDomain(userDTO);
-        if (!imageFile.isEmpty()) {
-            user.setImageFile(imageFile.getBytes());
-            user.setImageContentType(imageFile.getContentType());
+    public UserDTO save(UserDTO userDTO, MultipartFile image) throws IOException {
+        User existingUser = userRepository.findById(userDTO.id())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        if (!image.isEmpty()) {
+            existingUser.setImage(image.getBytes());
+            existingUser.setImageContentType(image.getContentType());
         }
-        this.save(user);
-        return toDTO(user);
+    
+        userRepository.save(existingUser);
+        return toDTO(existingUser);
+    }
+    
+
+    public void updateProfile(UserDTO updatedDto) {
+        User currentUser = userRepository.findById(getLoggedUser().id())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        currentUser.setName(updatedDto.name());
+        currentUser.setEmail(updatedDto.email());
+        currentUser.setPhone(updatedDto.phone());
+        currentUser.setLocation(updatedDto.location());
+        currentUser.setBio(updatedDto.bio());
+        currentUser.setExperience(updatedDto.experience());
+
+        userRepository.save(currentUser);
     }
 
-    public UserDTO update(String name, String email, String password, String phone, String location, String bio,
-            int experience) { // Updates the user's profile
-        User user = toDomain(getLoggedUser());
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setPhone(phone);
-        user.setLocation(location);
-        user.setBio(bio);
-        user.setExperience(experience);
-        userRepository.save(user);
-        return toDTO(user);
-    }
+    
 
     public void deleteById(long id) { // Deletes a user by its id
         userRepository.deleteById(id);
@@ -128,19 +130,30 @@ public class UserService {
     // Image methods
 
     public void removeImage() {
-        User user = toDomain(getLoggedUser());
-        user.setImageFile(null);
-        userRepository.save(user);
+        UserDTO dto = getLoggedUser();
+        User existingUser = userRepository.findById(dto.id())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        existingUser.setImage(null);
+        existingUser.setImageContentType(null);
+    
+        userRepository.save(existingUser);
     }
+    
 
-    public void updateUserImage(MultipartFile imageFile) throws IOException {
-        if (!imageFile.isEmpty()) {
-            User user = toDomain(getLoggedUser());
-            user.setImageFile(imageFile.getBytes());
-            user.setImageContentType(imageFile.getContentType());
-            userRepository.save(user);
+    public void updateUserImage(MultipartFile image) throws IOException {
+        if (!image.isEmpty()) {
+            UserDTO dto = getLoggedUser();
+            User existingUser = userRepository.findById(dto.id())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+    
+            existingUser.setImage(image.getBytes());
+            existingUser.setImageContentType(image.getContentType());
+    
+            userRepository.save(existingUser);
         }
     }
+    
 
     private UserDTO toDTO(User user) {
         return userMapper.toDTO(user);

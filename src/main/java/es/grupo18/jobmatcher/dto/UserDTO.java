@@ -8,5 +8,5 @@ public record UserDTO(
         String location,
         String bio,
         int experience,
-        byte[] imageFile,
+        byte[] image,
         String imageContentType) {}

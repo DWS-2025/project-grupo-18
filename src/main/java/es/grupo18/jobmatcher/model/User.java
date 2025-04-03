@@ -30,7 +30,7 @@ public class User {
     private int experience;
 
     @Lob
-    private byte[] imageFile;
+    private byte[] image;
     private String imageContentType;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,7 +51,7 @@ public class User {
     // Complete constructor
 
     public User(String name, String email, String password, String phone, String location, String bio, int experience,
-            byte[] imageFile,
+            byte[] image,
             List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
         this.name = name;
         this.email = email;
@@ -60,7 +60,7 @@ public class User {
         this.location = location;
         this.bio = bio;
         this.experience = experience;
-        this.imageFile = imageFile;
+        this.image = image;
         this.reviewsList = (reviewsList != null) ? new ArrayList<>(reviewsList) : new ArrayList<>();
         this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
         this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList)
@@ -68,7 +68,7 @@ public class User {
     }
 
     public boolean hasImage() {
-        return imageFile != null && imageFile.length > 0 && imageContentType != null;
+        return image != null && image.length > 0 && imageContentType != null;
     }
 
     // Getters
@@ -105,8 +105,8 @@ public class User {
         return experience;
     }
 
-    public byte[] getImageFile() {
-        return imageFile;
+    public byte[] getImage() {
+        return image;
     }
 
     public String getImageContentType() {
@@ -159,8 +159,8 @@ public class User {
         this.experience = experience;
     }
 
-    public void setImageFile(byte[] imageFile) {
-        this.imageFile = imageFile;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     public void setImageContentType(String imageContentType) {

@@ -57,13 +57,13 @@
         <section class="blog-posts">
             {{#posts}}
             <div class="box">
-                <a href="/blog/posts/{{id}}">
-                    <h1>{{title}}</h1>
+                <a href="/blog/posts/{{post.id}}">
+                    <h1>{{post.title}}</h1>
                 </a>
-                <img src="/blog/posts/{{id}}/image?ts={{currentTimeMillis}}" class="post-image" onerror="this.style.display='none';">
-                <p>{{content}}</p>
-                <p><strong>Fecha:</strong> {{timestamp}}</p>
-                <p><strong>Autor:</strong> {{authorName}}</p>
+                <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" class="post-image" onerror="this.style.display='none';">
+                <p>{{post.content}}</p>
+                <p><strong>Fecha:</strong> {{formattedTimestamp}}</p>
+                <p><strong>Autor:</strong> {{post.authorName}}</p>
             </div>
             {{/posts}}
 

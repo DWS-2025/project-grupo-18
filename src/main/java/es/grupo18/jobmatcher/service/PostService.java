@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -36,8 +35,6 @@ public class PostService {
 
     @Autowired
     private ReviewService reviewService;
-
-    private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list with authors
         return toDTOs(postRepository.findAllWithAuthors());
@@ -116,13 +113,13 @@ public class PostService {
     }
 
     public PostDTO toDTO(Post post) {
-    String formattedTimestamp = post.getTimestamp().format(TIMESTAMP_FORMATTER);
     List<ReviewDTO> reviews = reviewService.findReviewsByPostId(post.getId()); 
+    
     return new PostDTO(
         post.getId(),
         post.getTitle(),
         post.getContent(),
-        formattedTimestamp,
+        post.getTimestamp() != null ? post.getTimestamp() : LocalDateTime.now(),
         post.getAuthor() != null ? post.getAuthor().getId() : null,
         post.getImage(),
         post.getImageContentType(),

@@ -28,24 +28,24 @@ public class ProfileController {
     @GetMapping("/profile/image")
     public ResponseEntity<byte[]> getProfileImage() {
         UserDTO user = userService.getLoggedUser();
-        if (user.imageFile() != null) {
+        if (user.image() != null) {
             String contentType = user.imageContentType();
             if (contentType == null || contentType.isBlank()) {
                 contentType = "image/jpeg";
             }
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(user.imageFile());
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(user.image());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/profile/upload_image")
-    public ResponseEntity<?> uploadProfileImage(@RequestParam("imageFile") MultipartFile imageFile) throws IOException {
-        if (!imageFile.isEmpty()) {
-            String contentType = imageFile.getContentType();
+    public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) throws IOException {
+        if (!image.isEmpty()) {
+            String contentType = image.getContentType();
             if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
                     || contentType.equals("image/png") || contentType.equals("image/webp"))) {
-                userService.updateUserImage(imageFile);
+                userService.updateUserImage(image);
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.badRequest().body("Formato de imagen no válido");
@@ -69,11 +69,26 @@ public class ProfileController {
     @PostMapping("/profile/edit")
     public String updateProfile(@RequestParam String name,
             @RequestParam String email,
+            @RequestParam(required = false) String password,
             @RequestParam String phone,
             @RequestParam String location,
             @RequestParam String bio,
             @RequestParam int experience) {
-        userService.update(name, email, null, phone, location, bio, experience);
+
+        UserDTO current = userService.getLoggedUser();
+
+        UserDTO updated = new UserDTO(
+                current.id(),
+                name,
+                email,
+                phone,
+                location,
+                bio,
+                experience,
+                current.image(),
+                current.imageContentType());
+
+        userService.updateProfile(updated);
         return "redirect:/profile";
     }
 

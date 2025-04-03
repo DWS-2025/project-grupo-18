@@ -30,10 +30,9 @@
             <div class="box">
                 <h1>{{post.title}}</h1>
 
-                <img src="/blog/posts/{{id}}/image?ts={{currentTimeMillis}}" class="post-image" onerror="this.style.display='none';">
-
+                <img src="/blog/posts/{{postId}}/image?ts={{currentTimeMillis}}" class="post-image" onerror="this.style.display='none';">
                 <p>{{post.content}}</p>
-                <p><strong>Fecha:</strong> {{post.timestamp}}</p>
+                <p><strong>Fecha:</strong> {{formattedTimestamp}}</p>
 
                 {{#post.authorName}}
                 <p><strong>Autor:</strong> {{post.authorName}}</p>
@@ -56,7 +55,7 @@
             <h2>Reseñas</h2>
 
             {{#post.reviews}}
-            <a href="/blog/posts/{{post.id}}/reviews/{{id}}" class="review-link">
+            <a href="/blog/posts/{{postId}}/reviews/{{id}}" class="review-link">
                 <div class="review box">
                     <p>{{text}}</p>
                     <p><strong>Rating:</strong> {{rating}} / 5</p>

@@ -37,10 +37,10 @@ public class ImageRestController {
     @GetMapping("/users/{id}")
     public ResponseEntity<Resource> getUserImage(@PathVariable Long id) {
         UserDTO user = userService.findById(id);
-        if (user != null && user.imageFile() != null) {
-            Resource image = new ByteArrayResource(user.imageFile());
+        if (user != null && user.image() != null) {
+            Resource image = new ByteArrayResource(user.image());
             return ResponseEntity.ok()
-                    .contentLength(user.imageFile().length)
+                    .contentLength(user.image().length)
                     .contentType(MediaType.parseMediaType(user.imageContentType() != null
                             ? user.imageContentType()
                             : "image/jpeg"))
