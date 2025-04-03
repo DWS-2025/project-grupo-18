@@ -2,7 +2,6 @@ package es.grupo18.jobmatcher.controller.rest;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
-import es.grupo18.jobmatcher.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
@@ -19,9 +19,6 @@ public class CompanyRestController {
 
     @Autowired
     private CompanyService companyService;
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping
     public Page<CompanyDTO> getAll(Pageable pageable) {
@@ -52,12 +49,12 @@ public class CompanyRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CompanyDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         CompanyDTO company = companyService.findById(id);
         if (company == null)
             return ResponseEntity.notFound().build();
         companyService.delete(company);
-        return ResponseEntity.ok(company);
+        return ResponseEntity.noContent().build(); // No se devuelve el objeto borrado
     }
 
     @PostMapping("/{id}/favourites")
@@ -65,7 +62,7 @@ public class CompanyRestController {
         CompanyDTO company = companyService.findById(id);
         if (company == null)
             return ResponseEntity.notFound().build();
-        userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), company);
+        companyService.toggleFavouriteCompanyForCurrentUser(id);
         return ResponseEntity.ok().build();
     }
 
@@ -74,7 +71,7 @@ public class CompanyRestController {
         CompanyDTO company = companyService.findById(id);
         if (company == null)
             return ResponseEntity.notFound().build();
-        userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), company);
+        companyService.toggleFavouriteCompanyForCurrentUser(id);
         return ResponseEntity.ok().build();
     }
 
@@ -83,8 +80,11 @@ public class CompanyRestController {
         CompanyDTO company = companyService.findById(id);
         if (company == null)
             return ResponseEntity.notFound().build();
-        boolean isFav = userService.isCompanyFavourite(company);
-        return ResponseEntity.ok(isFav);
+        return ResponseEntity.ok(companyService.isCompanyFavouriteForCurrentUser(id));
     }
 
+    @GetMapping("/matches")
+    public ResponseEntity<List<CompanyDTO>> getMutualMatches() {
+        return ResponseEntity.ok(companyService.getMutualMatchesForCurrentUser());
+    }
 }
