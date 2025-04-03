@@ -49,7 +49,16 @@ public class ReviewRestController {
         ReviewDTO existing = reviewService.findById(id);
         if (existing == null)
             return ResponseEntity.notFound().build();
-        ReviewDTO updated = new ReviewDTO(id, dto.text(), dto.rating(), existing.authorId(), existing.postId());
+
+        ReviewDTO updated = new ReviewDTO(
+                id,
+                dto.text(),
+                dto.rating(),
+                existing.authorId(),
+                existing.postId(),
+                existing.authorName() 
+        );
+
         reviewService.update(existing, updated);
         return ResponseEntity.ok(updated);
     }
@@ -63,5 +72,4 @@ public class ReviewRestController {
         reviewService.delete(id, post);
         return ResponseEntity.ok(review);
     }
-
 }

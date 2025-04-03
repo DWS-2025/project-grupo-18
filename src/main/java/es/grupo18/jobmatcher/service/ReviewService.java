@@ -85,5 +85,9 @@ public class ReviewService {
     private List<ReviewDTO> toDTOs(List<Review> reviews) {
         return reviewMapper.toDTOs(reviews);
     }
+    public List<ReviewDTO> findReviewsByPostId(Long postId) {
+        return toDTOs(reviewRepository.findByPostId(postId));
+    }
+    
 
 }

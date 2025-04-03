@@ -29,16 +29,26 @@
         <section class="blog-posts">
             <div class="box">
                 <h1>{{post.title}}</h1>
+
                 {{#post.hasImage}}
                 <div class="post-image-container">
                     <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post"
-                        class="post-image" onerror="this.style.display='none'">
+                         class="post-image" onerror="this.style.display='none'">
                 </div>
                 {{/post.hasImage}}
+
                 <p>{{post.content}}</p>
                 <p><strong>Fecha:</strong> {{post.timestamp}}</p>
+
+                {{#post.authorName}}
                 <p><strong>Autor:</strong> {{post.authorName}}</p>
+                {{/post.authorName}}
+
+                {{^post.authorName}}
+                <p><strong>Autor:</strong> Anónimo</p>
+                {{/post.authorName}}
             </div>
+
             <div class="button-group">
                 <button onclick="location.href='/blog/posts/{{post.id}}/edit'">Editar</button>
                 <form action="/blog/posts/{{post.id}}/delete" method="post" style="display:inline;">
@@ -49,15 +59,22 @@
 
         <section class="reviews">
             <h2>Reseñas</h2>
+
             {{#post.reviews}}
-            <a href="/blog/posts/{{postId}}/reviews/{{id}}" class="review-link">
+            <a href="/blog/posts/{{post.id}}/reviews/{{id}}" class="review-link">
                 <div class="review box">
                     <p>{{text}}</p>
                     <p><strong>Rating:</strong> {{rating}} / 5</p>
-                    <p><strong>Autor:</strong> {{author.name}}</p>
+                    {{#authorName}}
+                    <p><strong>Autor:</strong> {{authorName}}</p>
+                    {{/authorName}}
+                    {{^authorName}}
+                    <p><strong>Autor:</strong> Anónimo</p>
+                    {{/authorName}}
                 </div>
             </a>
             {{/post.reviews}}
+
             {{^post.reviews}}
             <p>No hay reseñas aún para este post. ¡Sé el primero en comentar!</p>
             {{/post.reviews}}

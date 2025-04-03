@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
+import es.grupo18.jobmatcher.dto.ReviewDTO;
 import es.grupo18.jobmatcher.mapper.PostMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Post;
@@ -32,6 +33,9 @@ public class PostService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ReviewService reviewService;
 
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -112,12 +116,21 @@ public class PostService {
     }
 
     public PostDTO toDTO(Post post) {
-        String formattedTimestamp = post.getTimestamp().format(TIMESTAMP_FORMATTER);
-        return new PostDTO(post.getId(), post.getTitle(), post.getContent(), formattedTimestamp,
-                post.getAuthor() != null ? post.getAuthor().getId() : null,
-                post.getImage(), post.getImageContentType(),
-                post.getAuthor() != null ? post.getAuthor().getName() : "");
+    String formattedTimestamp = post.getTimestamp().format(TIMESTAMP_FORMATTER);
+    List<ReviewDTO> reviews = reviewService.findReviewsByPostId(post.getId()); 
+    return new PostDTO(
+        post.getId(),
+        post.getTitle(),
+        post.getContent(),
+        formattedTimestamp,
+        post.getAuthor() != null ? post.getAuthor().getId() : null,
+        post.getImage(),
+        post.getImageContentType(),
+        post.getAuthor() != null ? post.getAuthor().getName() : "",
+        reviews 
+    );
     }
+
 
     Post toDomain(PostDTO dto) {
         return postMapper.toDomain(dto);
