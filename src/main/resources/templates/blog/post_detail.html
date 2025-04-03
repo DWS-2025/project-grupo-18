@@ -33,8 +33,8 @@
                 </div>
                 {{/post.hasImage}}
                 <p>{{post.content}}</p>
-                <p><strong>Fecha:</strong> {{post.formattedTimestamp}}</p>
-                <p><strong>Autor:</strong> {{post.author.name}}</p>
+                <p><strong>Fecha:</strong> {{post.timestamp}}</p>
+                <p><strong>Autor:</strong> {{post.authorName}}</p>
             </div>
             <div class="button-group">
                 <button onclick="location.href='/blog/posts/{{post.id}}/edit'">Editar</button>
