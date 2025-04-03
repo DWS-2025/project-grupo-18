@@ -76,6 +76,7 @@ public class UserService {
         user.setLocation(location);
         user.setBio(bio);
         user.setExperience(experience);
+        userRepository.save(user);
         return toDTO(user);
     }
 
@@ -87,6 +88,10 @@ public class UserService {
         userRepository.deleteById(toDomain(user).getId());
         return user;
     }
+
+    public Collection<CompanyDTO> getFavouriteCompanies() {
+        return companyMapper.toDTOs(toDomain(getLoggedUser()).getFavouriteCompaniesList());
+    }    
 
     // Method to manage favourite companies
 
@@ -110,6 +115,7 @@ public class UserService {
     public void removeImage() {
         User user = toDomain(getLoggedUser());
         user.setImageFile(null);
+        userRepository.save(user);
     }
 
     public void updateUserImage(MultipartFile imageFile) throws IOException {
@@ -117,7 +123,7 @@ public class UserService {
             User user = toDomain(getLoggedUser());
             user.setImageFile(imageFile.getBytes());
             user.setImageContentType(imageFile.getContentType());
-            save(user);
+            userRepository.save(user);
         }
     }
 

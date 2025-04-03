@@ -1,21 +1,18 @@
 package es.grupo18.jobmatcher.controller.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import es.grupo18.jobmatcher.model.Company;
-import es.grupo18.jobmatcher.model.User;
+import es.grupo18.jobmatcher.dto.CompanyDTO;
+import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
 import es.grupo18.jobmatcher.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 
 @Controller
 public class MatchController {
@@ -26,14 +23,14 @@ public class MatchController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/matches") // Show the matches page
+    @GetMapping("/matches")
     public String showCompanies(Model model) {
-        List<Company> allCompanies = companyService.findAll();
-        User currentUser = userService.getLoggedUser();
-        List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
+        Collection<CompanyDTO> allCompanies = companyService.findAll();
+        UserDTO currentUser = userService.getLoggedUser();
+        Collection<CompanyDTO> favouriteCompanies = userService.getFavouriteCompanies();
 
-        List<Company> nonFavouriteCompanies = new ArrayList<>();
-        for (Company company : allCompanies) {
+        List<CompanyDTO> nonFavouriteCompanies = new ArrayList<>();
+        for (CompanyDTO company : allCompanies) {
             if (!favouriteCompanies.contains(company)) {
                 nonFavouriteCompanies.add(company);
             }
@@ -44,58 +41,61 @@ public class MatchController {
         return "match/matches";
     }
 
-    @PostMapping("/matches/{companyId}/addFavourite") // Add a company to the user's favourite list
+    @PostMapping("/matches/{companyId}/addFavourite")
     public String addFavourite(@PathVariable long companyId) {
-        User currentUser = userService.getLoggedUser();
-        Company company = companyService.findById(companyId);
+
+        UserDTO currentUser = userService.getLoggedUser();
+        CompanyDTO company = companyService.findById(companyId);
 
         if (company != null) {
-            userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
+            userService.addOrRemoveFavouriteCompany(currentUser.id(), company);
             companyService.addOrRemoveFavouriteUser(companyId, currentUser);
         }
 
-        return "redirect:/matches"; // Recharges the match page to show updates
+        return "redirect:/matches";
     }
 
-    @PostMapping("/matches/{companyId}/removeFavourite") // Remove a company from the user's favourite list
-    public String removeFavourite(@PathVariable long companyId, @RequestParam String origin) {
-        User currentUser = userService.getLoggedUser();
-        Company company = companyService.findById(companyId);
+    @PostMapping("/matches/{companyId}/removeFavourite")
+    public String removeFavourite(@PathVariable long companyId, @RequestParam(required = false) String origin) {
+
+        UserDTO currentUser = userService.getLoggedUser();
+        CompanyDTO company = companyService.findById(companyId);
 
         if (company != null) {
-            userService.addOrRemoveFavouriteCompany(currentUser.getId(), company);
+            userService.addOrRemoveFavouriteCompany(currentUser.id(), company);
             companyService.addOrRemoveFavouriteUser(companyId, currentUser);
         }
-        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches"); // Recharges the matches page
-                                                                                          // to show updates
+
+        return "redirect:" + (origin != null && !origin.isBlank() ? origin : "/matches");
     }
 
-    @GetMapping("/matches/likes") // Show the likes match page
+    @GetMapping("/matches/likes")
     public String showConsultantMatchPage(Model model) {
-        User currentUser = userService.getLoggedUser();
-        List<Company> favouriteCompanies = currentUser.getFavouriteCompaniesList();
-        List<Company> mutualMatchCompanies = new ArrayList<>();
+  
+        UserDTO currentUser = userService.getLoggedUser();
+        Collection<CompanyDTO> favouriteCompanies = userService.getFavouriteCompanies();
 
-        // Filters companies that have the user in their favourite list
-        for (Company company : favouriteCompanies) {
-            if (companyService.isUserFavourite(company.getId(), currentUser)) {
+        List<CompanyDTO> mutualMatchCompanies = new ArrayList<>();
+        for (CompanyDTO company : favouriteCompanies) {
+            if (companyService.isUserFavourite(company.id(), currentUser)) {
                 mutualMatchCompanies.add(company);
             }
         }
 
         model.addAttribute("mutualMatchCompanies", mutualMatchCompanies);
-
         return "match/likes";
     }
 
-    @GetMapping("/company/{companyId}") // Show the company individual page
+    @GetMapping("/company/{companyId}")
     public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
-        try {
-            Company company = companyService.findById(companyId);
+
+        CompanyDTO company = companyService.findById(companyId);
+        if (company != null) {
             model.addAttribute("company", company);
             return "company/show_company";
-        } catch (EntityNotFoundException e) {
+        } else {
             return "error";
         }
     }
+    
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -32,22 +33,25 @@ public class PostService {
     @Autowired
     private UserMapper userMapper;
 
-    public Collection<PostDTO> findAllWithAuthors() {
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list with authors
         return toDTOs(postRepository.findAllWithAuthors());
     }
 
-    public Collection<PostDTO> findAll() {
+    public Collection<PostDTO> findAll() { // Returns the posts list in reverse order
         return toDTOs(postRepository.findAll());
     }
 
-    public PostDTO findById(long id) {
+    public PostDTO findById(long id) { // Returns a post by its id
         Optional<Post> post = postRepository.findById(id);
         return post.map(this::toDTO).orElse(null);
     }
 
-    public PostDTO save(PostDTO postDTO) {
+    public PostDTO save(PostDTO postDTO) { // Saves a post
         Post post = toDomain(postDTO);
         post.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
+        post.setTimestamp(LocalDateTime.now());
         postRepository.save(post);
         return toDTO(post);
     }
@@ -56,7 +60,7 @@ public class PostService {
         Post post = toDomain(oldPostDTO);
         post.setTitle(updatedPostDTO.title());
         post.setContent(updatedPostDTO.content());
-        post.setTimestamp(LocalDateTime.parse(updatedPostDTO.timestamp()));
+        post.setTimestamp(LocalDateTime.now());
 
         if (updatedPostDTO.image() != null && updatedPostDTO.image().length > 0) {
             post.setImage(updatedPostDTO.image());
@@ -67,16 +71,15 @@ public class PostService {
         return toDTO(post);
     }
 
-    public void deleteById(long id) {
+    public void deleteById(long id) { // Deletes a post by its id
         postRepository.deleteById(id);
     }
 
-    public PostDTO delete(PostDTO post) {
+    public void delete(PostDTO post) { // Deletes a post
         postRepository.deleteById(toDomain(post).getId());
-        return post;
     }
 
-    public Collection<PostDTO> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
+    public List<PostDTO> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
         List<Post> posts = new ArrayList<>(postRepository.findAll());
 
         if (from != null && to != null) {
@@ -108,16 +111,22 @@ public class PostService {
         return toDTOs(posts);
     }
 
-    private PostDTO toDTO(Post post) {
-        return postMapper.toDTO(post);
+    public PostDTO toDTO(Post post) {
+        String formattedTimestamp = post.getTimestamp().format(TIMESTAMP_FORMATTER);
+        return new PostDTO(post.getId(), post.getTitle(), post.getContent(), formattedTimestamp,
+                post.getAuthor() != null ? post.getAuthor().getId() : null,
+                post.getImage(), post.getImageContentType());
     }
 
-    private Post toDomain(PostDTO dto) {
+    Post toDomain(PostDTO dto) {
         return postMapper.toDomain(dto);
     }
 
-    private List<PostDTO> toDTOs(List<Post> posts) {
-        return postMapper.toDTOs(posts);
+    List<PostDTO> toDTOs(List<Post> posts) {
+        return posts.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    List<Post> toDomains(List<PostDTO> dtos) {
+        return postMapper.toDomains(dtos);
+    }
 } 

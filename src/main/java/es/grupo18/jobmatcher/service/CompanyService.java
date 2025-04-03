@@ -27,8 +27,8 @@ public class CompanyService {
     @Autowired
     private UserMapper userMapper;
 
-    public Page<Company> findAll(Pageable pageable) {
-        return companyRepository.findAll(pageable);
+    public Page<CompanyDTO> findAll(Pageable pageable) {
+        return companyRepository.findAll(pageable).map(this::toDTO);
     }
 
     public Collection<CompanyDTO> findAll() {
@@ -39,8 +39,8 @@ public class CompanyService {
         return toDTO(companyRepository.findById(id).orElse(null));
     }
 
-    public Page<Company> findPaginated(Pageable pageable) {
-        return companyRepository.findAll(pageable);
+    public Page<CompanyDTO> findPaginated(Pageable pageable) {
+        return companyRepository.findAll(pageable).map(this::toDTO);
     }
 
     public long count() {

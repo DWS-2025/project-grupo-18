@@ -1,18 +1,14 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import java.util.Optional;
-
+import es.grupo18.jobmatcher.dto.CompanyDTO;
+import es.grupo18.jobmatcher.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-
-import es.grupo18.jobmatcher.model.Company;
-import es.grupo18.jobmatcher.service.CompanyService;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class CompaniesController {
@@ -23,11 +19,12 @@ public class CompaniesController {
     @GetMapping("/companies")
     public String listCompanies(Model model, Pageable page) {
         Pageable pageable = PageRequest.of(page.getPageNumber(), 10);
+        Page<CompanyDTO> companiesPage = companyService.findAll(pageable);
 
-        model.addAttribute("companies", companyService.findAll(pageable));
+        model.addAttribute("companies", companiesPage.getContent());
 
-        boolean hasPrev = pageable.getPageNumber() >= 1;
-        boolean hasNext = (pageable.getPageNumber() + 1) * pageable.getPageSize() < companyService.count();
+        boolean hasPrev = companiesPage.hasPrevious();
+        boolean hasNext = companiesPage.hasNext();
 
         model.addAttribute("hasPrev", hasPrev);
         model.addAttribute("prev", pageable.getPageNumber() - 1);
@@ -39,21 +36,21 @@ public class CompaniesController {
 
     @GetMapping("/companies/new")
     public String showCompanyForm(Model model) {
-        model.addAttribute("company", new Company());
+        model.addAttribute("company", new CompanyDTO(null, "", "", "", ""));
         return "company/new_company_form";
     }
 
     @PostMapping("/companies/new")
-    public String newCompany(Model model, Company company) {
-        companyService.save(company);
+    public String newCompany(@ModelAttribute CompanyDTO companyDTO) {
+        companyService.save(companyDTO);
         return "redirect:/companies";
     }
 
     @GetMapping("/companies/{companyId}")
     public String getCompany(Model model, @PathVariable("companyId") long id) {
-        Optional<Company> company = Optional.ofNullable(companyService.findById(id));
-        if (company.isPresent()) {
-            model.addAttribute("company", company.get());
+        CompanyDTO company = companyService.findById(id);
+        if (company != null) {
+            model.addAttribute("company", company);
             return "company/show_company";
         } else {
             return "company/company_not_found";
@@ -62,9 +59,9 @@ public class CompaniesController {
 
     @GetMapping("/companies/{companyId}/edit")
     public String editCompany(Model model, @PathVariable("companyId") long id) {
-        Optional<Company> company = Optional.ofNullable(companyService.findById(id));
-        if (company.isPresent()) {
-            model.addAttribute("company", company.get());
+        CompanyDTO company = companyService.findById(id);
+        if (company != null) {
+            model.addAttribute("company", company);
             return "company/company_form";
         } else {
             return "company/company_not_found";
@@ -72,10 +69,9 @@ public class CompaniesController {
     }
 
     @PostMapping("/companies/{companyId}/edit")
-    public String updateCompany(Model model, @PathVariable("companyId") long id, Company updatedCompany) {
-        Optional<Company> op = Optional.ofNullable(companyService.findById(id));
-        if (op.isPresent()) {
-            Company oldCompany = op.get();
+    public String updateCompany(@PathVariable("companyId") long id, @ModelAttribute CompanyDTO updatedCompany) {
+        CompanyDTO oldCompany = companyService.findById(id);
+        if (oldCompany != null) {
             companyService.update(oldCompany, updatedCompany);
             return "redirect:/companies/" + id;
         } else {
@@ -85,7 +81,10 @@ public class CompaniesController {
 
     @PostMapping("/companies/{companyId}/delete")
     public String deleteCompany(@PathVariable("companyId") long id) {
-        companyService.delete(companyService.findById(id));
+        CompanyDTO company = companyService.findById(id);
+        if (company != null) {
+            companyService.delete(company);
+        }
         return "redirect:/companies";
     }
 
