@@ -153,6 +153,21 @@
     width: 100%;
 }
 
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #0077b6;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    animation: spin 0.8s linear infinite;
+    margin-left: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .dark-mode .company-item {
     background-color: #1e1e1e;
     color: white;

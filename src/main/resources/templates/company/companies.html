@@ -26,16 +26,16 @@
         </div>
     </header>
 
-    <main class="container">
-        <div id="company-list"></div>
+    <main>
+        <div id="company-list" class="company-grid"></div>
         <div class="pagination">
-            <div class="pagination">
-                <button id="prev-button" style="display: none;">Anterior</button>
-                <span id="page-info" style="margin: 0 10px;"></span>
-                <button id="next-button" style="display: none;">Siguiente</button>
-            </div>            
+            <button id="load-more-button">Más resultados</button>
+            <div id="spinner" class="spinner" style="display: none;"></div>
         </div>
     </main>
+    
+    <script type="module" src="/js/companiesAjax.js"></script>
+    
 
     <script type="module" src="/js/companiesAjax.js"></script>
 
