@@ -76,5 +76,5 @@ public class ProfileController {
         userService.update(name, email, null, phone, location, bio, experience);
         return "redirect:/profile";
     }
-    
+
 }

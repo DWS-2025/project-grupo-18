@@ -53,7 +53,7 @@
                 <button type="submit" class="btn">Aplicar filtros</button>
             </form>
         </section>
-        
+
         <section class="blog-posts">
             {{#posts}}
             <div class="box">
@@ -62,7 +62,8 @@
                 </a>
                 {{#hasImage}}
                 <div class="post-image-container">
-                    <img src="/blog/posts/{{id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post" class="post-image">
+                    <img src="/blog/posts/{{id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post"
+                        class="post-image">
                 </div>
                 {{/hasImage}}
                 <p>{{content}}</p>
@@ -78,8 +79,6 @@
             {{/posts}}
         </section>
     </main>
-
-
 
     <footer>
         <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>

@@ -25,12 +25,12 @@ public class Post {
 
     private String title;
 
-    @Column(length = 1000) // Aumenta la longitud de content a 1000 caracteres
+    @Column(length = 1000)
     private String content;
 
     private LocalDateTime timestamp;
 
-    @Lob // Almacena la imagen como datos binarios
+    @Lob
     private byte[] image;
     private String imageContentType;
 

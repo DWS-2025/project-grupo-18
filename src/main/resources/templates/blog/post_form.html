@@ -15,7 +15,9 @@
 
     <header>
         <div class="header-left">
-            <button class="back-btn" onclick="location.href='{{#isEdit}}/blog/posts/{{post.id}}{{/isEdit}}{{^isEdit}}/blog/posts{{/isEdit}}'">⬅️ Atrás</button>
+            <button class="back-btn"
+                onclick="location.href='{{#isEdit}}/blog/posts/{{post.id}}{{/isEdit}}{{^isEdit}}/blog/posts{{/isEdit}}'">⬅️
+                Atrás</button>
         </div>
         <div class="title">
             <a href="/main">JOBMATCHER</a>
@@ -29,16 +31,21 @@
     <main class="container">
         <div class="box">
             <h1>{{#isEdit}}Editar post{{/isEdit}}{{^isEdit}}Nuevo post{{/isEdit}}</h1> <!-- Form title -->
-            <form id="postForm" method="post" action="{{#isEdit}}/blog/posts/{{post.id}}/edit{{/isEdit}}{{^isEdit}}/blog/posts/new{{/isEdit}}" enctype="multipart/form-data">
+            <form id="postForm" method="post"
+                action="{{#isEdit}}/blog/posts/{{post.id}}/edit{{/isEdit}}{{^isEdit}}/blog/posts/new{{/isEdit}}"
+                enctype="multipart/form-data">
                 <!-- Input group for the post title -->
                 <div class="input-group">
                     <label for="title">Título:</label>
-                    <input type="text" id="title" name="title" value="{{#isEdit}}{{post.title}}{{/isEdit}}" required> <!-- Title input (required) -->
+                    <input type="text" id="title" name="title" value="{{#isEdit}}{{post.title}}{{/isEdit}}" required>
+                    <!-- Title input (required) -->
                 </div>
                 <!-- Input group for the post content -->
                 <div class="input-group">
                     <label for="content">Contenido:</label>
-                    <textarea id="content" name="content" rows="10" required maxlength="500">{{#isEdit}}{{post.content}}{{/isEdit}}</textarea> <!-- Content textarea (required, max 500 characters) -->
+                    <textarea id="content" name="content" rows="10" required
+                        maxlength="500">{{#isEdit}}{{post.content}}{{/isEdit}}</textarea>
+                    <!-- Content textarea (required, max 500 characters) -->
                 </div>
                 <!-- Input group for the post image file -->
                 <div class="input-group">
@@ -48,14 +55,16 @@
                     {{#post.hasImage}}
                     <div class="current-image">
                         <p>Imagen actual:</p>
-                        <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen actual" style="max-width: 200px;">
+                        <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen actual"
+                            style="max-width: 200px;">
                     </div>
                     {{/post.hasImage}}
                     {{/isEdit}}
                 </div>
                 <!-- Button to submit the form -->
                 <div class="button-group">
-                    <button type="submit">{{#isEdit}}Actualizar{{/isEdit}}{{^isEdit}}Publicar{{/isEdit}}</button> <!-- Submit button -->
+                    <button type="submit">{{#isEdit}}Actualizar{{/isEdit}}{{^isEdit}}Publicar{{/isEdit}}</button>
+                    <!-- Submit button -->
                 </div>
             </form>
         </div>

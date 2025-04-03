@@ -23,13 +23,14 @@ public class PostRestController {
 
     @GetMapping("/")
     public Collection<PostDTO> getAllPosts() {
-        return postService.findAll(); // o findAllWithAuthors() si prefieres
+        return postService.findAll();
     }
 
     @GetMapping("/{id}")
     public PostDTO getPost(@PathVariable long id) {
         PostDTO post = postService.findById(id);
-        if (post == null) throw new NoSuchElementException("Post not found with id: " + id);
+        if (post == null)
+            throw new NoSuchElementException("Post not found with id: " + id);
         return post;
     }
 
@@ -46,14 +47,16 @@ public class PostRestController {
     @PutMapping("/{id}")
     public PostDTO updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
         PostDTO existing = postService.findById(id);
-        if (existing == null) throw new NoSuchElementException("Post not found with id: " + id);
+        if (existing == null)
+            throw new NoSuchElementException("Post not found with id: " + id);
         return postService.update(existing, postDTO);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable long id) {
         PostDTO post = postService.findById(id);
-        if (post == null) throw new NoSuchElementException("Post not found with id: " + id);
+        if (post == null)
+            throw new NoSuchElementException("Post not found with id: " + id);
         postService.delete(post);
         return ResponseEntity.noContent().build();
     }
@@ -70,5 +73,5 @@ public class PostRestController {
 
         return postService.findFilteredPosts(sort, fromDate, toDate, title);
     }
-    
+
 }

@@ -91,33 +91,27 @@
     });
 
     document.getElementById("resetPhotoButton").addEventListener("click", function () {
-    fetch('/profile/reset_image', { method: 'POST' })
-        .then(response => {
-            if (!response.ok) throw new Error("Error al restablecer la imagen");
+        fetch('/profile/reset_image', { method: 'POST' })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al restablecer la imagen");
 
-            const timestamp = Date.now();
-            const img = document.getElementById("profilePhoto");
+                const timestamp = Date.now();
+                const img = document.getElementById("profilePhoto");
 
-            // Creamos una imagen temporal para comprobar si carga
-            const testImg = new Image();
-            testImg.onload = () => {
-                // Si carga, actualizamos la imagen real
-                img.src = testImg.src;
-            };
-            testImg.onerror = () => {
-                // Si falla, cargamos la imagen por defecto
-                img.src = '/img/default-profile.jpg';
-            };
-            testImg.src = `/profile/image?ts=${timestamp}`;
-        })
-        .catch(err => {
-            alert("Error: " + err.message);
-        });
-});
-
-
+                const testImg = new Image();
+                testImg.onload = () => {
+                    img.src = testImg.src;
+                };
+                testImg.onerror = () => {
+                    img.src = '/img/default-profile.jpg';
+                };
+                testImg.src = `/profile/image?ts=${timestamp}`;
+            })
+            .catch(err => {
+                alert("Error: " + err.message);
+            });
+    });
 
 </script>
-
 
 </html>

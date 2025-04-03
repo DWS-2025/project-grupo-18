@@ -112,7 +112,7 @@ public class User {
     public String getImageContentType() {
         return imageContentType;
     }
-    
+
     public List<Review> getReviews() {
         return reviewsList;
     }

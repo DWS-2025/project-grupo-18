@@ -55,5 +55,5 @@ public class UserRestController {
         userService.delete(user);
         return ResponseEntity.ok(user);
     }
-    
+
 }

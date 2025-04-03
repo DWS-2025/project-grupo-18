@@ -10,8 +10,11 @@ import java.util.List;
 public interface CompanyMapper {
 
     CompanyDTO toDTO(Company company);
+
     Company toDomain(CompanyDTO dto);
 
     List<CompanyDTO> toDTOs(List<Company> companies);
+
     List<Company> toDomains(List<CompanyDTO> dtos);
+
 }

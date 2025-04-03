@@ -86,7 +86,8 @@ public class BlogController {
             }
         }
 
-        PostDTO postDTO = new PostDTO(null, title, content, LocalDateTime.now().toString(), null, imageBytes, contentType, "");
+        PostDTO postDTO = new PostDTO(null, title, content, LocalDateTime.now().toString(), null, imageBytes,
+                contentType, "");
         postService.save(postDTO);
         return "redirect:/blog/posts";
     }
@@ -138,7 +139,8 @@ public class BlogController {
             }
         }
 
-        PostDTO updated = new PostDTO(postId, title, content, LocalDateTime.now().toString(), existing.authorId(), image, contentType, existing.authorName());
+        PostDTO updated = new PostDTO(postId, title, content, LocalDateTime.now().toString(), existing.authorId(),
+                image, contentType, existing.authorName());
         postService.update(existing, updated);
         return "redirect:/blog/posts/" + postId;
     }
@@ -216,5 +218,5 @@ public class BlogController {
         }
         return "post_not_found";
     }
-    
+
 }

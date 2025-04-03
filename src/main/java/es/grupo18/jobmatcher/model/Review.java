@@ -35,7 +35,6 @@ public class Review {
         this.rating = rating;
     }
 
-    // Nuevo constructor con autor
     public Review(String text, int rating, User author) {
         this.text = text;
         this.rating = rating;

@@ -32,7 +32,7 @@
             <h1>{{name}}</h1>
             <p>{{location}}</p>
             <p>{{bio}}</p>
-    
+
             <!-- Button for adding to favourites -->
             <form action="/matches/{{id}}/addFavourite" method="post">
                 <input type="hidden" name="companyName" value="{{name}}">
@@ -41,13 +41,13 @@
             </form>
         </div>
         {{/nonFavouriteCompanies}}
-    
+
         {{#favouriteCompanies}}
         <div class="box" onclick="location.href='/company/{{id}}'">
             <h1>{{name}}</h1>
             <p>{{location}}</p>
             <p>{{bio}}</p>
-    
+
             <!-- Button for removing from favourites -->
             <form action="/matches/{{id}}/removeFavourite" method="post">
                 <input type="hidden" name="companyName" value="{{name}}">

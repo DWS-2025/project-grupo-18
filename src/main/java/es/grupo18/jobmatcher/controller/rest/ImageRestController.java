@@ -45,8 +45,10 @@ public class ImageRestController {
     public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
             throws IOException {
         UserDTO user = userService.findById(id);
-        if (user == null) return ResponseEntity.notFound().build();
-        if (file.isEmpty()) return ResponseEntity.badRequest().body("Empty image file");
+        if (user == null)
+            return ResponseEntity.notFound().build();
+        if (file.isEmpty())
+            return ResponseEntity.badRequest().body("Empty image file");
 
         userService.save(user, file);
         return ResponseEntity.ok().build();
@@ -55,7 +57,8 @@ public class ImageRestController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUserImage(@PathVariable Long id) {
         UserDTO user = userService.findById(id);
-        if (user == null) return ResponseEntity.notFound().build();
+        if (user == null)
+            return ResponseEntity.notFound().build();
 
         userService.removeImage();
         return ResponseEntity.noContent().build();
@@ -81,13 +84,14 @@ public class ImageRestController {
     public ResponseEntity<?> uploadPostImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
             throws IOException {
         PostDTO post = postService.findById(id);
-        if (post == null) return ResponseEntity.notFound().build();
-        if (file.isEmpty()) return ResponseEntity.badRequest().body("Empty image file");
+        if (post == null)
+            return ResponseEntity.notFound().build();
+        if (file.isEmpty())
+            return ResponseEntity.badRequest().body("Empty image file");
 
         PostDTO updated = new PostDTO(
                 post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                file.getBytes(), file.getContentType(),""
-        );
+                file.getBytes(), file.getContentType(), "");
 
         postService.update(post, updated);
         return ResponseEntity.ok().build();
@@ -96,15 +100,15 @@ public class ImageRestController {
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<?> deletePostImage(@PathVariable Long id) {
         PostDTO post = postService.findById(id);
-        if (post == null) return ResponseEntity.notFound().build();
+        if (post == null)
+            return ResponseEntity.notFound().build();
 
         PostDTO updated = new PostDTO(
                 post.id(), post.title(), post.content(), post.timestamp(), post.authorId(),
-                null, null,""
-        );
+                null, null, "");
 
         postService.update(post, updated);
         return ResponseEntity.noContent().build();
     }
-    
+
 }

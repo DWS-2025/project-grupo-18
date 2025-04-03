@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
+//import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
+//import org.springframework.util.FileCopyUtils;
 
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.Post;
@@ -36,7 +36,7 @@ public class DataGeneratorService {
         public void init() throws IOException {
                 LocalDateTime now = LocalDateTime.now();
 
-                // Usuarios
+                // Users
                 User ana = new User("Ana García", "ana.garcia@gmail.com", "password123", "666555444", "Madrid",
                                 "Soy una profesional en busca de oportunidades en marketing digital.", 2, null, null,
                                 null, null);
@@ -48,17 +48,12 @@ public class DataGeneratorService {
                                 null);
                 userRepository.save(carlos);
 
-                // Load images from resources
-                byte[] interviewImage = loadImageFromResources("static/img/interview.jpg");
-                byte[] resumeImage = loadImageFromResources("static/img/curriculumDesign.avif");
-                byte[] networkingImage = loadImageFromResources("static/img/network.avif");
-
                 // Post 1 with interview image
                 Post post1 = new Post(
                                 "5 Consejos Clave para Triunfar en tu Entrevista de Trabajo",
                                 "Prepararte para una entrevista puede ser intimidante, pero con estos consejos podrás destacar: investiga la empresa, practica tus respuestas, muestra confianza, haz preguntas inteligentes y sigue el contacto tras la entrevista. ¡Tu próximo empleo está más cerca de lo que crees!",
                                 now.minusMonths(2).minusDays(5),
-                                interviewImage,
+                                "",
                                 ana);
                 post1.setImageContentType("image/jpeg");
                 post1.getReviews().add(new Review(
@@ -71,7 +66,7 @@ public class DataGeneratorService {
                                 "Cómo Diseñar un Currículum que Destaque ante los Reclutadores",
                                 "Un CV bien estructurado es tu carta de presentación. Usa un diseño limpio, destaca tus logros con números, adapta tu experiencia al puesto y no olvides incluir palabras clave del sector.",
                                 now.minusMonths(1).minusDays(3),
-                                resumeImage,
+                                "",
                                 carlos);
                 post2.setImageContentType("image/jpeg");
                 post2.getReviews().add(new Review("Rediseñé mi CV y recibí más respuestas. ¡Recomendado!", 5, carlos));
@@ -82,7 +77,7 @@ public class DataGeneratorService {
                                 "Errores que Debes Evitar al Buscar Trabajo en 2025",
                                 "Desde enviar el mismo CV genérico a todas las ofertas hasta no seguir las instrucciones, estos errores pueden costarte oportunidades.",
                                 now.minusYears(1).minusMonths(7),
-                                networkingImage,
+                                "",
                                 ana);
                 post3.setImageContentType("image/jpeg");
                 postRepository.save(post3);
@@ -92,7 +87,7 @@ public class DataGeneratorService {
                                 "El Poder del Networking: Construye tu Red para Encontrar Empleo",
                                 "Conectar con profesionales de tu sector puede abrirte puertas inesperadas. Participa en eventos y usa LinkedIn estratégicamente.",
                                 now.minusYears(1).minusMonths(3),
-                                networkingImage,
+                                "",
                                 carlos);
                 postRepository.save(post4);
 
@@ -111,14 +106,16 @@ public class DataGeneratorService {
 
         }
 
-        private byte[] loadImageFromResources(String path) throws IOException {
-                try {
-                        ClassPathResource resource = new ClassPathResource(path);
-                        return FileCopyUtils.copyToByteArray(resource.getInputStream());
-                } catch (IOException e) {
-                        System.err.println("Could not load image: " + path);
-                        return new byte[0];
-                }
-        }
+        /*
+         * private byte[] loadImageFromResources(String path) throws IOException {
+         * try {
+         * ClassPathResource resource = new ClassPathResource(path);
+         * return FileCopyUtils.copyToByteArray(resource.getInputStream());
+         * } catch (IOException e) {
+         * System.err.println("Could not load image: " + path);
+         * return new byte[0];
+         * }
+         * }
+         */
 
 }

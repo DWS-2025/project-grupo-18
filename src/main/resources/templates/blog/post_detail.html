@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="/js/darkMode.js" defer></script>
 </head>
+
 <body class="page-centered">
     <header>
         <div class="header-left">
@@ -29,7 +31,8 @@
                 <h1>{{post.title}}</h1>
                 {{#post.hasImage}}
                 <div class="post-image-container">
-                    <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post" class="post-image" onerror="this.style.display='none'">
+                    <img src="/blog/posts/{{post.id}}/image?ts={{currentTimeMillis}}" alt="Imagen del post"
+                        class="post-image" onerror="this.style.display='none'">
                 </div>
                 {{/post.hasImage}}
                 <p>{{post.content}}</p>
@@ -44,10 +47,8 @@
             </div>
         </section>
 
-        <!-- Sección de reseñas -->
         <section class="reviews">
             <h2>Reseñas</h2>
-            <!-- Listado de reseñas -->
             {{#post.reviews}}
             <a href="/blog/posts/{{postId}}/reviews/{{id}}" class="review-link">
                 <div class="review box">
@@ -57,12 +58,10 @@
                 </div>
             </a>
             {{/post.reviews}}
-            <!-- Mensaje cuando no hay reseñas -->
             {{^post.reviews}}
             <p>No hay reseñas aún para este post. ¡Sé el primero en comentar!</p>
             {{/post.reviews}}
-        
-            <!-- Formulario para añadir nueva reseña -->
+
             <div class="new-review box">
                 <h3>Añadir una nueva reseña</h3>
                 <form action="/blog/posts/{{post.id}}/reviews/new" method="post">
@@ -84,4 +83,5 @@
         <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
     </footer>
 </body>
+
 </html>

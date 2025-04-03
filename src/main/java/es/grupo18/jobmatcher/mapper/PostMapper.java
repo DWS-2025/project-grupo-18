@@ -20,5 +20,7 @@ public interface PostMapper {
     Post toDomain(PostDTO dto);
 
     List<PostDTO> toDTOs(List<Post> posts);
+
     List<Post> toDomains(List<PostDTO> dtos);
+    
 }

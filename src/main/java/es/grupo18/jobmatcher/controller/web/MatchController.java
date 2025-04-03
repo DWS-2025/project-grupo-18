@@ -70,7 +70,7 @@ public class MatchController {
 
     @GetMapping("/matches/likes")
     public String showConsultantMatchPage(Model model) {
-  
+
         UserDTO currentUser = userService.getLoggedUser();
         Collection<CompanyDTO> favouriteCompanies = userService.getFavouriteCompanies();
 

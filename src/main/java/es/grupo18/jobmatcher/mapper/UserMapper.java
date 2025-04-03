@@ -10,9 +10,11 @@ import java.util.List;
 public interface UserMapper {
 
     UserDTO toDTO(User user);
+
     User toDomain(UserDTO userDTO);
 
     List<UserDTO> toDTOs(List<User> users);
+
     List<User> toDomains(List<UserDTO> dtos);
 
 }
