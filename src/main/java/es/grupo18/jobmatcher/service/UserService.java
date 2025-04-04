@@ -139,7 +139,15 @@ public class UserService {
         return companyMapper.toDTOs(user.getFavouriteCompaniesList());
     }
     
-
+    public void removeCompanyFromAllUsers(Long companyId) {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (user.getFavouriteCompaniesList().removeIf(c -> c.getId() == companyId)) {
+                userRepository.save(user);
+            }
+        }
+    }
+    
     // Image methods
 
     public void removeImage() {
@@ -152,6 +160,14 @@ public class UserService {
 
         userRepository.save(existingUser);
     }
+
+    public void removeImageById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setImage(null);
+        user.setImageContentType(null);
+        userRepository.save(user);
+    }    
 
     public void updateUserImage(MultipartFile image) throws IOException {
         if (!image.isEmpty()) {

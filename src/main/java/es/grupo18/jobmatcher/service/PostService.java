@@ -59,9 +59,18 @@ public class PostService {
         return toDTO(post);
     }
 
-    public PostDTO create(String title, String content, MultipartFile image) throws IOException { // Creates a post
-        Post post = new Post(title, content, LocalDateTime.now(), image.getBytes(), userMapper.toDomain(userService.getLoggedUser()));
-        post.setImageContentType(image.getContentType());
+    public PostDTO create(String title, String content, MultipartFile image) throws IOException {
+        byte[] imageBytes = null;
+        String contentType = null;
+
+        if (image != null && !image.isEmpty()) {
+            imageBytes = image.getBytes();
+            contentType = image.getContentType();
+        }
+
+        Post post = new Post(title, content, LocalDateTime.now(), imageBytes,
+                userMapper.toDomain(userService.getLoggedUser()));
+        post.setImageContentType(contentType);
         postRepository.save(post);
         return toDTO(post);
     }
@@ -98,6 +107,20 @@ public class PostService {
 
         postRepository.save(post);
         return toDTO(post);
+    }
+
+    public void updateImageOnly(Long id, MultipartFile file) throws IOException {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (file != null && !file.isEmpty()) {
+            post.setImage(file.getBytes());
+            post.setImageContentType(file.getContentType());
+            post.setTimestamp(LocalDateTime.now());
+            postRepository.save(post);
+        } else {
+            throw new RuntimeException("File empty");
+        }
     }
 
     public void deleteById(long id) { // Deletes a post by its id
@@ -141,19 +164,18 @@ public class PostService {
     }
 
     public PostDTO toDTO(Post post) {
-    List<ReviewDTO> reviews = reviewService.findReviewsByPostId(post.getId()); 
-    
-    return new PostDTO(
-        post.getId(),
-        post.getTitle(),
-        post.getContent(),
-        post.getTimestamp() != null ? post.getTimestamp() : LocalDateTime.now(),
-        post.getAuthor() != null ? post.getAuthor().getId() : null,
-        post.getImage(),
-        post.getImageContentType(),
-        post.getAuthor() != null ? post.getAuthor().getName() : "",
-        reviews 
-    );
+        List<ReviewDTO> reviews = reviewService.findReviewsByPostId(post.getId());
+
+        return new PostDTO(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getTimestamp() != null ? post.getTimestamp() : LocalDateTime.now(),
+                post.getAuthor() != null ? post.getAuthor().getId() : null,
+                post.getImage(),
+                post.getImageContentType(),
+                post.getAuthor() != null ? post.getAuthor().getName() : "",
+                reviews);
     }
 
     Post toDomain(PostDTO dto) {
@@ -166,6 +188,18 @@ public class PostService {
 
     List<Post> toDomains(List<PostDTO> dtos) {
         return postMapper.toDomains(dtos);
+    }
+
+    public void removeImageByPostId(Long id) {
+        PostDTO postDTO = findById(id);
+        if (postDTO == null) {
+            throw new RuntimeException("Post not found");
+        }
+
+        Post post = toDomain(postDTO);
+        post.setImage(null);
+        post.setImageContentType(null);
+        postRepository.save(post);
     }
 
 }

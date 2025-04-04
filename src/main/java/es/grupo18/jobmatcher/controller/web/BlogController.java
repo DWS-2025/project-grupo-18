@@ -80,36 +80,36 @@ public class BlogController {
 
     @PostMapping("/blog/posts/new")
     public String newPost(@RequestParam("image") MultipartFile image,
-            @RequestParam String title,
-            @RequestParam String content) throws IOException {
-
-        String contentType = null;
-
+                          @RequestParam String title,
+                          @RequestParam String content) throws IOException {
+    
         if (!image.isEmpty()) {
-            contentType = image.getContentType();
+            String contentType = image.getContentType();
             if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
                     || contentType.equals("image/png") || contentType.equals("image/webp"))) {
                 postService.create(title, content, image);
             } else {
                 return "redirect:/blog/posts/new?error=invalidImageType";
             }
+        } else {
+            postService.create(title, content, null);
         }
+    
         return "redirect:/blog/posts";
     }
 
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
         try {
-            PostDTO post = postService.findById(postId);
-            model.addAttribute("post", post);
+            model.addAttribute("post", postService.findById(postId));
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String formattedTimestamp = post.timestamp() != null ? post.timestamp().format(formatter) : "";
+            String formattedTimestamp = postService.findById(postId).timestamp() != null ? postService.findById(postId).timestamp().format(formatter) : "";
             model.addAttribute("formattedTimestamp", formattedTimestamp);
             return "blog/post_detail";
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -132,7 +132,7 @@ public class BlogController {
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
             return "blog/post_form";
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -145,7 +145,7 @@ public class BlogController {
             postService.update(postId, title, content, image);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -155,7 +155,7 @@ public class BlogController {
             postService.delete(postService.findById(postId));
             return "redirect:/blog/posts";
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -167,7 +167,7 @@ public class BlogController {
             reviewService.create(postId, text, rating);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -178,7 +178,7 @@ public class BlogController {
             model.addAttribute("review", reviewService.findById(reviewId));
             return "blog/review_form";
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -191,7 +191,7 @@ public class BlogController {
             reviewService.update(reviewId, text, rating);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -201,7 +201,7 @@ public class BlogController {
             reviewService.delete(reviewId, postService.findById(postId));
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 
@@ -212,7 +212,7 @@ public class BlogController {
             model.addAttribute("review", reviewService.findById(reviewId));
             return "blog/review_detail";
         } catch (NoSuchElementException e) {
-            return "post_not_found";
+            return "blog/post_not_found";
         }
     }
 

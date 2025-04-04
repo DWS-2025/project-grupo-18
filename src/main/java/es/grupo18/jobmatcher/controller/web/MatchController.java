@@ -1,6 +1,7 @@
 package es.grupo18.jobmatcher.controller.web;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,12 +48,12 @@ public class MatchController {
 
     @GetMapping("/company/{companyId}")
     public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
-        CompanyDTO company = companyService.findById(companyId);
-        if (company != null) {
-            model.addAttribute("company", company);
+        try {
+            model.addAttribute("company", companyService.findById(companyId));
             return "company/show_company";
-        } else {
+        } catch (NoSuchElementException e) {
             return "error";
         }
     }
+    
 }

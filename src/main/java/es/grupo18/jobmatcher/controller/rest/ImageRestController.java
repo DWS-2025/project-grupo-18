@@ -51,20 +51,19 @@ public class ImageRestController {
     }
 
     @PostMapping("/users/{id}")
-    public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
-            throws IOException {
+    public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             userService.save(userService.findById(id), file);
             return ResponseEntity.ok().build();
         } catch (IOException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body("Error uploading image");
         }
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUserImage(@PathVariable Long id) {
         try {
-            userService.removeImage();
+            userService.removeImageById(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -76,45 +75,39 @@ public class ImageRestController {
     @GetMapping("/posts/{id}")
     public ResponseEntity<byte[]> getPostImage(@PathVariable Long id) {
         try {
-            if (postService.findById(id) != null && postService.findById(id).image() != null
-                    && postService.findById(id).image().length > 0) {
-                MediaType contentType = MediaType.parseMediaType(
-                        postService.findById(id).imageContentType() != null
-                                ? postService.findById(id).imageContentType()
-                                : "image/jpeg");
-                return ResponseEntity.ok()
-                        .contentType(contentType)
-                        .contentLength(postService.findById(id).image().length)
-                        .body(postService.findById(id).image());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            MediaType contentType = MediaType.parseMediaType(
+                    postService.findById(id).imageContentType() != null ? postService.findById(id).imageContentType()
+                            : "image/jpeg");
+            return ResponseEntity.ok()
+                    .contentType(contentType)
+                    .contentLength(postService.findById(id).image().length)
+                    .body(postService.findById(id).image());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/posts/{id}")
-    public ResponseEntity<?> uploadPostImage(@PathVariable Long id, @RequestParam("file") MultipartFile file)
-            throws IOException {
+    public ResponseEntity<?> uploadPostImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
-            postService.update(id, postService.findById(id).title(),
-                    postService.findById(id).content(), file);
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body("No file uploaded");
+            }
+            postService.updateImageOnly(id, file);
             return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error uploading image: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<?> deletePostImage(@PathVariable Long id) {
         try {
-            postService.update(id, postService.findById(id).title(),
-                    postService.findById(id).content(), null);
+            postService.removeImageByPostId(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
 }

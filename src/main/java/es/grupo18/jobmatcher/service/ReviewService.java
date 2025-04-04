@@ -2,6 +2,7 @@ package es.grupo18.jobmatcher.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import es.grupo18.jobmatcher.mapper.ReviewMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.model.Review;
+import es.grupo18.jobmatcher.repository.PostRepository;
 import es.grupo18.jobmatcher.repository.ReviewRepository;
 
 @Service
@@ -24,6 +26,9 @@ public class ReviewService {
 
     @Autowired
     private ReviewMapper reviewMapper;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private PostMapper postMapper;
@@ -52,9 +57,14 @@ public class ReviewService {
         return toDTO(review);
     }
 
-    public ReviewDTO create(long id, String text, int rating) { // Creates a review
+    public ReviewDTO create(long postId, String text, int rating) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("Post not found"));
+
         Review review = new Review(text, rating);
         review.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
+        review.setPost(post);
+
         reviewRepository.save(review);
         return toDTO(review);
     }
@@ -100,9 +110,9 @@ public class ReviewService {
     private List<ReviewDTO> toDTOs(List<Review> reviews) {
         return reviewMapper.toDTOs(reviews);
     }
+
     public List<ReviewDTO> findReviewsByPostId(Long postId) {
         return toDTOs(reviewRepository.findByPostId(postId));
     }
-    
 
 }

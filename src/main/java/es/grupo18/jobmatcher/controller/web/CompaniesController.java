@@ -52,8 +52,7 @@ public class CompaniesController {
     @GetMapping("/companies/{companyId}")
     public String getCompany(Model model, @PathVariable("companyId") long id) {
         try {
-            CompanyDTO company = companyService.findById(id);
-            model.addAttribute("company", company);
+            model.addAttribute("company", companyService.findById(id));
             return "company/show_company";
         } catch (NoSuchElementException e) {
             return "company/company_not_found";
@@ -64,12 +63,10 @@ public class CompaniesController {
     @GetMapping("/companies/{companyId}/edit")
     public String editCompany(Model model, @PathVariable("companyId") long id) {
         try {
-            CompanyDTO company = companyService.findById(id);
-            model.addAttribute("company", company);
+            model.addAttribute("company", companyService.findById(id));
             return "company/company_form";
         } catch (NoSuchElementException e) {
             return "company/company_not_found";
-
         }
     }
 

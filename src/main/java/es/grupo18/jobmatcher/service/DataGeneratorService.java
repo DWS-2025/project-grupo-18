@@ -106,16 +106,4 @@ public class DataGeneratorService {
 
         }
 
-        /*
-         * private byte[] loadImageFromResources(String path) throws IOException {
-         * try {
-         * ClassPathResource resource = new ClassPathResource(path);
-         * return FileCopyUtils.copyToByteArray(resource.getInputStream());
-         * } catch (IOException e) {
-         * System.err.println("Could not load image: " + path);
-         * return new byte[0];
-         * }
-         * }
-         */
-
 }

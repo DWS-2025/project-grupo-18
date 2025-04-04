@@ -74,6 +74,7 @@ public class CompanyService {
     }
 
     public void deleteById(long id) {
+        userService.removeCompanyFromAllUsers(id);
         companyRepository.deleteById(id);
     }
 
