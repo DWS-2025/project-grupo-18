@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ public class BlogController {
             Model model) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         LocalDateTime fromDate = null;
         LocalDateTime toDate = null;
 
@@ -55,11 +58,21 @@ public class BlogController {
 
         List<PostDTO> posts = new ArrayList<>(postService.findFilteredPosts(sort, fromDate, toDate, title));
 
-        List<PostView> postViews = posts.stream()
-                .map(PostView::new)
-                .toList();
+        List<Map<String, Object>> postMaps = posts.stream()
+            .map(post -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", post.id());
+                map.put("title", post.title());
+                map.put("content", post.content());
+                map.put("authorName", post.authorName());
+                map.put("timestamp", post.timestamp());
+                map.put("formattedTimestamp", post.timestamp() != null
+                        ? post.timestamp().format(displayFormatter)
+                        : "");
+                return map;
+            }).toList();
 
-        model.addAttribute("posts", postViews);
+        model.addAttribute("posts", postMaps);
         model.addAttribute("sort", sort != null ? sort : "");
         model.addAttribute("from", from != null ? from : "");
         model.addAttribute("to", to != null ? to : "");
@@ -213,25 +226,6 @@ public class BlogController {
             return "blog/review_detail";
         } catch (NoSuchElementException e) {
             return "blog/post_not_found";
-        }
-    }
-
-    public static class PostView {
-        private final PostDTO post;
-        private final String formattedTimestamp;
-
-        public PostView(PostDTO post) {
-            this.post = post;
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            this.formattedTimestamp = post.timestamp() != null ? post.timestamp().format(formatter) : "";
-        }
-
-        public PostDTO getPost() {
-            return post;
-        }
-
-        public String getFormattedTimestamp() {
-            return formattedTimestamp;
         }
     }
 
