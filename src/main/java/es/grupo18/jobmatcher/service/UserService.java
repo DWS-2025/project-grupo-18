@@ -13,6 +13,7 @@ import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
+import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 
@@ -107,26 +108,29 @@ public class UserService {
     }
 
     // Method to manage favourite companies
-
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
-
         UserDTO currentUserDTO = findById(userId);
-        List<CompanyDTO> favourites = new ArrayList<>(getFavouriteCompanies());
-
-        boolean alreadyFavourite = favourites.stream()
-                .anyMatch(c -> c.id().equals(companyDTO.id()));
-
-        if (alreadyFavourite) {
-            favourites.removeIf(c -> c.id().equals(companyDTO.id()));
+    
+        User updatedUser = toDomain(currentUserDTO);
+    
+        User originalUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        updatedUser.setPosts(originalUser.getPosts());
+        updatedUser.setReviews(originalUser.getReviews());
+    
+        List<Company> favourites = new ArrayList<>(originalUser.getFavouriteCompaniesList());
+    
+        if (favourites.stream().anyMatch(c -> c.getId() == companyDTO.id()
+        )) {
+            favourites.removeIf(c -> c.getId() == companyDTO.id());
         } else {
-            favourites.add(companyDTO);
+            favourites.add(companyMapper.toDomain(companyDTO));
         }
-
-        User user = toDomain(currentUserDTO);
-        user.setFavouriteCompaniesList(companyMapper.toDomains(favourites));
-
-        userRepository.save(user);
+    
+        updatedUser.setFavouriteCompaniesList(favourites);
+        userRepository.save(updatedUser);
     }
+    
 
     public boolean isCompanyFavourite(CompanyDTO company) {
         User user = userRepository.findById(getLoggedUser().id())
