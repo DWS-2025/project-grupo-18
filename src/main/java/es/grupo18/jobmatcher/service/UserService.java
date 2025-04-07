@@ -129,16 +129,19 @@ public class UserService {
     }
 
     public boolean isCompanyFavourite(CompanyDTO company) {
-        User user = toDomain(getLoggedUser());
-        return user.getFavouriteCompaniesList().contains(companyMapper.toDomain(company));
+        User user = userRepository.findById(getLoggedUser().id())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getFavouriteCompaniesList().stream()
+                .anyMatch(c -> c.getId() == company.id());
     }
 
     public Collection<CompanyDTO> getFavouriteCompanies() {
         User user = userRepository.findById(getLoggedUser().id())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return companyMapper.toDTOs(user.getFavouriteCompaniesList());
     }
-    
+
     public void removeCompanyFromAllUsers(Long companyId) {
         List<User> users = userRepository.findAll();
         for (User user : users) {
@@ -147,7 +150,7 @@ public class UserService {
             }
         }
     }
-    
+
     // Image methods
 
     public void removeImage() {
@@ -167,7 +170,7 @@ public class UserService {
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
-    }    
+    }
 
     public void updateUserImage(MultipartFile image) throws IOException {
         if (!image.isEmpty()) {

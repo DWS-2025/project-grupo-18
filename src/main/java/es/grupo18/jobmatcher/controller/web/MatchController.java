@@ -1,6 +1,5 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
 
 @Controller
@@ -41,8 +39,7 @@ public class MatchController {
 
     @GetMapping("/matches/likes")
     public String showConsultantMatchPage(Model model) {
-        List<CompanyDTO> mutualMatchCompanies = companyService.getMutualMatchesForCurrentUser();
-        model.addAttribute("mutualMatchCompanies", mutualMatchCompanies);
+        model.addAttribute("mutualMatchCompanies", companyService.getMutualMatchesForCurrentUser());
         return "match/likes";
     }
 
