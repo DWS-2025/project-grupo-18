@@ -47,7 +47,7 @@ The following entities include associated images:
 
 ### 🗂️ Database Schema
 
-![Database diagram](db/db-diagram.png)
+![Database diagram](db-mysql/db-diagram.png)
 
 This diagram illustrates the main entities of the application and their relationships, including a many-to-many association between users and companies through likes.
 

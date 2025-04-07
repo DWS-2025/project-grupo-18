@@ -95,7 +95,13 @@ public class ReviewService {
         if (reviewDTO == null)
             return null;
         Review review = toDomain(reviewDTO);
+        Post post = postRepository.findById(postDTO.id())
+        .orElseThrow(() -> new NoSuchElementException("Post not found"));
+
+        post.getReviews().removeIf(r -> r.getId() == reviewId);
+        postRepository.save(post);
         reviewRepository.delete(review);
+        
         return reviewDTO;
     }
 
