@@ -86,8 +86,17 @@ public class ReviewService {
         return toDTO(review);
     }
 
-    public void deleteById(long id) { // Deletes a review by its id
+    public void deleteById(long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Review not found"));
 
+        Post post = review.getPost();
+        if (post != null) {
+            post.getReviews().removeIf(r -> r.getId() == id);
+            postRepository.save(post);
+        }
+
+        reviewRepository.delete(review);
     }
 
     public ReviewDTO delete(Long reviewId, PostDTO postDTO) {
@@ -96,12 +105,12 @@ public class ReviewService {
             return null;
         Review review = toDomain(reviewDTO);
         Post post = postRepository.findById(postDTO.id())
-        .orElseThrow(() -> new NoSuchElementException("Post not found"));
+                .orElseThrow(() -> new NoSuchElementException("Post not found"));
 
         post.getReviews().removeIf(r -> r.getId() == reviewId);
         postRepository.save(post);
         reviewRepository.delete(review);
-        
+
         return reviewDTO;
     }
 

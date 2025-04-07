@@ -59,10 +59,10 @@ public class ReviewRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ReviewDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             reviewService.deleteById(id);
-            return ResponseEntity.ok(reviewService.findById(id));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
