@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "6d83f638-9222-4251-aee2-8b0867471a10",
+		"_postman_id": "5cc26fe6-05a6-4e71-9bdc-79a058df01d6",
 		"name": "Jobmatcher API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43680415",
-		"_collection_link": "https://daniel-8946244.postman.co/workspace/Daniel's-Workspace~776fd013-95ac-4256-82fd-3f92ead9641f/collection/43680415-6d83f638-9222-4251-aee2-8b0867471a10?action=share&source=collection_link&creator=43680415"
+		"_collection_link": "https://daniel-8946244.postman.co/workspace/Testing~79aa3d29-820e-47e6-9edd-083fbed7c001/collection/43680415-5cc26fe6-05a6-4e71-9bdc-79a058df01d6?action=share&source=collection_link&creator=43680415"
 	},
 	"item": [
 		{
@@ -16,7 +16,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies?page=3&size=10",
+							"raw": "http://localhost:8080/api/companies?page=0&size=10",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -29,7 +29,7 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "3"
+									"value": "0"
 								},
 								{
 									"key": "size",
@@ -473,7 +473,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/1",
+							"raw": "http://localhost:8080/api/images/posts/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -483,7 +483,7 @@
 								"api",
 								"images",
 								"posts",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -508,7 +508,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/1",
+							"raw": "http://localhost:8080/api/images/posts/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -518,7 +518,7 @@
 								"api",
 								"images",
 								"posts",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -530,7 +530,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/1",
+							"raw": "http://localhost:8080/api/images/posts/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -540,7 +540,7 @@
 								"api",
 								"images",
 								"posts",
-								"1"
+								"2"
 							]
 						}
 					},
