@@ -25,11 +25,13 @@ public class CustomErrorController implements ErrorController {
 
         if (statusCode == HttpStatus.NOT_FOUND.value()) { // 404
             model.addAttribute("error", "Página no encontrada");
-        } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) { // 500
+        } else if (statusCode == HttpStatus.METHOD_NOT_ALLOWED.value()) { // 405
+            model.addAttribute("error", "Método HTTP no permitido");
+        }else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) { // 500
             model.addAttribute("error", "Error interno del servidor");
         } else { // Other errors
             model.addAttribute("error", "Error inesperado");
-        }
+        } 
 
         return "error";
     }
