@@ -1,7 +1,6 @@
 package es.grupo18.jobmatcher.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -46,9 +45,10 @@ public class PostService {
         return toDTOs(postRepository.findAll());
     }
 
-    public PostDTO findById(long id) { // Returns a post by its id
-        Optional<Post> post = postRepository.findById(id);
-        return post.map(this::toDTO).orElse(null);
+    public PostDTO findById(long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return toDTO(post);
     }
 
     public PostDTO save(PostDTO postDTO) { // Saves a post
@@ -123,8 +123,10 @@ public class PostService {
         }
     }
 
-    public void deleteById(long id) { // Deletes a post by its id
-        postRepository.deleteById(id);
+    public void deleteById(long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        postRepository.delete(post);
     }
 
     public void delete(PostDTO post) { // Deletes a post
@@ -196,6 +198,9 @@ public class PostService {
             throw new RuntimeException("Post not found");
         }
 
+        if (postDTO.image() == null) {
+            throw new RuntimeException("Image not found");
+        }
         Post post = toDomain(postDTO);
         post.setImage(null);
         post.setImageContentType(null);

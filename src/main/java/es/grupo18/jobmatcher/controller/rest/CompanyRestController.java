@@ -34,16 +34,16 @@ public class CompanyRestController {
     public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(companyService.findById(id));
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-    }
+    }    
 
     @PostMapping
-    public ResponseEntity<CompanyDTO> create(@RequestBody CompanyDTO dto) {
-        dto = companyService.save(dto);
-        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(dto.id()).toUri();
-        return ResponseEntity.created(location).body(dto);
+    public ResponseEntity<CompanyDTO> create(@RequestBody CompanyDTO companyDTO) {
+        companyDTO = companyService.save(companyDTO);
+        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(companyDTO.id()).toUri();
+        return ResponseEntity.created(location).body(companyDTO);
     }
 
     @PutMapping("/{id}")
@@ -60,7 +60,7 @@ public class CompanyRestController {
     public ResponseEntity<CompanyDTO> delete(@PathVariable Long id) {
         try {
             companyService.deleteById(id);
-            return ResponseEntity.ok(companyService.findById(id));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -80,7 +80,7 @@ public class CompanyRestController {
     public ResponseEntity<Void> removeFromFavourites(@PathVariable Long id) {
         try {
             userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), companyService.findById(id));
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -97,7 +97,11 @@ public class CompanyRestController {
 
     @GetMapping("/matches")
     public ResponseEntity<List<CompanyDTO>> getMutualMatches() {
-        return ResponseEntity.ok(companyService.getMutualMatchesForCurrentUser());
+        try {
+            return ResponseEntity.ok(companyService.getMutualMatchesForCurrentUser());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
-    
+
 }

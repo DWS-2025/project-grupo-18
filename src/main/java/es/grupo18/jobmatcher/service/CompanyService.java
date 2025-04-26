@@ -41,8 +41,10 @@ public class CompanyService {
     }
 
     public CompanyDTO findById(long id) {
-        return toDTO(companyRepository.findById(id).orElse(null));
-    }
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+        return toDTO(company);
+    }    
 
     public Page<CompanyDTO> findPaginated(Pageable pageable) {
         return companyRepository.findAll(pageable).map(this::toDTO);
@@ -74,8 +76,10 @@ public class CompanyService {
     }
 
     public void deleteById(long id) {
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
         userService.removeCompanyFromAllUsers(id);
-        companyRepository.deleteById(id);
+        companyRepository.delete(company);
     }
 
     public CompanyDTO delete(CompanyDTO company) {

@@ -3,7 +3,6 @@ package es.grupo18.jobmatcher.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,9 @@ public class ReviewService {
     }
 
     public ReviewDTO findById(long id) {
-        Optional<Review> review = reviewRepository.findById(id);
-        return review.map(this::toDTO).orElse(null);
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+        return toDTO(review);
     }
 
     public ReviewDTO save(PostDTO postDTO, ReviewDTO reviewDTO) { // Saves a review
@@ -88,7 +88,7 @@ public class ReviewService {
 
     public void deleteById(long id) {
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Review not found"));
+                .orElseThrow(() -> new RuntimeException("Review not found"));
 
         Post post = review.getPost();
         if (post != null) {

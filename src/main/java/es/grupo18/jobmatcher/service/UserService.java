@@ -46,8 +46,10 @@ public class UserService {
     }
 
     public UserDTO findById(long id) {
-        return toDTO(userRepository.findById(id).orElse(null));
-    }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return toDTO(user);
+    }    
 
     public UserDTO save(UserDTO user) { // Saves a user
         userRepository.save(toDomain(user));
@@ -98,9 +100,11 @@ public class UserService {
         return toDTO(currentUser);
     }
 
-    public void deleteById(long id) { // Deletes a user by its id
-        userRepository.deleteById(id);
-    }
+    public void deleteById(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.delete(user);
+    }    
 
     public UserDTO delete(UserDTO user) { // Deletes a user
         userRepository.deleteById(toDomain(user).getId());
@@ -171,10 +175,15 @@ public class UserService {
     public void removeImageById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        if (user.getImage() == null) {
+            throw new RuntimeException("Image not found");
+        }
+    
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
-    }
+    }    
 
     public void updateUserImage(MultipartFile image) throws IOException {
         if (!image.isEmpty()) {

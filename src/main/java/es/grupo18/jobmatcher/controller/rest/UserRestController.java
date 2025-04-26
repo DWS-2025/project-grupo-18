@@ -53,7 +53,7 @@ public class UserRestController {
     public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
         try {
             userService.deleteById(id);
-            return ResponseEntity.ok(userService.findById(id));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

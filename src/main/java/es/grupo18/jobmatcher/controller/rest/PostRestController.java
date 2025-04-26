@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +26,11 @@ public class PostRestController {
     }
 
     @GetMapping("/{id}")
-    public PostDTO getPost(@PathVariable long id) {
+    public ResponseEntity<PostDTO> getPost(@PathVariable long id) {
         try {
-            return postService.findById(id);
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Post not found with id: " + id);
+            return ResponseEntity.ok(postService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -46,21 +45,21 @@ public class PostRestController {
     }
 
     @PutMapping("/{id}")
-    public PostDTO updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostDTO> updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
         try {
-            return postService.update(postService.findById(id), postDTO);
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Post not found with id: " + id);
+            return ResponseEntity.ok(postService.update(postService.findById(id), postDTO));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable long id) {
+    public ResponseEntity<PostDTO> deletePost(@PathVariable long id) {
         try {
             postService.deleteById(id);
             return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Post not found with id: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

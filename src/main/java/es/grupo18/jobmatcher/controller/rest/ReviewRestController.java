@@ -30,7 +30,6 @@ public class ReviewRestController {
     @GetMapping("/{id}")
     public ResponseEntity<ReviewDTO> getById(@PathVariable Long id) {
         try {
-            reviewService.findById(id);
             return ResponseEntity.ok(reviewService.findById(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -39,13 +38,9 @@ public class ReviewRestController {
 
     @PostMapping("/post/{postId}")
     public ResponseEntity<ReviewDTO> create(@PathVariable Long postId, @RequestBody ReviewDTO dto) {
-        try {
-            dto = reviewService.save(postService.findById(postId), dto);
-            URI location = fromCurrentRequest().path("/{id}").buildAndExpand(dto.id()).toUri();
-            return ResponseEntity.created(location).body(dto);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        dto = reviewService.save(postService.findById(postId), dto);
+        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(location).body(dto);
     }
 
     @PutMapping("/{id}")
