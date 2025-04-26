@@ -36,9 +36,9 @@ public class CompanyService {
         return companyRepository.findAll(pageable).map(this::toDTO);
     }
 
-    public Collection<CompanyDTO> findAll() {
-        return toDTOs(companyRepository.findAll());
-    }
+//    public Collection<CompanyDTO> findAll() {
+//        return toDTOs(companyRepository.findAll());
+//    }
 
     public CompanyDTO findById(long id) {
         Company company = companyRepository.findById(id)
@@ -46,13 +46,13 @@ public class CompanyService {
         return toDTO(company);
     }    
 
-    public Page<CompanyDTO> findPaginated(Pageable pageable) {
-        return companyRepository.findAll(pageable).map(this::toDTO);
-    }
+//    public Page<CompanyDTO> findPaginated(Pageable pageable) {
+//        return companyRepository.findAll(pageable).map(this::toDTO);
+//    }
 
-    public long count() {
-        return companyRepository.count();
-    }
+//    public long count() {
+//        return companyRepository.count();
+//    }
 
     public CompanyDTO save(CompanyDTO company) {
         Company companyDomain = toDomain(company);
@@ -82,11 +82,11 @@ public class CompanyService {
         companyRepository.delete(company);
     }
 
-    public CompanyDTO delete(CompanyDTO company) {
-        Company companyDomain = toDomain(company);
-        companyRepository.deleteById(companyDomain.getId());
-        return toDTO(companyDomain);
-    }
+//    public CompanyDTO delete(CompanyDTO company) {
+//        Company companyDomain = toDomain(company);
+//       companyRepository.deleteById(companyDomain.getId());
+//        return toDTO(companyDomain);
+//    }
 
     public CompanyDTO addOrRemoveFavouriteUser(long companyId, UserDTO userDTO) {
         Company company = companyRepository.findById(companyId)
@@ -121,7 +121,8 @@ public class CompanyService {
     }
 
     public List<CompanyDTO> getNonFavouriteCompaniesForCurrentUser() {
-        Collection<CompanyDTO> all = findAll();
+//        Collection<CompanyDTO> all = findAll();
+        Collection<CompanyDTO> all = findAll(Pageable.unpaged()).getContent();
         Collection<CompanyDTO> favourites = userService.getFavouriteCompanies();
 
         return all.stream()

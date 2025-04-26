@@ -106,11 +106,11 @@ public class UserService {
         userRepository.delete(user);
     }    
 
-    public UserDTO delete(UserDTO user) { // Deletes a user
+/*     public UserDTO delete(UserDTO user) { // Deletes a user
         userRepository.deleteById(toDomain(user).getId());
         return user;
     }
-
+*/
     // Method to manage favourite companies
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
         UserDTO currentUserDTO = findById(userId);
