@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-//import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-//import org.springframework.util.FileCopyUtils;
 
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.Post;
@@ -103,7 +101,6 @@ public class DataGeneratorService {
                         company.setFavouriteUsersList(new ArrayList<>());
                         companyRepository.save(company);
                 }
-
         }
 
 }
