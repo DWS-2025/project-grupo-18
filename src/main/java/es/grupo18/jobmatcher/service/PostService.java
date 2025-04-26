@@ -37,11 +37,11 @@ public class PostService {
 
     @Autowired
     private ReviewService reviewService;
-
+/*
     public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list with authors
         return toDTOs(postRepository.findAllWithAuthors());
     }
-
+*/
     public Collection<PostDTO> findAll() { // Returns the posts list in reverse order
         return toDTOs(postRepository.findAll());
     }

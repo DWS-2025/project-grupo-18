@@ -30,7 +30,6 @@ public class ReviewRestController {
     @GetMapping("/{id}")
     public ResponseEntity<ReviewDTO> getById(@PathVariable Long id) {
         try {
-            reviewService.findById(id);
             return ResponseEntity.ok(reviewService.findById(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
