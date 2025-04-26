@@ -5,9 +5,10 @@ import es.grupo18.jobmatcher.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
-import java.util.Collection;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
@@ -18,9 +19,14 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
+//    @GetMapping
+//   public Collection<UserDTO> getAll() {
+//        return userService.findAll();
+//    }
+
     @GetMapping
-    public Collection<UserDTO> getAll() {
-        return userService.findAll();
+    public Page<UserDTO> getAll(Pageable pageable) {
+        return userService.findAll(pageable);
     }
 
     @GetMapping("/{id}")

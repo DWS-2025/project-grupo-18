@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
@@ -50,6 +52,12 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return toDTO(user);
     }    
+
+    public Page<UserDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(this::toDTO);
+    }
+    
+
 
     public UserDTO save(UserDTO user) { // Saves a user
         userRepository.save(toDomain(user));
@@ -105,12 +113,11 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
     }    
-
-/*     public UserDTO delete(UserDTO user) { // Deletes a user
+     public UserDTO delete(UserDTO user) { // Deletes a user
         userRepository.deleteById(toDomain(user).getId());
         return user;
     }
-*/
+    
     // Method to manage favourite companies
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
         UserDTO currentUserDTO = findById(userId);
@@ -198,6 +205,32 @@ public class UserService {
         }
     }
 
+    public void updateUserImage(Long id, MultipartFile image) throws IOException {
+        if (!image.isEmpty()) {
+            User existingUser = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+    
+            existingUser.setImage(image.getBytes());
+            existingUser.setImageContentType(image.getContentType());
+    
+            userRepository.save(existingUser);
+        }
+    }
+    
+    public void removeImage(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        if (user.getImage() == null) {
+            throw new RuntimeException("Image not found");
+        }
+    
+        user.setImage(null);
+        user.setImageContentType(null);
+        userRepository.save(user);
+    }
+    
+
     private UserDTO toDTO(User user) {
         return userMapper.toDTO(user);
     }
@@ -209,5 +242,13 @@ public class UserService {
     private List<UserDTO> toDTOs(List<User> users) {
         return userMapper.toDTOs(users);
     }
+
+    public UserDTO createEmpty() {
+        return new UserDTO(
+            null,"","","","","",0,null,null
+        );
+    }
+    
+    
 
 }

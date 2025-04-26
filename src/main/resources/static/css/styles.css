@@ -301,3 +301,8 @@ select {
 .dark-mode .match-location {
     color: #dddddd;
 }
+
+.description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
