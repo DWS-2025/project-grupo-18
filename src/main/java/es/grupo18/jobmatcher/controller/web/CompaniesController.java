@@ -40,7 +40,7 @@ public class CompaniesController {
     @GetMapping("/companies/new")
     public String showCompanyForm(Model model) {
         model.addAttribute("company", companyService.createEmpty());
-        return "company/new_company_form";
+        return "company/company_form";
     }
 
     @PostMapping("/companies/new")
