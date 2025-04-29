@@ -30,6 +30,7 @@ public class User {
     private String location;
     private String bio;
     private int experience;
+    private String role;
 
     @Lob
     private byte[] image;
@@ -137,6 +138,10 @@ public class User {
     public List<Company> getFavouriteCompaniesList() {
         return favouriteCompaniesList;
     }
+    
+    public String getRole() {
+        return role;
+    }
 
     // Setters
 
@@ -190,6 +195,10 @@ public class User {
 
     public void setFavouriteCompaniesList(List<Company> favouriteCompaniesList) {
         this.favouriteCompaniesList = favouriteCompaniesList;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

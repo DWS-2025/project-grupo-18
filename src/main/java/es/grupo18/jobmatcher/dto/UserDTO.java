@@ -9,4 +9,5 @@ public record UserDTO(
         String bio,
         int experience,
         byte[] image,
-        String imageContentType) {}
+        String imageContentType,
+        String role) {}

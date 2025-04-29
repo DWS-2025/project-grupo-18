@@ -6,13 +6,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
@@ -31,12 +31,6 @@ public class UserService {
     @Autowired
     private CompanyMapper companyMapper;
 
-    /**
-     * Returns always the same user for simplicity before adding authentication
-     * 
-     * @return User
-     */
-
     // === ENTITIES ===
 
     public UserDTO getLoggedUser() {
@@ -51,15 +45,27 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return toDTO(user);
-    }    
+    }
 
     public Page<UserDTO> findAll(Pageable pageable) {
         return userRepository.findAll(pageable).map(this::toDTO);
     }
-    
 
-
-    public UserDTO save(UserDTO user) { // Saves a user
+    public UserDTO save(UserDTO user) {
+        if (user.role() == null || user.role().isBlank()) {
+            user = new UserDTO(
+                user.id(),
+                user.name(),
+                user.email(),
+                user.phone(),
+                user.location(),
+                user.bio(),
+                user.experience(),
+                user.image(),
+                user.imageContentType(),
+                "user"
+            );
+        }
         userRepository.save(toDomain(user));
         return user;
     }
@@ -112,36 +118,35 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
-    }    
-     public UserDTO delete(UserDTO user) { // Deletes a user
+    }
+
+    public UserDTO delete(UserDTO user) {
         userRepository.deleteById(toDomain(user).getId());
         return user;
     }
-    
+
     // Method to manage favourite companies
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
         UserDTO currentUserDTO = findById(userId);
-    
+
         User updatedUser = toDomain(currentUserDTO);
-    
+
         User originalUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         updatedUser.setPosts(originalUser.getPosts());
         updatedUser.setReviews(originalUser.getReviews());
-    
+
         List<Company> favourites = new ArrayList<>(originalUser.getFavouriteCompaniesList());
-    
-        if (favourites.stream().anyMatch(c -> c.getId() == companyDTO.id()
-        )) {
+
+        if (favourites.stream().anyMatch(c -> c.getId() == companyDTO.id())) {
             favourites.removeIf(c -> c.getId() == companyDTO.id());
         } else {
             favourites.add(companyMapper.toDomain(companyDTO));
         }
-    
+
         updatedUser.setFavouriteCompaniesList(favourites);
         userRepository.save(updatedUser);
     }
-    
 
     public boolean isCompanyFavourite(CompanyDTO company) {
         User user = userRepository.findById(getLoggedUser().id())
@@ -182,15 +187,15 @@ public class UserService {
     public void removeImageById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
         if (user.getImage() == null) {
             throw new RuntimeException("Image not found");
         }
-    
+
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
-    }    
+    }
 
     public void updateUserImage(MultipartFile image) throws IOException {
         if (!image.isEmpty()) {
@@ -209,27 +214,28 @@ public class UserService {
         if (!image.isEmpty()) {
             User existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
             existingUser.setImage(image.getBytes());
             existingUser.setImageContentType(image.getContentType());
-    
+
             userRepository.save(existingUser);
         }
     }
-    
+
     public void removeImage(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
         if (user.getImage() == null) {
             throw new RuntimeException("Image not found");
         }
-    
+
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
     }
-    
+
+    // Helpers
 
     private UserDTO toDTO(User user) {
         return userMapper.toDTO(user);
@@ -245,10 +251,24 @@ public class UserService {
 
     public UserDTO createEmpty() {
         return new UserDTO(
-            null,"","","","","",0,null,null
+            null,
+            "",
+            "",
+            "",
+            "",
+            "",
+            0,
+            null,
+            null,
+            ""
         );
     }
+    public boolean isAdmin(UserDTO user) {
+        return "ADMIN".equalsIgnoreCase(user.role());
+    }
     
+    public boolean isUser(UserDTO user) {
+        return "USER".equalsIgnoreCase(user.role());
+    }
     
-
 }
