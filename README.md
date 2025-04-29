@@ -30,9 +30,11 @@ The application manages the following main entities, which can be created, edite
 
 | User Type   | Permissions                                                                                            |
 |-------------|--------------------------------------------------------------------------------------------------------|
-| Basic User  | Can create, edit, and delete companies (if acting as admin), posts, reviews, and manage their profile. |
-
-> *Note:* In this phase, the admin is simulated as a basic user with company creation privileges.
+| GUEST       | Can navigate through the matches and blog pages.                                                       |
+|-------------|--------------------------------------------------------------------------------------------------------|
+| USER        | Can create and edit their own posts, give likes and manage their profile.                              |
+|-------------|--------------------------------------------------------------------------------------------------------|
+| ADMIN       | Can create, edit, and delete companies, users, posts, reviews, and manage their profile.               |
 
 ---
 
