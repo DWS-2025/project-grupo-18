@@ -29,12 +29,28 @@ The application manages the following main entities, which can be created, edite
 ### 🔐 User Permissions
 
 | User Type   | Permissions                                                                                            |
-|-------------|--------------------------------------------------------------------------------------------------------|
 | GUEST       | Can navigate through the matches and blog pages.                                                       |
-|-------------|--------------------------------------------------------------------------------------------------------|
 | USER        | Can create and edit their own posts, give likes and manage their profile.                              |
-|-------------|--------------------------------------------------------------------------------------------------------|
 | ADMIN       | Can create, edit, and delete companies, users, posts, reviews, and manage their profile.               |
+
+---
+
+### 🧑‍💻 Example Users for Testing
+
+The following users are available for testing purposes:
+
+| Username         | Email                    | Password    | Roles        |
+|------------------|--------------------------|-------------|--------------|
+| Admin User       | admin@example.com        | password123 | USER, ADMIN  |
+| Test User 1      | testuser1@example.com    | password123 | USER         |
+| Test User 2      | testuser2@example.com    | password123 | USER         |
+| Test User 3      | testuser3@example.com    | password123 | USER         |
+| Test User 4      | testuser4@example.com    | password123 | USER         |
+| ...              | ...                      | ...         | ...          |
+| Test User 20     | testuser20@example.com   | password123 | USER         |
+
+
+> 🔒 All passwords are set to `password123` for testing convenience.
 
 ---
 
