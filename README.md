@@ -28,10 +28,11 @@ The application manages the following main entities, which can be created, edite
 
 ### 🔐 User Permissions
 
-| User Type   | Permissions                                                                                            |
-| GUEST       | Can navigate through the matches and blog pages.                                                       |
-| USER        | Can create and edit their own posts, give likes and manage their profile.                              |
-| ADMIN       | Can create, edit, and delete companies, users, posts, reviews, and manage their profile.               |
+| User Type   | Permissions                                                                                |
+|-------------|--------------------------------------------------------------------------------------------|
+| GUEST       | Can navigate through the matches and blog pages.                                           |
+| USER        | Can create and edit their own posts, give likes and manage their profile.                  |
+| ADMIN       | Can create, edit, and delete companies, users, posts, reviews, and manage their profile.   |
 
 ---
 
