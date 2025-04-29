@@ -141,7 +141,6 @@
   			<version>2.8.5</version>
 		</dependency>
 
-		<!-- Procesador de anotaciones -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
@@ -149,6 +148,10 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
 	</dependencies>
 
