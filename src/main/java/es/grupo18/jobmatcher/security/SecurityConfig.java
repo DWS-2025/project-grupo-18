@@ -88,32 +88,58 @@ public class SecurityConfig {
         @Bean
         @Order(2)
         public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-                http.authenticationProvider(authenticationProvider());
-
-                http
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/", "/main", "/login", "/register", "/css/**",
-                                                                "/img/**", "/js/**", "/blog/posts", "/matches")
-                                                .permitAll()
-                                                .requestMatchers("/profile/**").hasRole("USER")
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/users").hasRole("ADMIN")
-                                                .anyRequest().authenticated())
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .loginProcessingUrl("/login")
-                                                .defaultSuccessUrl("/main", true)
-                                                .failureUrl("/loginerror")
-                                                .permitAll())
-                                .logout(logout -> logout
-                                                .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/")
-                                                .permitAll())
-                                .exceptionHandling(ex -> ex.accessDeniedPage("/403"))
-                                .sessionManagement(
-                                                sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
-
-                return http.build();
-        }
+            http.authenticationProvider(authenticationProvider());
         
+            http
+                .authorizeHttpRequests(auth -> auth
+                    // ALL
+                    .requestMatchers("/", "/main", "/error", "/blog/posts", "/blog/posts/{postId}", "/blog/posts/{postId}/reviews/{reviewId}", "/login", "/loginerror").permitAll()
+        
+                    // GUEST or USER
+                    .requestMatchers("/register").permitAll()
+        
+                    // MATCH (only USER)
+                    .requestMatchers("/matches/**", "/company/**").hasRole("USER")
+        
+                    // PROFILE
+                    .requestMatchers("/profile/**").hasRole("USER")
+        
+                    // USERS (only ADMIN)
+                    .requestMatchers("/users/**").hasRole("ADMIN")
+        
+                    // BLOG
+                    .requestMatchers(
+                        "/blog/posts/new",
+                        "/blog/posts/{postId}/edit",
+                        "/blog/posts/{postId}/delete",
+                        "/blog/posts/{id}/image",
+                        "/blog/posts/{postId}/reviews/new",
+                        "/blog/posts/{postId}/reviews/{reviewId}/edit",
+                        "/blog/posts/{postId}/reviews/{reviewId}/delete"
+                    ).hasAnyRole("USER", "ADMIN")
+        
+                    // COMPANIES
+                    .requestMatchers("/companies/**").hasRole("ADMIN")
+        
+                    // Any other request
+                    .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .defaultSuccessUrl("/main", true)
+                    .failureUrl("/loginerror")
+                    .permitAll()
+                )
+                .logout(logout -> logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .permitAll()
+                )
+                .exceptionHandling(ex -> ex.accessDeniedPage("/403"))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+        
+            return http.build();
+        }   
+
 }
