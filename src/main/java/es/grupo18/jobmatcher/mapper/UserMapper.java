@@ -12,16 +12,15 @@ public interface UserMapper {
 
     @Mapping(target = "image", source = "image")
     @Mapping(target = "imageContentType", source = "imageContentType")
-    @Mapping(target = "role", source = "role")
+    @Mapping(target = "roles", source = "roles")
     UserDTO toDTO(User user);
 
     @Mapping(target = "image", source = "image")
     @Mapping(target = "imageContentType", source = "imageContentType")
-    @Mapping(target = "role", source = "role")
+    @Mapping(target = "roles", source = "roles")
     User toDomain(UserDTO userDTO);
 
     List<UserDTO> toDTOs(List<User> users);
 
     List<User> toDomains(List<UserDTO> dtos);
-
 }

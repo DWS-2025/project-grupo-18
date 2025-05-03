@@ -1,4 +1,6 @@
 package es.grupo18.jobmatcher.dto;
+import java.util.List;
+
 
 public record UserDTO(
         Long id,
@@ -10,4 +12,5 @@ public record UserDTO(
         int experience,
         byte[] image,
         String imageContentType,
-        String role) {}
+        List<String> roles
+) {}

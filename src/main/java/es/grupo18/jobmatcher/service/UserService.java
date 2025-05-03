@@ -52,7 +52,7 @@ public class UserService {
     }
 
     public UserDTO save(UserDTO user) {
-        if (user.role() == null || user.role().isBlank()) {
+        if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
                 user.id(),
                 user.name(),
@@ -63,7 +63,7 @@ public class UserService {
                 user.experience(),
                 user.image(),
                 user.imageContentType(),
-                "user"
+                List.of("USER")
             );
         }
         userRepository.save(toDomain(user));
@@ -260,15 +260,15 @@ public class UserService {
             0,
             null,
             null,
-            ""
+            new ArrayList<>()
         );
     }
+
     public boolean isAdmin(UserDTO user) {
-        return "ADMIN".equalsIgnoreCase(user.role());
+        return user.roles() != null && user.roles().contains("ADMIN");
     }
-    
+
     public boolean isUser(UserDTO user) {
-        return "USER".equalsIgnoreCase(user.role());
+        return user.roles() != null && user.roles().contains("USER");
     }
-    
 }
