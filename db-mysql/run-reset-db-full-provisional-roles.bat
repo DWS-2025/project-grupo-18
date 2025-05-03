@@ -8,7 +8,7 @@ set PASSWORD=Jobmatcher_123
 set DATABASE=jobmatcher
 
 REM Usamos la ruta del .bat + nombre del archivo SQL
-set SQLFILE=%~dp0reset-db-full-provisionl-roles.sql
+set SQLFILE=%~dp0reset-db-full-provisional-roles.sql
 
 REM Verificar si mysql.exe existe
 if not exist %MYSQL_BIN% (

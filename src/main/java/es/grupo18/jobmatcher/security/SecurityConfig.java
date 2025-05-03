@@ -1,69 +1,119 @@
 package es.grupo18.jobmatcher.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import es.grupo18.jobmatcher.security.jwt.JWTRequestFilter;
+import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+        @Autowired
+        private JWTRequestFilter jwtRequestFilter;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Autowired
+        private UnauthorizedHandlerJWT unauthorizedHandlerJwt;
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+        @Autowired
+        private UserDetailsService userDetailsService;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authenticationProvider(authenticationProvider());
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/main", "/login", "/register", "/css/**", "/img/**", "/js/**", "/blog/posts",
-                        "/matches")
-                .permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated());
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider() {
+                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+                authProvider.setUserDetailsService(userDetailsService);
+                authProvider.setPasswordEncoder(passwordEncoder());
+                return authProvider;
+        }
 
-        http.formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/main", true)
-                .failureUrl("/loginerror")
-                .permitAll());
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+                return authConfig.getAuthenticationManager();
+        }
 
-        http.logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll());
+        // API REST
+        @Bean
+        @Order(1)
+        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+                http.authenticationProvider(authenticationProvider());
 
-        http.exceptionHandling(exception -> exception
-                .accessDeniedPage("/403"));
+                http.securityMatcher("/api/**")
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .exceptionHandling(
+                                                handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/auth/**").permitAll() // login, register API
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/companies/**").permitAll()
+                                                .requestMatchers("/api/users/me").hasRole("USER")
+                                                .requestMatchers("/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/posts/**").hasRole("USER")
+                                                .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasRole("USER") // debes
+                                                                                                                  // validar
+                                                                                                                  // propiedad
+                                                                                                                  // en
+                                                                                                                  // servicio
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .anyRequest().authenticated());
 
-        http.formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/main", true)
-                .failureUrl("/loginerror")
-                .permitAll());
+                http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
+        // Web
+        @Bean
+        @Order(2)
+        public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+                http.authenticationProvider(authenticationProvider());
+
+                http
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/", "/main", "/login", "/register", "/css/**",
+                                                                "/img/**", "/js/**", "/blog/posts", "/matches")
+                                                .permitAll()
+                                                .requestMatchers("/profile/**").hasRole("USER")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/users").hasRole("ADMIN")
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .loginProcessingUrl("/login")
+                                                .defaultSuccessUrl("/main", true)
+                                                .failureUrl("/loginerror")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/")
+                                                .permitAll())
+                                .exceptionHandling(ex -> ex.accessDeniedPage("/403"))
+                                .sessionManagement(
+                                                sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+                return http.build();
+        }
+        
 }

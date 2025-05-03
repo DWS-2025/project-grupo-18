@@ -40,7 +40,6 @@ public class UserController {
         model.addAttribute("hasNext", usersPage.hasNext());
         model.addAttribute("next", pageable.getPageNumber() + 1);
 
-        // Añadimos info de rol
         UserDTO currentUser = userService.getLoggedUser();
         model.addAttribute("isAdmin", userService.isAdmin(currentUser));
         model.addAttribute("isUser", userService.isUser(currentUser));
@@ -150,4 +149,5 @@ public class UserController {
         userService.removeImage(userId);
         return "redirect:/users/" + userId;
     }
+    
 }

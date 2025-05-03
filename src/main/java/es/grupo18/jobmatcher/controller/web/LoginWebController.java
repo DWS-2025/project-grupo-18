@@ -14,12 +14,12 @@ public class LoginWebController {
     public String login(Model model, HttpServletRequest request) {
         CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
         model.addAttribute("token", token.getToken());
-        return "login"; 
+        return "login/login"; 
     }
 
     @GetMapping("/loginerror")
     public String loginError(Model model) {
-        model.addAttribute("loginError", true);
-        return "login"; 
+        model.addAttribute("loginError");
+        return "login/loginerror"; 
     }
 }
