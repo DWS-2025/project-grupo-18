@@ -94,42 +94,57 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
 
                                                 // Static resources
-                                                .requestMatchers("/css/**", "/js/**", "/img/**")
-                                                .permitAll()
-
-                                                // ALL
-                                                .requestMatchers("/", "/main", "/error", "/blog/posts",
+                                                .requestMatchers("/css/**", "/js/**", "/img/**", "/", "/main", "/error",
+                                                                "/blog/posts",
                                                                 "/blog/posts/{postId}",
                                                                 "/blog/posts/{postId}/reviews/{reviewId}", "/login",
-                                                                "/loginerror")
-                                                .permitAll()
-
-                                                // GUEST or USER
-                                                .requestMatchers("/register", "/register/**").permitAll()
-
-                                                // MATCH (only USER)
-                                                .requestMatchers("/matches/**", "/company/**").hasRole("USER")
-
-                                                // PROFILE
-                                                .requestMatchers("/profile/**").hasRole("USER")
-
-                                                // USERS (only ADMIN)
-                                                .requestMatchers("/users/**").hasRole("ADMIN")
-
-                                                // BLOG
-                                                .requestMatchers(
+                                                                "/loginerror", "/register", "/register/**",
+                                                                "/matches/**", "/company/**", "/profile/**",
+                                                                "/users/**",
                                                                 "/blog/posts/new",
                                                                 "/blog/posts/{postId}/edit",
                                                                 "/blog/posts/{postId}/delete",
                                                                 "/blog/posts/{id}/image",
                                                                 "/blog/posts/{postId}/reviews/new",
                                                                 "/blog/posts/{postId}/reviews/{reviewId}/edit",
-                                                                "/blog/posts/{postId}/reviews/{reviewId}/delete")
-                                                .hasAnyRole("USER", "ADMIN")
+                                                                "/blog/posts/{postId}/reviews/{reviewId}/delete",
+                                                                "/companies/**")
+                                                .permitAll()
 
-                                                // COMPANIES
-                                                .requestMatchers("/companies/**").hasRole("ADMIN")
-
+                                                /*
+                                                 * ALL
+                                                 * .requestMatchers("/", "/main", "/error", "/blog/posts",
+                                                 * "/blog/posts/{postId}",
+                                                 * "/blog/posts/{postId}/reviews/{reviewId}", "/login",
+                                                 * "/loginerror")
+                                                 * .permitAll()
+                                                 * 
+                                                 * // GUEST or USER
+                                                 * .requestMatchers("/register", "/register/**").permitAll()
+                                                 * 
+                                                 * // MATCH (only USER)
+                                                 * .requestMatchers("/matches/**", "/company/**").hasRole("USER")
+                                                 * 
+                                                 * // PROFILE
+                                                 * .requestMatchers("/profile/**").hasRole("USER")
+                                                 * 
+                                                 * // USERS (only ADMIN)
+                                                 * .requestMatchers("/users/**").hasRole("ADMIN")
+                                                 * 
+                                                 * // BLOG
+                                                 * .requestMatchers(
+                                                 * "/blog/posts/new",
+                                                 * "/blog/posts/{postId}/edit",
+                                                 * "/blog/posts/{postId}/delete",
+                                                 * "/blog/posts/{id}/image",
+                                                 * "/blog/posts/{postId}/reviews/new",
+                                                 * "/blog/posts/{postId}/reviews/{reviewId}/edit",
+                                                 * "/blog/posts/{postId}/reviews/{reviewId}/delete")
+                                                 * .hasAnyRole("USER", "ADMIN")
+                                                 * 
+                                                 * // COMPANIES
+                                                 * .requestMatchers("/companies/**").hasRole("ADMIN")
+                                                 */
                                                 // Any other request
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
