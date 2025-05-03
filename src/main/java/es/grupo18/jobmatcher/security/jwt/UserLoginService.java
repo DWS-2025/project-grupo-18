@@ -1,7 +1,10 @@
 package es.grupo18.jobmatcher.security.jwt;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,13 +13,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import es.grupo18.jobmatcher.model.User;
+import es.grupo18.jobmatcher.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class UserLoginService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final Logger log = LoggerFactory.getLogger(UserLoginService.class);
 
@@ -52,6 +64,26 @@ public class UserLoginService {
                 "Auth successful. Tokens are created in cookie.");
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
+
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+    
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(List.of("USER"));
+        user.setRole("USER");
+    
+        userRepository.save(user);
+    
+        var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+    
+        String token = jwtTokenProvider.generateAccessToken(userDetails);
+        return new AuthResponse(AuthResponse.Status.SUCCESS, "User registered successfully.");
+    }    
 
     public ResponseEntity<AuthResponse> refresh(HttpServletResponse response, String refreshToken) {
         try {

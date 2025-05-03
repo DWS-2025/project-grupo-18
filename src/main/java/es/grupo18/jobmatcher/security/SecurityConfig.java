@@ -105,7 +105,7 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 // GUEST or USER
-                                                .requestMatchers("/register").permitAll()
+                                                .requestMatchers("/register", "/register/**").permitAll()
 
                                                 // MATCH (only USER)
                                                 .requestMatchers("/matches/**", "/company/**").hasRole("USER")
