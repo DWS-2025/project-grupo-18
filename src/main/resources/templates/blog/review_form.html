@@ -27,6 +27,7 @@
         <div class="box">
             <h1>Editar Reseña</h1>
             <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/edit" method="post">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <div class="input-group">
                     <label for="text">Reseña:</label>
                     <textarea id="text" name="text" required>{{review.text}}</textarea>

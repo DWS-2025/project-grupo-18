@@ -44,8 +44,9 @@
             </div>
 
             <div class="button-group">
-                <button onclick="location.href='/blog/posts/{{post.id}}/edit'">Editar</button>
+                <button data-id="{{post.id}}" onclick="goToEdit(this)">Editar</button>
                 <form action="/blog/posts/{{post.id}}/delete" method="post" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="{{token}}">
                     <button type="submit">Borrar</button>
                 </form>
             </div>
@@ -76,9 +77,10 @@
             <div class="new-review box">
                 <h3>Añadir una nueva reseña</h3>
                 <form action="/blog/posts/{{post.id}}/reviews/new" method="post">
+                    <input type="hidden" name="_csrf" value="{{token}}">
                     <div class="input-group">
                         <label for="text">Reseña:</label>
-                        <textarea id="text" name="text" required></textarea>
+                        <textarea id="text" name="text" rows="4" maxlength="500" required></textarea>
                     </div>
                     <div class="input-group">
                         <label for="rating">Rating (1-5):</label>
@@ -93,6 +95,13 @@
     <footer>
         <div class="copyright">© 2025 Desarrollado por el equipo de Cibercatalejo.</div>
     </footer>
+
+    <script>
+        function goToEdit(el) {
+          const id = el.dataset.id;
+          location.href = '/blog/posts/' + encodeURIComponent(id) + '/edit';
+        }
+    </script>
 </body>
 
 </html>

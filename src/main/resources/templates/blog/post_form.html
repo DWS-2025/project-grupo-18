@@ -34,6 +34,8 @@
             <form id="postForm" method="post"
                 action="{{#isEdit}}/blog/posts/{{post.id}}/edit{{/isEdit}}{{^isEdit}}/blog/posts/new{{/isEdit}}"
                 enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="{{token}}">
+                
                 <!-- Input group for the post title -->
                 <div class="input-group">
                     <label for="title">Título:</label>

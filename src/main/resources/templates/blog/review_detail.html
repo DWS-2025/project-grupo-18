@@ -47,7 +47,8 @@
             <div class="button-group">
                 <button onclick="location.href='/blog/posts/{{post.id}}/reviews/{{review.id}}/edit'">Editar</button>
                 <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/delete" method="post"
-                      style="display:inline;">
+                    style="display:inline;">
+                    <input type="hidden" name="_csrf" value="{{token}}">
                     <button type="submit">Borrar</button>
                 </form>
             </div>

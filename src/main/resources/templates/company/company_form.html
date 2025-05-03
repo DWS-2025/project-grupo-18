@@ -30,6 +30,7 @@
 
         <form id="companyForm" method="post"
             action="{{#company.id}}/companies/{{company.id}}/edit{{/company.id}}{{^company.id}}/companies/new{{/company.id}}">
+            <input type="hidden" name="_csrf" value="{{token}}">
             <div class="input-group">
                 <label for="name">Nombre de la Empresa:</label>
                 <input type="text" id="name" name="name" required minlength="2" maxlength="100"

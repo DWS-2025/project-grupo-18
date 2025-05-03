@@ -27,6 +27,7 @@
         <div class="box">
             <h1>Registro</h1>
             <form id="registerForm" th:action="@{/register}" th:object="${user}" method="post">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <div class="input-group">
                     <label for="name">Nombre</label>
                     <input type="text" id="name" th:field="*{name}" name="name" required>

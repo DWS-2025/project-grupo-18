@@ -30,6 +30,7 @@
     <div class="box">
         <h2>Editar Usuario</h2>
         <form method="post" action="{{#user.id}}/users/{{user.id}}/edit{{/user.id}}{{^user.id}}/users/new{{/user.id}}">
+            <input type="hidden" name="_csrf" value="{{token}}">
             <label for="name">Nombre</label>
             <input type="text" id="name" name="name" value="{{user.name}}" required>
 

@@ -36,6 +36,7 @@
             <div class="button-group">
                 <button id="resetPhotoButton">Restablecer Foto</button>
                 <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="{{token}}">
                     <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
@@ -52,7 +53,7 @@
                 <li><strong>Teléfono:</strong> {{user.phone}}</li>
                 <li><strong>Ubicación:</strong> {{user.location}}</li>
                 <li><strong>Acerca de mí:</strong>
-                    <div style="margin-top: 0.5em;" class="bio-html">{{{user.bio}}}</div>
+                    <div style="margin-top: 0.5em;" class="bio-html">{{user.bio}}</div>
                 </li>                
                 <li><strong>Experiencia:</strong> {{user.experience}} años</li>
             </ul>

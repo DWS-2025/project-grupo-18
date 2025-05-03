@@ -36,6 +36,7 @@
             <!-- Button for adding to favourites -->
             <form action="/matches/{{id}}/addFavourite" method="post">
                 <input type="hidden" name="companyName" value="{{name}}">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <input type="hidden" name="origin" value="/matches">
                 <button type="submit">Añadir a Favoritos</button>
             </form>
@@ -50,6 +51,7 @@
 
             <!-- Button for removing from favourites -->
             <form action="/matches/{{id}}/removeFavourite" method="post">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <input type="hidden" name="companyName" value="{{name}}">
                 <input type="hidden" name="origin" value="/matches">
                 <button type="submit">Eliminar de Favoritos</button>

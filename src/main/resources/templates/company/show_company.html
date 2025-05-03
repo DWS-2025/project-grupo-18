@@ -41,10 +41,10 @@
         </div>
 
         <div class="company-delete-button">
-            <form method="post" action="/companies/{{company.id}}/delete"
-                onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
+            <form method="post" action="/companies/{{company.id}}/delete" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <button type="submit">🗑️ Eliminar Empresa</button>
-            </form>
+            </form>            
         </div>
 
     </main>

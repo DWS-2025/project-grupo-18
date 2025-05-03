@@ -35,6 +35,7 @@
             <p>{{bio}}</p>
             <!-- Button for removing from favourites -->
             <form action="/matches/{{id}}/removeFavourite" method="post" onclick="event.stopPropagation()">
+                <input type="hidden" name="_csrf" value="{{token}}">
                 <input type="hidden" name="companyName" value="{{name}}">
                 <input type="hidden" name="origin" value="/matches/likes">
                 <button type="submit">Eliminar de Favoritos</button>
