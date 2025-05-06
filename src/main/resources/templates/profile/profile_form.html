@@ -43,24 +43,33 @@
 
             <div class="input-group">
                 <label for="phone">Teléfono:</label>
-                <input type="tel" id="phone" name="phone" value="{{user.phone}}" pattern="^\+?[0-9\s\-]{7,15}$">
+                <input type="tel" id="phone" name="phone"
+                    value="{{#user.phone}}{{user.phone}}{{/user.phone}}{{^user.phone}}{{/user.phone}}"
+                    pattern="^\+?[0-9\s\-]{7,15}$">
             </div>
-
+            
             <div class="input-group">
                 <label for="location">Ubicación:</label>
-                <input type="text" id="location" name="location" value="{{user.location}}" maxlength="100">
+                <input type="text" id="location" name="location"
+                    value="{{#user.location}}{{user.location}}{{/user.location}}{{^user.location}}{{/user.location}}"
+                    maxlength="100">
             </div>
-
+            
             <div class="input-group">
                 <label for="bio">Biografía:</label>
-                <div id="quill-editor" style="height: 200px;">{{user.bio}}</div>
+                <div id="quill-editor" style="height: 200px;">
+                    {{#user.bio}}{{{user.bio}}}{{/user.bio}}{{^user.bio}}{{/user.bio}}
+                </div>
                 <input type="hidden" name="bio" id="bioInput">
             </div>
-
+            
             <div class="input-group">
                 <label for="experience">Experiencia (años):</label>
-                <input type="number" id="experience" name="experience" value="{{user.experience}}" min="0" max="50">
+                <input type="number" id="experience" name="experience"
+                    value="{{#user.experience}}{{user.experience}}{{/user.experience}}{{^user.experience}}{{/user.experience}}"
+                    min="0" max="50">
             </div>
+            
 
             <div class="button-group">
                 <button type="submit">Guardar Cambios</button>

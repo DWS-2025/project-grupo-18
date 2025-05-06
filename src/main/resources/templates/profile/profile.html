@@ -26,21 +26,20 @@
         </div>
     </header>
 
-    <!-- Profile information -->
     <div class="container">
         <!-- Profile photo -->
         <div class="box">
             <h2>Foto de Perfil</h2>
             <img id="profilePhoto" src="/profile/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
                 class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
+
             <div class="button-group">
                 <button id="resetPhotoButton">Restablecer Foto</button>
-                <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
-                    <input type="hidden" name="_csrf" value="{{token}}">
+                <form id="uploadForm" style="display:inline;">
                     <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
-
+                
             </div>
         </div>
 
@@ -50,13 +49,17 @@
             <ul>
                 <li><strong>Nombre:</strong> {{user.name}}</li>
                 <li><strong>Email:</strong> {{user.email}}</li>
-                <li><strong>Teléfono:</strong> {{user.phone}}</li>
-                <li><strong>Ubicación:</strong> {{user.location}}</li>
-                <li><strong>Acerca de mí:</strong>
-                    <div style="margin-top: 0.5em;" class="bio-html">{{user.bio}}</div>
-                </li>                
-                <li><strong>Experiencia:</strong> {{user.experience}} años</li>
+                <li><strong>Teléfono:</strong> {{#user.phone}}{{user.phone}}{{/user.phone}}{{^user.phone}}Sin
+                    información{{/user.phone}}</li>
+                <li><strong>Ubicación:</strong>
+                    {{#user.location}}{{user.location}}{{/user.location}}{{^user.location}}Sin
+                    información{{/user.location}}</li>
+                <li><strong>Biografía:</strong> {{#user.bio}}{{{user.bio}}}{{/user.bio}}{{^user.bio}}Sin
+                    información{{/user.bio}}</li>
+                <li><strong>Experiencia:</strong> {{#user.experience}}{{user.experience}}
+                    años{{/user.experience}}{{^user.experience}}Sin información{{/user.experience}}</li>
             </ul>
+
             <div class="button-group">
                 <button onclick="location.href='/profile/edit'">Editar Datos</button>
             </div>
@@ -64,57 +67,60 @@
     </div>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        <div class="copyright">
+            &copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
         </div>
     </footer>
 
-</body>
+    <script>
 
-<script>
-    document.getElementById("uploadForm").addEventListener("change", function (e) {
-        const fileInput = document.getElementById("photoInput");
-        if (!fileInput.files.length) return;
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return decodeURIComponent(match[2]);
+        }
 
-        const formData = new FormData();
-        formData.append("image", fileInput.files[0]);
+        document.getElementById("uploadForm").addEventListener("change", function () {
+            const fileInput = document.getElementById("photoInput");
+            if (!fileInput.files.length) return;
 
-        fetch('/profile/upload_image', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            fetch('/profile/upload_image', {
+                method: 'POST',
+                headers: {
+                    'X-XSRF-TOKEN': getCookie("XSRF-TOKEN")
+                },
+                body: formData,
+                credentials: 'same-origin'
+            }).then(response => {
                 if (!response.ok) throw new Error("Error al subir la imagen");
                 const timestamp = Date.now();
-                const img = document.getElementById("profilePhoto");
-                img.src = `/profile/image?ts=${timestamp}`;
-            })
-            .catch(err => {
+                document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
+            }).catch(err => {
                 alert("Error: " + err.message);
             });
-    });
+        });
 
-    document.getElementById("resetPhotoButton").addEventListener("click", function () {
-        fetch('/profile/reset_image', { method: 'POST' })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al restablecer la imagen");
-
-                const timestamp = Date.now();
-                const img = document.getElementById("profilePhoto");
-
-                const testImg = new Image();
-                testImg.onload = () => {
-                    img.src = testImg.src;
-                };
-                testImg.onerror = () => {
-                    img.src = '/img/default-profile.jpg';
-                };
-                testImg.src = `/profile/image?ts=${timestamp}`;
+        document.getElementById("resetPhotoButton").addEventListener("click", function () {
+            fetch('/profile/reset_image', {
+                method: 'POST',
+                headers: {
+                    'X-XSRF-TOKEN': getCookie("XSRF-TOKEN")
+                },
+                credentials: 'same-origin'
             })
-            .catch(err => {
-                alert("Error: " + err.message);
-            });
-    });
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al restablecer la imagen");
+                    const timestamp = Date.now();
+                    document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
+                })
+                .catch(err => {
+                    alert("Error: " + err.message);
+                });
+        });
+    </script>
 
-</script>
+</body>
 
 </html>

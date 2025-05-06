@@ -2,9 +2,12 @@ package es.grupo18.jobmatcher.controller.web;
 
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,19 @@ public class ProfileController {
     private UserService userService;
 
     @GetMapping("/profile")
-    public String showProfile(Model model) {
-        model.addAttribute("user", userService.getLoggedUser());
+    public String showProfile(Model model, HttpServletRequest request) {
+        UserDTO user = userService.getLoggedUser();
+        boolean isBioVisible = user.bio() != null && !user.bio().trim().equals("<p><br></p>");
+
+        model.addAttribute("user", user);
         model.addAttribute("currentTimeMillis", System.currentTimeMillis());
+        model.addAttribute("isBioVisible", isBioVisible);
+
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        if (csrfToken != null) {
+            model.addAttribute("token", csrfToken.getToken());
+        }
+
         return "profile/profile";
     }
 
@@ -32,13 +45,15 @@ public class ProfileController {
             if (contentType == null || contentType.isBlank()) {
                 contentType = "image/jpeg";
             }
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType).body(userService.getLoggedUser().image());
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(userService.getLoggedUser().image());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/profile/upload_image")
+    @ResponseBody
     public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) throws IOException {
         if (!image.isEmpty()) {
             String contentType = image.getContentType();
@@ -54,9 +69,10 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/reset_image")
-    public String resetProfileImage() {
+    @ResponseBody
+    public ResponseEntity<?> resetProfileImage() {
         userService.removeImage();
-        return "redirect:/profile";
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/profile/edit")

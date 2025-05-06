@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +36,9 @@ public class UserService {
     // === ENTITIES ===
 
     public UserDTO getLoggedUser() {
-        return toDTO(userRepository.findAll().get(0));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return toDTO(userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email)));
     }
 
     public Collection<UserDTO> findAll() {
@@ -54,17 +58,16 @@ public class UserService {
     public UserDTO save(UserDTO user) {
         if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
-                user.id(),
-                user.name(),
-                user.email(),
-                user.phone(),
-                user.location(),
-                user.bio(),
-                user.experience(),
-                user.image(),
-                user.imageContentType(),
-                List.of("USER")
-            );
+                    user.id(),
+                    user.name(),
+                    user.email(),
+                    user.phone(),
+                    user.location(),
+                    user.bio(),
+                    user.experience(),
+                    user.image(),
+                    user.imageContentType(),
+                    List.of("USER"));
         }
         userRepository.save(toDomain(user));
         return user;
@@ -251,17 +254,16 @@ public class UserService {
 
     public UserDTO createEmpty() {
         return new UserDTO(
-            null,
-            "",
-            "",
-            "",
-            "",
-            "",
-            0,
-            null,
-            null,
-            new ArrayList<>()
-        );
+                null,
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                null,
+                null,
+                new ArrayList<>());
     }
 
     public boolean isAdmin(UserDTO user) {
