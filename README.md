@@ -45,10 +45,6 @@ The following users are available for testing purposes:
 | Admin User       | admin@example.com        | password123 | USER, ADMIN  |
 | Test User 1      | testuser1@example.com    | password123 | USER         |
 | Test User 2      | testuser2@example.com    | password123 | USER         |
-| Test User 3      | testuser3@example.com    | password123 | USER         |
-| Test User 4      | testuser4@example.com    | password123 | USER         |
-| ...              | ...                      | ...         | ...          |
-| Test User 20     | testuser20@example.com   | password123 | USER         |
 
 
 > 🔒 All passwords are set to `password123` for testing convenience.

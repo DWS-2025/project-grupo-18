@@ -3,6 +3,7 @@ package es.grupo18.jobmatcher.controller.web;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ public class RegisterWebController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute User user, BindingResult result, Model model, HttpServletRequest request) {
+    public String registerUser(@ModelAttribute User user, BindingResult result, Model model,
+            HttpServletRequest request) {
         if (result.hasErrors()) {
             model.addAttribute("error", "Datos inválidos");
             addAttributesToModel(model, user, request);
@@ -57,7 +59,7 @@ public class RegisterWebController {
         }
 
         user.setEncoded_password(passwordEncoder.encode(user.getEncoded_password()));
-        user.setRoles(List.of("USER"));
+        user.setRoles(new ArrayList<>(List.of("USER")));
         userRepository.save(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());

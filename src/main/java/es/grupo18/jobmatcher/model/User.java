@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +16,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.EnumType;
+
 
 @Entity(name = "UserTable")
 public class User {
@@ -46,7 +49,7 @@ public class User {
     private List<Company> favouriteCompaniesList = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+    private List<String> roles;
 
     // Empty constructor for initializations
 
@@ -55,9 +58,15 @@ public class User {
 
     // Complete constructor
 
+	public User(String name, String encoded_password, String... roles) {
+		this.name = name;
+		this.encoded_password = encoded_password;
+		this.roles = List.of(roles);
+	}
+
     public User(String name, String email, String encoded_password, String phone, String location, String bio, int experience,
             byte[] image,
-            List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
+            List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList, String... roles) {
         this.name = name;
         this.email = email;
         this.encoded_password = encoded_password;
@@ -70,6 +79,7 @@ public class User {
         this.postsList = (postsList != null) ? new ArrayList<>(postsList) : new ArrayList<>();
         this.favouriteCompaniesList = (favouriteCompaniesList != null) ? new ArrayList<>(favouriteCompaniesList)
                 : new ArrayList<>();
+        this.roles = List.of(roles);
     }
 
     public boolean hasImage() {
