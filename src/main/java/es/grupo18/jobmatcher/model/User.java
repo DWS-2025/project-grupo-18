@@ -25,12 +25,11 @@ public class User {
 
     private String name;
     private String email;
-    private String password;
+    private String encoded_password;
     private String phone;
     private String location;
     private String bio;
     private int experience;
-    private String role;
 
     @Lob
     private byte[] image;
@@ -49,14 +48,6 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
     // Empty constructor for initializations
 
     public User() {
@@ -64,12 +55,12 @@ public class User {
 
     // Complete constructor
 
-    public User(String name, String email, String password, String phone, String location, String bio, int experience,
+    public User(String name, String email, String encoded_password, String phone, String location, String bio, int experience,
             byte[] image,
             List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList) {
         this.name = name;
         this.email = email;
-        this.password = password;
+        this.encoded_password = encoded_password;
         this.phone = phone;
         this.location = location;
         this.bio = bio;
@@ -99,8 +90,8 @@ public class User {
         return email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getEncoded_password() {
+        return encoded_password;
     }
 
     public String getPhone() {
@@ -138,11 +129,11 @@ public class User {
     public List<Company> getFavouriteCompaniesList() {
         return favouriteCompaniesList;
     }
-    
-    public String getRole() {
-        return role;
-    }
 
+    public List<String> getRoles() {
+        return roles;
+    }
+    
     // Setters
 
     public void setId(Long id) {
@@ -157,8 +148,8 @@ public class User {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setEncoded_password(String encoded_password) {
+        this.encoded_password = encoded_password;
     }
 
     public void setPhone(String phone) {
@@ -196,9 +187,9 @@ public class User {
     public void setFavouriteCompaniesList(List<Company> favouriteCompaniesList) {
         this.favouriteCompaniesList = favouriteCompaniesList;
     }
-
-    public void setRole(String role) {
-        this.role = role;
+    
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -224,7 +215,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
+                ", encoded_password='" + encoded_password + '\'' +
                 ", phone='" + phone + '\'' +
                 ", location='" + location + '\'' +
                 ", bio='" + bio + '\'' +

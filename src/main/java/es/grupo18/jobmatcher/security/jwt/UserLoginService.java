@@ -73,9 +73,8 @@ public class UserLoginService {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEncoded_password(passwordEncoder.encode(request.getPassword()));
         user.setRoles(List.of("USER"));
-        user.setRole("USER");
     
         userRepository.save(user);
     

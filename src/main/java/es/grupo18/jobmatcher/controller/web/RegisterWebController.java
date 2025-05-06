@@ -56,9 +56,8 @@ public class RegisterWebController {
             return "register/register";
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEncoded_password(passwordEncoder.encode(user.getEncoded_password()));
         user.setRoles(List.of("USER"));
-        user.setRole("USER");
         userRepository.save(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
