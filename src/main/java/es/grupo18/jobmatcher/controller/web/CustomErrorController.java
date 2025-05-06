@@ -12,28 +12,33 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class CustomErrorController implements ErrorController {
 
-    @GetMapping("/error") // Error page
+    @GetMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 
-        int statusCode = 500; // Default error message
+        int statusCode = 500;
         if (status != null) {
             statusCode = Integer.parseInt(status.toString());
         }
 
         model.addAttribute("status", statusCode);
 
-        if (statusCode == HttpStatus.NOT_FOUND.value()) { // 404
+        if (statusCode == HttpStatus.NOT_FOUND.value()) {
             model.addAttribute("error", "Página no encontrada");
-        } else if (statusCode == HttpStatus.METHOD_NOT_ALLOWED.value()) { // 405
+            return "error/404";
+        } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
+            model.addAttribute("error", "Acceso denegado");
+            return "error/403";
+        } else if (statusCode == HttpStatus.METHOD_NOT_ALLOWED.value()) {
             model.addAttribute("error", "Método HTTP no permitido");
-        }else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) { // 500
+            return "error/405";
+        } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
             model.addAttribute("error", "Error interno del servidor");
-        } else { // Other errors
+            return "error/500";
+        } else {
             model.addAttribute("error", "Error inesperado");
-        } 
-
-        return "error";
+            return "error/error";
+        }
     }
 
 }

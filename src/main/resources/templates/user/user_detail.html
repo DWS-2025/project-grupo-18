@@ -65,7 +65,9 @@
 </footer>
 
 <script>
-    document.getElementById("uploadForm").addEventListener("change", function (e) {
+    const csrfToken = document.querySelector('input[name="_csrf"]').value;
+
+    document.getElementById("uploadForm").addEventListener("change", function () {
         const fileInput = document.getElementById("photoInput");
         if (!fileInput.files.length) return;
 
@@ -74,41 +76,50 @@
 
         fetch('/users/{{user.id}}/upload_image', {
             method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },
             body: formData
         })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al subir la imagen");
-                const timestamp = Date.now();
-                const img = document.getElementById("userPhoto");
-                img.src = `/users/{{user.id}}/image?ts=${timestamp}`;
-            })
-            .catch(err => {
-                alert("Error: " + err.message);
-            });
+        .then(response => {
+            if (!response.ok) throw new Error("Error al subir la imagen");
+            const timestamp = Date.now();
+            const img = document.getElementById("userPhoto");
+            img.src = `/users/{{user.id}}/image?ts=${timestamp}`;
+        })
+        .catch(err => {
+            alert("Error: " + err.message);
+        });
     });
 
     document.getElementById("resetPhotoButton").addEventListener("click", function () {
-        fetch('/users/{{user.id}}/reset_image', { method: 'POST' })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al restablecer la imagen");
+        fetch('/users/{{user.id}}/reset_image', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Error al restablecer la imagen");
 
-                const timestamp = Date.now();
-                const img = document.getElementById("userPhoto");
+            const timestamp = Date.now();
+            const img = document.getElementById("userPhoto");
 
-                const testImg = new Image();
-                testImg.onload = () => {
-                    img.src = testImg.src;
-                };
-                testImg.onerror = () => {
-                    img.src = '/img/default-profile.jpg';
-                };
-                testImg.src = `/users/{{user.id}}/image?ts=${timestamp}`;
-            })
-            .catch(err => {
-                alert("Error: " + err.message);
-            });
+            const testImg = new Image();
+            testImg.onload = () => {
+                img.src = testImg.src;
+            };
+            testImg.onerror = () => {
+                img.src = '/img/default-profile.jpg';
+            };
+            testImg.src = `/users/{{user.id}}/image?ts=${timestamp}`;
+        })
+        .catch(err => {
+            alert("Error: " + err.message);
+        });
     });
 </script>
+
 
 </body>
 </html>
