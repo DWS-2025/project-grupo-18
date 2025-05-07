@@ -67,12 +67,17 @@ public class UserController {
     @GetMapping("/{userId}")
     public String getUser(Model model, @PathVariable Long userId) {
         try {
-            model.addAttribute("user", userService.findById(userId));
+            UserDTO targetUser = userService.findById(userId);
+            model.addAttribute("user", targetUser);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
 
             UserDTO currentUser = userService.getLoggedUser();
             model.addAttribute("isAdmin", userService.isAdmin(currentUser));
             model.addAttribute("isUser", userService.isUser(currentUser));
+            model.addAttribute("isAdminOrUser", userService.isAdmin(currentUser) || userService.isUser(currentUser));
+
+            boolean isSelf = currentUser != null && currentUser.id().equals(userId);
+            model.addAttribute("isSelf", isSelf);
 
             return "user/user_detail";
         } catch (NoSuchElementException e) {
@@ -107,6 +112,11 @@ public class UserController {
 
     @PostMapping("/{userId}/delete")
     public String deleteUser(@PathVariable Long userId) {
+        UserDTO currentUser = userService.getLoggedUser();
+        if (currentUser.id().equals(userId)) {
+            return "redirect:/profile";
+        }
+
         try {
             userService.deleteById(userId);
             return "redirect:/users";
@@ -130,7 +140,8 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/upload_image")
-    public String uploadUserImage(@PathVariable Long userId, @RequestParam("image") MultipartFile image) throws IOException {
+    public String uploadUserImage(@PathVariable Long userId, @RequestParam("image") MultipartFile image)
+            throws IOException {
         if (!image.isEmpty()) {
             String contentType = image.getContentType();
             if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
@@ -149,5 +160,5 @@ public class UserController {
         userService.removeImage(userId);
         return "redirect:/users/" + userId;
     }
-    
+
 }
