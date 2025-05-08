@@ -44,6 +44,7 @@
                 {{/review.authorName}}
             </div>
 
+            {{#canEditReview}}
             <div class="button-group">
                 <button onclick="location.href='/blog/posts/{{post.id}}/reviews/{{review.id}}/edit'">Editar</button>
                 <form action="/blog/posts/{{post.id}}/reviews/{{review.id}}/delete" method="post"
@@ -52,6 +53,8 @@
                     <button type="submit">Borrar</button>
                 </form>
             </div>
+            {{/canEditReview}}
+
         </div>
     </main>
 

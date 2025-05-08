@@ -30,7 +30,8 @@
             <div class="box">
                 <h1>{{post.title}}</h1>
 
-                <img src="/blog/posts/{{postId}}/image?ts={{currentTimeMillis}}" class="post-image" onerror="this.style.display='none';">
+                <img src="/blog/posts/{{postId}}/image?ts={{currentTimeMillis}}" class="post-image"
+                    onerror="this.style.display='none';">
                 <p>{{post.content}}</p>
                 <p><strong>Fecha:</strong> {{formattedTimestamp}}</p>
 
@@ -43,6 +44,7 @@
                 {{/post.authorName}}
             </div>
 
+            {{#canEditPost}}
             <div class="button-group">
                 <button data-id="{{post.id}}" onclick="goToEdit(this)">Editar</button>
                 <form action="/blog/posts/{{post.id}}/delete" method="post" style="display:inline;">
@@ -50,6 +52,8 @@
                     <button type="submit">Borrar</button>
                 </form>
             </div>
+            {{/canEditPost}}
+
         </section>
 
         <section class="reviews">
@@ -98,8 +102,8 @@
 
     <script>
         function goToEdit(el) {
-          const id = el.dataset.id;
-          location.href = '/blog/posts/' + encodeURIComponent(id) + '/edit';
+            const id = el.dataset.id;
+            location.href = '/blog/posts/' + encodeURIComponent(id) + '/edit';
         }
     </script>
 </body>

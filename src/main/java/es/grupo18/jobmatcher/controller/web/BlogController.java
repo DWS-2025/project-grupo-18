@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
+import es.grupo18.jobmatcher.dto.ReviewDTO;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
+import es.grupo18.jobmatcher.service.UserService;
 
 @Controller
 public class BlogController {
@@ -33,6 +35,9 @@ public class BlogController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/blog/posts")
     public String getFilteredPosts(@RequestParam(required = false) String sort,
@@ -59,18 +64,18 @@ public class BlogController {
         List<PostDTO> posts = new ArrayList<>(postService.findFilteredPosts(sort, fromDate, toDate, title));
 
         List<Map<String, Object>> postMaps = posts.stream()
-            .map(post -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", post.id());
-                map.put("title", post.title());
-                map.put("content", post.content());
-                map.put("authorName", post.authorName());
-                map.put("timestamp", post.timestamp());
-                map.put("formattedTimestamp", post.timestamp() != null
-                        ? post.timestamp().format(displayFormatter)
-                        : "");
-                return map;
-            }).toList();
+                .map(post -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", post.id());
+                    map.put("title", post.title());
+                    map.put("content", post.content());
+                    map.put("authorName", post.authorName());
+                    map.put("timestamp", post.timestamp());
+                    map.put("formattedTimestamp", post.timestamp() != null
+                            ? post.timestamp().format(displayFormatter)
+                            : "");
+                    return map;
+                }).toList();
 
         model.addAttribute("posts", postMaps);
         model.addAttribute("sort", sort != null ? sort : "");
@@ -93,9 +98,9 @@ public class BlogController {
 
     @PostMapping("/blog/posts/new")
     public String newPost(@RequestParam("image") MultipartFile image,
-                          @RequestParam String title,
-                          @RequestParam String content) throws IOException {
-    
+            @RequestParam String title,
+            @RequestParam String content) throws IOException {
+
         if (!image.isEmpty()) {
             String contentType = image.getContentType();
             if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
@@ -107,19 +112,26 @@ public class BlogController {
         } else {
             postService.create(title, content, null);
         }
-    
+
         return "redirect:/blog/posts";
     }
 
     @GetMapping("/blog/posts/{postId}")
     public String getPost(Model model, @PathVariable long postId) {
         try {
-            model.addAttribute("post", postService.findById(postId));
+            PostDTO post = postService.findById(postId);
+            model.addAttribute("post", post);
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
+
+            String username = userService.getLoggedUser().email();
+            boolean canEdit = postService.canEditOrDeletePost(postId, username);
+            model.addAttribute("canEditPost", canEdit);
+
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String formattedTimestamp = postService.findById(postId).timestamp() != null ? postService.findById(postId).timestamp().format(formatter) : "";
+            String formattedTimestamp = post.timestamp() != null ? post.timestamp().format(formatter) : "";
             model.addAttribute("formattedTimestamp", formattedTimestamp);
+
             return "blog/post_detail";
         } catch (NoSuchElementException e) {
             return "blog/post_not_found";
@@ -222,7 +234,13 @@ public class BlogController {
     public String getReview(Model model, @PathVariable long postId, @PathVariable long reviewId) {
         try {
             model.addAttribute("post", postService.findById(postId));
-            model.addAttribute("review", reviewService.findById(reviewId));
+            ReviewDTO review = reviewService.findById(reviewId);
+            model.addAttribute("review", review);
+
+            String username = userService.getLoggedUser().email();
+            boolean canEdit = reviewService.canEditOrDeleteReview(reviewId, username);
+            model.addAttribute("canEditReview", canEdit);
+
             return "blog/review_detail";
         } catch (NoSuchElementException e) {
             return "blog/post_not_found";

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
@@ -79,8 +78,12 @@ public class ReviewService {
         return toDTO(oldReview);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #reviewDTO.authorId == principal.id")
-    public ReviewDTO update(long reviewId, String text, int rating) { // Updates a review
+    public ReviewDTO update(long reviewId, String text, int rating) {
+        String email = userService.getLoggedUser().email();
+        if (!canEditOrDeleteReview(reviewId, email)) {
+            throw new SecurityException("No tienes permiso para editar esta review");
+        }
+
         Review review = toDomain(findById(reviewId));
         review.setText(text);
         review.setRating(rating);
@@ -89,6 +92,11 @@ public class ReviewService {
     }
 
     public void deleteById(long id) {
+        String email = userService.getLoggedUser().email();
+        if (!canEditOrDeleteReview(id, email)) {
+            throw new SecurityException("No tienes permiso para eliminar esta review");
+        }
+
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
@@ -97,7 +105,6 @@ public class ReviewService {
             post.getReviews().removeIf(r -> r.getId() == id);
             postRepository.save(post);
         }
-
         reviewRepository.delete(review);
     }
 
@@ -130,6 +137,13 @@ public class ReviewService {
 
     public List<ReviewDTO> findReviewsByPostId(Long postId) {
         return toDTOs(reviewRepository.findByPostId(postId));
+    }
+
+    public boolean canEditOrDeleteReview(Long reviewId, String username) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new NoSuchElementException("Review no encontrada"));
+        return review.getAuthor().getEmail().equals(username)
+                || userService.hasRole(username, "ADMIN");
     }
 
 }

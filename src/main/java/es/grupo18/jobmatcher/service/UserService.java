@@ -20,9 +20,13 @@ import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
+import es.grupo18.jobmatcher.security.RepositoryUserDetailsService;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private RepositoryUserDetailsService repositoryUserDetailsService;
 
     @Autowired
     private UserRepository userRepository;
@@ -273,4 +277,11 @@ public class UserService {
     public boolean isUser(UserDTO user) {
         return user.roles() != null && user.roles().contains("USER");
     }
+
+    public boolean hasRole(String username, String role) {
+        return repositoryUserDetailsService.loadUserByUsername(username).getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
+    }
+
 }

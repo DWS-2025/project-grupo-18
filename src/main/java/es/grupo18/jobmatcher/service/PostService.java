@@ -1,6 +1,7 @@
 package es.grupo18.jobmatcher.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -9,8 +10,6 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,7 +82,6 @@ public class PostService {
         return new PostDTO(null, "", "", LocalDateTime.now(), null, null, null, "", List.of());
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #postDTO.userId == authentication.principal.id")
     public PostDTO update(PostDTO oldPostDTO, PostDTO updatedPostDTO) {
         Post post = toDomain(oldPostDTO);
         post.setTitle(updatedPostDTO.title());
@@ -99,8 +97,12 @@ public class PostService {
         return toDTO(post);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #postDTO.userId == authentication.principal.id")
     public PostDTO update(long id, String title, String content, MultipartFile image) throws IOException {
+        String email = userService.getLoggedUser().email();
+        if (!canEditOrDeletePost(id, email)) {
+            throw new SecurityException("No tienes permiso para editar este post");
+        }
+
         Post post = toDomain(findById(id));
         post.setTitle(title);
         post.setContent(content);
@@ -129,14 +131,17 @@ public class PostService {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #postDTO.id == authentication.principal.id")
     public void deleteById(long id) {
+        String email = userService.getLoggedUser().email();
+        if (!canEditOrDeletePost(id, email)) {
+            throw new SecurityException("No tienes permiso para eliminar este post");
+        }
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.delete(post);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #post.authorId == principal.id")
     public void delete(PostDTO post) {
         postRepository.deleteById(toDomain(post).getId());
     }
@@ -213,6 +218,12 @@ public class PostService {
         post.setImage(null);
         post.setImageContentType(null);
         postRepository.save(post);
+    }
+
+    public boolean canEditOrDeletePost(Long postId, String username) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("Post no encontrado"));
+        return post.getAuthor().getEmail().equals(username) || userService.hasRole(username, "ADMIN");
     }
 
 }

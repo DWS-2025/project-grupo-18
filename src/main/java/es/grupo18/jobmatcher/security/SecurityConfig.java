@@ -79,12 +79,14 @@ public class SecurityConfig {
                                                 .requestMatchers("/", "/main", "/register", "/login", "/loginerror",
                                                                 "/error/**", "/css/**", "/js/**", "/img/**")
                                                 .permitAll()
-                                                .requestMatchers("matches/**").hasRole("USER")
+                                                .requestMatchers("/blog", "/blog/posts", "/blog/posts/*",
+                                                                "/blog/posts/*/image", "/blog/posts/*/reviews/*")
+                                                .permitAll()
+                                                .requestMatchers("/matches/**").hasRole("USER")
                                                 .requestMatchers("/users/**").hasAnyRole("ADMIN")
                                                 .requestMatchers("/companies/**").hasRole("ADMIN")
                                                 .requestMatchers("/profile/**").hasRole("USER")
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/blog","/blog/posts/{postId}","/blog/posts/{postId}/reviews/{reviewId}").permitAll()
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")
@@ -94,4 +96,3 @@ public class SecurityConfig {
         }
 
 }
-        
