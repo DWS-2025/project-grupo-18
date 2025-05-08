@@ -13,7 +13,6 @@
 </head>
 
 <body class="page-centered">
-
     <header>
         <div class="header-left">
             <button class="back-btn" onclick="location.href='/main'">⬅️ Atrás</button>
@@ -27,7 +26,7 @@
         <form method="post" action="/logout" style="display: inline;">
             <input type="hidden" name="_csrf" value="{{token}}">
             <button type="submit">Cerrar sesión</button>
-        </form>        
+        </form>
     </header>
 
     <div class="container">
@@ -36,14 +35,13 @@
             <h2>Foto de Perfil</h2>
             <img id="profilePhoto" src="/profile/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
                 class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
-
             <div class="button-group">
                 <button id="resetPhotoButton">Restablecer Foto</button>
-                <form id="uploadForm" style="display:inline;">
+                <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="{{token}}">
                     <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
                     <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
                 </form>
-                
             </div>
         </div>
 
@@ -63,7 +61,6 @@
                 <li><strong>Experiencia:</strong> {{#user.experience}}{{user.experience}}
                     años{{/user.experience}}{{^user.experience}}Sin información{{/user.experience}}</li>
             </ul>
-
             <div class="button-group">
                 <button onclick="location.href='/profile/edit'">Editar Datos</button>
             </div>
@@ -78,51 +75,39 @@
 
     <script>
 
-        function getCookie(name) {
-            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-            if (match) return decodeURIComponent(match[2]);
-        }
+        const csrfToken = document.querySelector("input[name='_csrf']").value;
 
-        document.getElementById("uploadForm").addEventListener("change", function () {
-            const fileInput = document.getElementById("photoInput");
-            if (!fileInput.files.length) return;
-
+        document.getElementById("photoInput").addEventListener("change", function () {
             const formData = new FormData();
-            formData.append("image", fileInput.files[0]);
+            formData.append("image", this.files[0]);
+            formData.append("_csrf", "{{token}}");
 
-            fetch('/profile/upload_image', {
-                method: 'POST',
-                headers: {
-                    'X-XSRF-TOKEN': getCookie("XSRF-TOKEN")
-                },
-                body: formData,
-                credentials: 'same-origin'
+            fetch("/profile/upload_image", {
+                method: "POST",
+                body: formData
             }).then(response => {
                 if (!response.ok) throw new Error("Error al subir la imagen");
                 const timestamp = Date.now();
                 document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
-            }).catch(err => {
-                alert("Error: " + err.message);
-            });
+            }).catch(err => alert("Error: " + err.message));
         });
 
-        document.getElementById("resetPhotoButton").addEventListener("click", function () {
-            fetch('/profile/reset_image', {
-                method: 'POST',
+        document.getElementById("resetPhoto").addEventListener("click", function () {
+            fetch("/profile/reset_image", {
+                method: "POST",
                 headers: {
-                    'X-XSRF-TOKEN': getCookie("XSRF-TOKEN")
+                    "X-CSRF-TOKEN": csrfToken
                 },
-                credentials: 'same-origin'
+                credentials: "same-origin"
             })
                 .then(response => {
-                    if (!response.ok) throw new Error("Error al restablecer la imagen");
+                    if (!response.ok) throw new Error("Error al resetear la imagen");
                     const timestamp = Date.now();
                     document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
                 })
-                .catch(err => {
-                    alert("Error: " + err.message);
-                });
+                .catch(err => alert("Error: " + err.message));
         });
+
     </script>
 
 </body>

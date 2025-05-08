@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.grupo18.jobmatcher.dto.UserDTO;
@@ -143,25 +144,27 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/upload_image")
-    public String uploadUserImage(@PathVariable Long userId, @RequestParam("image") MultipartFile image)
+    @ResponseBody
+    public ResponseEntity<?> uploadUserImage(@PathVariable Long userId, @RequestParam("image") MultipartFile image)
             throws IOException {
         if (!image.isEmpty()) {
             String contentType = image.getContentType();
             if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
                     || contentType.equals("image/png") || contentType.equals("image/webp"))) {
                 userService.updateUserImage(userId, image);
-                return "redirect:/users/" + userId;
+                return ResponseEntity.ok().build();
             } else {
-                return "redirect:/users/" + userId + "?error=Formato de imagen no válido";
+                return ResponseEntity.badRequest().body("Formato de imagen no válido");
             }
         }
-        return "redirect:/users/" + userId + "?error=No se ha seleccionado ninguna imagen";
+        return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
     }
 
     @PostMapping("/{userId}/reset_image")
-    public String resetUserImage(@PathVariable Long userId) {
+    @ResponseBody
+    public ResponseEntity<?> resetUserImage(@PathVariable Long userId) {
         userService.removeImage(userId);
-        return "redirect:/users/" + userId;
+        return ResponseEntity.ok().build();
     }
 
 }

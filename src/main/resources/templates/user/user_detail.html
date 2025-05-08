@@ -26,24 +26,26 @@
         </div>
     </header>
 
-    <!-- User information -->
+    <!-- Contenedor principal -->
     <div class="container">
-        <!-- User photo -->
-        <div class="box">
-            <h2>Foto de Perfil</h2>
+
+        <!-- Encabezado del perfil con imagen -->
+        <div class="profile-header">
             <img id="userPhoto" src="/users/{{user.id}}/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
                 class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
+
             <div class="button-group">
-                <button id="resetPhotoButton">Restablecer Foto</button>
+                <button id="resetPhotoButton" class="btn">Restablecer Foto</button>
                 <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
                     <input type="hidden" name="_csrf" value="{{token}}">
                     <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
-                    <button type="button" onclick="document.getElementById('photoInput').click()">Cambiar Foto</button>
+                    <button type="button" class="btn" onclick="document.getElementById('photoInput').click()">Cambiar
+                        Foto</button>
                 </form>
             </div>
         </div>
 
-        <!-- User details -->
+        <!-- Información del usuario -->
         <div class="box">
             <h2>Datos del Usuario</h2>
             <ul>
@@ -54,55 +56,50 @@
                 <li><strong>Acerca de mí:</strong> {{user.bio}}</li>
                 <li><strong>Experiencia:</strong> {{user.experience}} años</li>
             </ul>
+
             <div class="button-group">
-                <button onclick="location.href='/users/{{user.id}}/edit'">Editar Datos</button>
+                <button class="btn" onclick="location.href='/users/{{user.id}}/edit'">Editar Datos</button>
             </div>
+
             {{#isAdminOrUser}}
             {{^isSelf}}
             <form method="post" action="/users/{{user.id}}/delete"
                 onsubmit="return confirm('¿Estás seguro de que quieres borrar este usuario?');">
                 <input type="hidden" name="_csrf" value="{{token}}">
-                <button type="submit">Eliminar usuario</button>
+                <button class="btn" type="submit">Eliminar usuario</button>
             </form>
             {{/isSelf}}
             {{#isSelf}}
-            <a href="/profile">Ir a mi perfil</a>
+            <a href="/profile" class="btn">Ir a mi perfil</a>
             {{/isSelf}}
             {{/isAdminOrUser}}
         </div>
     </div>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        <div class="copyright">
+            &copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
         </div>
     </footer>
 
     <script>
-        const csrfToken = document.querySelector('input[name="_csrf"]').value;
+        const csrfToken = "{{token}}";
 
-        document.getElementById("uploadForm").addEventListener("change", function () {
-            const fileInput = document.getElementById("photoInput");
-            if (!fileInput.files.length) return;
-
+        document.getElementById("photoInput").addEventListener("change", function () {
             const formData = new FormData();
-            formData.append("image", fileInput.files[0]);
+            formData.append("image", this.files[0]);
+            formData.append("_csrf", csrfToken);
 
             fetch('/users/{{user.id}}/upload_image', {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
                 body: formData
             })
                 .then(response => {
                     if (!response.ok) throw new Error("Error al subir la imagen");
                     const timestamp = Date.now();
-                    const img = document.getElementById("userPhoto");
-                    img.src = `/users/{{user.id}}/image?ts=${timestamp}`;
+                    document.getElementById("userPhoto").src = `/users/{{user.id}}/image?ts=${timestamp}`;
                 })
-                .catch(err => {
-                    alert("Error: " + err.message);
-                });
+                .catch(err => alert("Error: " + err.message));
         });
 
         document.getElementById("resetPhotoButton").addEventListener("click", function () {
@@ -114,25 +111,12 @@
             })
                 .then(response => {
                     if (!response.ok) throw new Error("Error al restablecer la imagen");
-
                     const timestamp = Date.now();
-                    const img = document.getElementById("userPhoto");
-
-                    const testImg = new Image();
-                    testImg.onload = () => {
-                        img.src = testImg.src;
-                    };
-                    testImg.onerror = () => {
-                        img.src = '/img/default-profile.jpg';
-                    };
-                    testImg.src = `/users/{{user.id}}/image?ts=${timestamp}`;
+                    document.getElementById("userPhoto").src = `/users/{{user.id}}/image?ts=${timestamp}`;
                 })
-                .catch(err => {
-                    alert("Error: " + err.message);
-                });
+                .catch(err => alert("Error: " + err.message));
         });
     </script>
-
 
 </body>
 
