@@ -66,18 +66,21 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public String getUser(Model model, @PathVariable Long userId) {
+        UserDTO currentUser = userService.getLoggedUser();
+
+        if (currentUser != null && currentUser.id().equals(userId)) {
+            return "redirect:/profile";
+        }
+
         try {
             UserDTO targetUser = userService.findById(userId);
             model.addAttribute("user", targetUser);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
 
-            UserDTO currentUser = userService.getLoggedUser();
             model.addAttribute("isAdmin", userService.isAdmin(currentUser));
             model.addAttribute("isUser", userService.isUser(currentUser));
             model.addAttribute("isAdminOrUser", userService.isAdmin(currentUser) || userService.isUser(currentUser));
-
-            boolean isSelf = currentUser != null && currentUser.id().equals(userId);
-            model.addAttribute("isSelf", isSelf);
+            model.addAttribute("isSelf", false); // Nunca entra aquí, ya fue redirigido arriba
 
             return "user/user_detail";
         } catch (NoSuchElementException e) {

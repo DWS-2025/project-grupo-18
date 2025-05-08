@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
@@ -78,6 +79,7 @@ public class ReviewService {
         return toDTO(oldReview);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #reviewDTO.authorId == principal.id")
     public ReviewDTO update(long reviewId, String text, int rating) { // Updates a review
         Review review = toDomain(findById(reviewId));
         review.setText(text);

@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,11 +38,13 @@ public class PostService {
 
     @Autowired
     private ReviewService reviewService;
-/*
-    public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list with authors
-        return toDTOs(postRepository.findAllWithAuthors());
-    }
-*/
+
+    /*
+     * public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list
+     * with authors
+     * return toDTOs(postRepository.findAllWithAuthors());
+     * }
+     */
     public Collection<PostDTO> findAll() { // Returns the posts list in reverse order
         return toDTOs(postRepository.findAll());
     }
@@ -79,6 +83,7 @@ public class PostService {
         return new PostDTO(null, "", "", LocalDateTime.now(), null, null, null, "", List.of());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #postDTO.userId == authentication.principal.id")
     public PostDTO update(PostDTO oldPostDTO, PostDTO updatedPostDTO) {
         Post post = toDomain(oldPostDTO);
         post.setTitle(updatedPostDTO.title());
@@ -94,6 +99,7 @@ public class PostService {
         return toDTO(post);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #postDTO.userId == authentication.principal.id")
     public PostDTO update(long id, String title, String content, MultipartFile image) throws IOException {
         Post post = toDomain(findById(id));
         post.setTitle(title);
@@ -123,13 +129,15 @@ public class PostService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #postDTO.id == authentication.principal.id")
     public void deleteById(long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.delete(post);
     }
 
-    public void delete(PostDTO post) { // Deletes a post
+    @PreAuthorize("hasRole('ADMIN') or #post.authorId == principal.id")
+    public void delete(PostDTO post) {
         postRepository.deleteById(toDomain(post).getId());
     }
 

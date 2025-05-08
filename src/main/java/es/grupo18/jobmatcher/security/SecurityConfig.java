@@ -1,6 +1,6 @@
 package es.grupo18.jobmatcher.security;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -21,71 +21,77 @@ import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
 
 @Configuration
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JWTRequestFilter jwtRequestFilter;
-    private final UnauthorizedHandlerJWT unauthorizedHandlerJWT;
-    private final RepositoryUserDetailsService userDetailsService;
+        private final JWTRequestFilter jwtRequestFilter;
+        private final UnauthorizedHandlerJWT unauthorizedHandlerJWT;
+        private final RepositoryUserDetailsService userDetailsService;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Autowired
+        public SecurityConfig(JWTRequestFilter jwtRequestFilter,
+                        UnauthorizedHandlerJWT unauthorizedHandlerJWT,
+                        RepositoryUserDetailsService userDetailsService) {
+                this.jwtRequestFilter = jwtRequestFilter;
+                this.unauthorizedHandlerJWT = unauthorizedHandlerJWT;
+                this.userDetailsService = userDetailsService;
+        }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider() {
+                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+                authProvider.setUserDetailsService(userDetailsService);
+                authProvider.setPasswordEncoder(passwordEncoder());
+                return authProvider;
+        }
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/**")
-                .csrf(csrf -> csrf.disable())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Cambia esto cuando definas los roles de la API
-                )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 
-        return http.build();
-    }
+        @Bean
+        @Order(1)
+        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .securityMatcher("/api/**")
+                                .csrf(csrf -> csrf.disable())
+                                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
+                                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .anyRequest().permitAll())
+                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/main", "/register", "/login", "/error/**", "/css/**", "/js/**",
-                                "/img/**")
-                        .permitAll()
-                        .requestMatchers("/users/**", "/profile/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/blog/**", "/companies/**").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/main", true)
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/main")
-                        .permitAll());
+                return http.build();
+        }
 
-        return http.build();
-    }
-    
+        @Bean
+        @Order(2)
+        public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/", "/main", "/register", "/login", "/loginerror",
+                                                                "/error/**", "/css/**", "/js/**", "/img/**")
+                                                .permitAll()
+                                                .requestMatchers("matches/**").hasRole("USER")
+                                                .requestMatchers("/users/**").hasAnyRole("ADMIN")
+                                                .requestMatchers("/companies/**").hasRole("ADMIN")
+                                                .requestMatchers("/profile/**").hasRole("USER")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/blog","/blog/posts/{postId}","/blog/posts/{postId}/reviews/{reviewId}").permitAll()
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .defaultSuccessUrl("/main", true)
+                                                .permitAll());
+                return http.build();
+        }
+
 }
+        

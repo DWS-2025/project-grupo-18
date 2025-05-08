@@ -24,6 +24,10 @@
         <div class="header-right">
             <button class="hidden-button"></button>
         </div>
+        <form method="post" action="/logout" style="display: inline;">
+            <input type="hidden" name="_csrf" value="{{token}}">
+            <button type="submit">Cerrar sesión</button>
+        </form>        
     </header>
 
     <div class="container">
