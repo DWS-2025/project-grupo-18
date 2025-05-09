@@ -36,7 +36,7 @@
             <img id="profilePhoto" src="/profile/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
                 class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
             <div class="button-group">
-                <button id="resetPhotoButton">Restablecer Foto</button>
+                <button id="resetPhotoButton" type="button">Restablecer Foto</button>
                 <form id="uploadForm" enctype="multipart/form-data" style="display:inline;">
                     <input type="hidden" name="_csrf" value="{{token}}">
                     <input type="file" id="photoInput" name="image" accept="image/*" style="display:none;">
@@ -44,6 +44,7 @@
                 </form>
             </div>
         </div>
+        
 
         <!-- User details -->
         <div class="box">
@@ -74,14 +75,13 @@
     </footer>
 
     <script>
-
         const csrfToken = document.querySelector("input[name='_csrf']").value;
-
+    
         document.getElementById("photoInput").addEventListener("change", function () {
             const formData = new FormData();
             formData.append("image", this.files[0]);
-            formData.append("_csrf", "{{token}}");
-
+            formData.append("_csrf", csrfToken);
+    
             fetch("/profile/upload_image", {
                 method: "POST",
                 body: formData
@@ -91,25 +91,34 @@
                 document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
             }).catch(err => alert("Error: " + err.message));
         });
-
-        document.getElementById("resetPhoto").addEventListener("click", function () {
+    
+        document.getElementById("resetPhotoButton").addEventListener("click", function () {
+            const formData = new FormData();
+            formData.append("_csrf", csrfToken);
+        
             fetch("/profile/reset_image", {
                 method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": csrfToken
-                },
+                body: formData,
                 credentials: "same-origin"
             })
-                .then(response => {
-                    if (!response.ok) throw new Error("Error al resetear la imagen");
-                    const timestamp = Date.now();
-                    document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
-                })
-                .catch(err => alert("Error: " + err.message));
-        });
-
+            .then(response => {
+                if (!response.ok) throw new Error("Error al resetear la imagen");
+                
+                const img = document.getElementById("profilePhoto");
+                const timestamp = Date.now();
+                const newSrc = `/profile/image?ts=${timestamp}`;
+                
+                img.onerror = function () {
+                    this.onerror = null;
+                    this.src = "/img/default-profile.jpg";
+                };
+        
+                img.src = newSrc;
+            })
+            .catch(err => alert("Error: " + err.message));
+        });        
+        
     </script>
-
 </body>
 
 </html>
