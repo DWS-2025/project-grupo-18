@@ -1,18 +1,5 @@
 package es.grupo18.jobmatcher.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
@@ -21,6 +8,24 @@ import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 import es.grupo18.jobmatcher.security.RepositoryUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -37,7 +42,10 @@ public class UserService {
     @Autowired
     private CompanyMapper companyMapper;
 
-    // === ENTITIES ===
+    private static final String CV_STORAGE_DIR = "cv_storage";
+    private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR).toAbsolutePath().normalize();
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public UserDTO getLoggedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -62,16 +70,18 @@ public class UserService {
     public UserDTO save(UserDTO user) {
         if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
-                    user.id(),
-                    user.name(),
-                    user.email(),
-                    user.phone(),
-                    user.location(),
-                    user.bio(),
-                    user.experience(),
-                    user.image(),
-                    user.imageContentType(),
-                    List.of("USER"));
+                user.id(),
+                user.name(),
+                user.email(),
+                user.phone(),
+                user.location(),
+                user.bio(),
+                user.experience(),
+                user.image(),
+                user.imageContentType(),
+                List.of("USER"),
+                user.cvFileName()
+            );
         }
         userRepository.save(toDomain(user));
         return user;
@@ -117,7 +127,6 @@ public class UserService {
         currentUser.setExperience(updatedDto.experience());
 
         userRepository.save(currentUser);
-
         return toDTO(currentUser);
     }
 
@@ -132,10 +141,8 @@ public class UserService {
         return user;
     }
 
-    // Method to manage favourite companies
     public void addOrRemoveFavouriteCompany(Long userId, CompanyDTO companyDTO) {
         UserDTO currentUserDTO = findById(userId);
-
         User updatedUser = toDomain(currentUserDTO);
 
         User originalUser = userRepository.findById(userId)
@@ -158,7 +165,6 @@ public class UserService {
     public boolean isCompanyFavourite(CompanyDTO company) {
         User user = userRepository.findById(getLoggedUser().id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         return user.getFavouriteCompaniesList().stream()
                 .anyMatch(c -> c.getId() == company.id());
     }
@@ -178,8 +184,6 @@ public class UserService {
         }
     }
 
-    // Image methods
-
     public void removeImage() {
         UserDTO dto = getLoggedUser();
         User existingUser = userRepository.findById(dto.id())
@@ -187,7 +191,6 @@ public class UserService {
 
         existingUser.setImage(null);
         existingUser.setImageContentType(null);
-
         userRepository.save(existingUser);
     }
 
@@ -210,9 +213,14 @@ public class UserService {
             User existingUser = userRepository.findById(dto.id())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            existingUser.setImage(image.getBytes());
-            existingUser.setImageContentType(image.getContentType());
+            String contentType = image.getContentType();
+            if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/jpg") ||
+                    contentType.equals("image/png") || contentType.equals("image/webp"))) {
+                throw new IllegalArgumentException("Formato de imagen no válido");
+            }
 
+            existingUser.setImage(image.getBytes());
+            existingUser.setImageContentType(contentType);
             userRepository.save(existingUser);
         }
     }
@@ -224,9 +232,118 @@ public class UserService {
 
             existingUser.setImage(image.getBytes());
             existingUser.setImageContentType(image.getContentType());
-
             userRepository.save(existingUser);
         }
+    }
+
+    public void uploadCv(MultipartFile cv) throws IOException {
+        logger.debug("Iniciando subida de CV para usuario autenticado");
+        if (cv.isEmpty()) {
+            logger.error("No se ha seleccionado ningún archivo");
+            throw new IllegalArgumentException("No se ha seleccionado ningún archivo");
+        }
+
+        String contentType = cv.getContentType();
+        if (!"application/pdf".equals(contentType)) {
+            logger.error("Tipo de archivo no permitido: {}", contentType);
+            throw new IllegalArgumentException("Solo se permiten archivos PDF");
+        }
+
+        String originalFilename = cv.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isBlank() || !originalFilename.toLowerCase().endsWith(".pdf")) {
+            logger.error("Nombre de archivo inválido: {}", originalFilename);
+            throw new IllegalArgumentException("Nombre de archivo inválido");
+        }
+
+        String sanitizedFilename = sanitizeFilename(originalFilename);
+        UserDTO userDTO = getLoggedUser();
+        User user = userRepository.findById(userDTO.id())
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+        logger.debug("Usuario autenticado: ID {}", user.getId());
+
+        // Verificar y crear directorio base
+        File baseDir = CV_STORAGE_PATH.toFile();
+        if (!baseDir.exists()) {
+            logger.debug("Creando directorio base: {}", baseDir.getAbsolutePath());
+            if (!baseDir.mkdirs()) {
+                logger.error("No se pudo crear el directorio base: {}", baseDir.getAbsolutePath());
+                throw new IOException("No se pudo crear el directorio base: " + baseDir.getAbsolutePath());
+            }
+        }
+
+        // Verificar permisos de escritura
+        if (!Files.isWritable(CV_STORAGE_PATH)) {
+            logger.error("El directorio base no tiene permisos de escritura: {}", baseDir.getAbsolutePath());
+            throw new IOException("El directorio base no tiene permisos de escritura: " + baseDir.getAbsolutePath());
+        }
+
+        // Eliminar CV anterior
+        if (user.getCvFileName() != null) {
+            Path oldCvPath = CV_STORAGE_PATH.resolve("user_" + user.getId()).resolve(sanitizeFilename(user.getCvFileName()));
+            File oldCv = oldCvPath.toFile();
+            if (oldCv.exists()) {
+                logger.debug("Eliminando CV anterior: {}", oldCv.getAbsolutePath());
+                if (!oldCv.delete()) {
+                    logger.warn("No se pudo eliminar el CV anterior: {}", oldCv.getAbsolutePath());
+                }
+            }
+        }
+
+        // Crear directorio del usuario
+        Path userDirPath = CV_STORAGE_PATH.resolve("user_" + user.getId());
+        File userDir = userDirPath.toFile();
+        if (!userDir.exists()) {
+            logger.debug("Creando directorio de usuario: {}", userDir.getAbsolutePath());
+            if (!userDir.mkdirs()) {
+                logger.error("No se pudo crear el directorio del usuario: {}", userDir.getAbsolutePath());
+                throw new IOException("No se pudo crear el directorio del usuario: " + userDir.getAbsolutePath());
+            }
+        }
+
+        // Verificar permisos de escritura en el directorio del usuario
+        if (!Files.isWritable(userDirPath)) {
+            logger.error("El directorio del usuario no tiene permisos de escritura: {}", userDir.getAbsolutePath());
+            throw new IOException("El directorio del usuario no tiene permisos de escritura: " + userDir.getAbsolutePath());
+        }
+
+        // Guardar archivo
+        Path destFilePath = userDirPath.resolve(sanitizedFilename);
+        logger.debug("Guardando CV en: {}", destFilePath.toAbsolutePath());
+        try {
+            cv.transferTo(destFilePath);
+        } catch (IOException e) {
+            logger.error("Error al guardar el CV en disco: {}", e.getMessage());
+            throw new IOException("Error al guardar el CV en disco: " + e.getMessage(), e);
+        }
+
+        user.setCvFileName(originalFilename);
+        userRepository.save(user);
+        logger.info("Usuario {} subió CV: {}", user.getId(), sanitizedFilename);
+    }
+
+    public File getCvFile() {
+        UserDTO userDTO = getLoggedUser();
+        User user = userRepository.findById(userDTO.id())
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        if (user.getCvFileName() == null) {
+            logger.error("No hay CV disponible para el usuario {}", user.getId());
+            throw new IllegalStateException("No hay CV disponible");
+        }
+
+        Path userDirPath = CV_STORAGE_PATH.resolve("user_" + user.getId());
+        Path cvFilePath = userDirPath.resolve(sanitizeFilename(user.getCvFileName()));
+        File cvFile = cvFilePath.toFile();
+        if (!cvFile.exists()) {
+            logger.error("Archivo CV no encontrado en disco: {}", cvFile.getAbsolutePath());
+            throw new IllegalStateException("Archivo CV no encontrado en disco");
+        }
+
+        return cvFile;
+    }
+
+    private String sanitizeFilename(String filename) {
+        return filename.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     public void removeImage(Long id) {
@@ -242,8 +359,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Helpers
-
     private UserDTO toDTO(User user) {
         return userMapper.toDTO(user);
     }
@@ -258,16 +373,18 @@ public class UserService {
 
     public UserDTO createEmpty() {
         return new UserDTO(
-                null,
-                "",
-                "",
-                "",
-                "",
-                "",
-                0,
-                null,
-                null,
-                new ArrayList<>());
+            null,
+            "",
+            "",
+            "",
+            "",
+            "",
+            0,
+            null,
+            null,
+            new ArrayList<>(),
+            null
+        );
     }
 
     public boolean isAdmin(UserDTO user) {
@@ -283,5 +400,4 @@ public class UserService {
                 .stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
-
 }

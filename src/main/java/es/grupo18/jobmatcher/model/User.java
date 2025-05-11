@@ -34,6 +34,7 @@ public class User {
     @Lob
     private byte[] image;
     private String imageContentType;
+    private String cvFileName;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewsList;
@@ -84,6 +85,9 @@ public class User {
     }
 
     // Getters
+    public String getCvFileName() {
+        return cvFileName;
+    }
 
     public Long getId() {
         return id;
@@ -142,6 +146,9 @@ public class User {
     }
     
     // Setters
+    public void setCvFileName(String cvFileName) {
+        this.cvFileName = cvFileName;
+    }
 
     public void setId(Long id) {
         this.id = id;

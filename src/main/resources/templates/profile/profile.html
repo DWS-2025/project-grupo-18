@@ -44,7 +44,19 @@
                 </form>
             </div>
         </div>
-        
+
+        <!-- Curriculum Vitae -->
+        <div class="box">
+            <h2>Currículum Vitae</h2>
+            <form id="uploadCvForm" enctype="multipart/form-data" style="display:inline;">
+                <input type="hidden" name="_csrf" value="{{token}}">
+                <input type="file" id="cvInput" name="cv" accept=".pdf" style="display:none;">
+                <button type="button" onclick="document.getElementById('cvInput').click()">Subir CV</button>
+            </form>
+            {{#user.cvFileName}}
+            <a href="/profile/download_cv" target="_blank">Descargar CV</a>
+            {{/user.cvFileName}}
+        </div>
 
         <!-- User details -->
         <div class="box">
@@ -70,18 +82,18 @@
 
     <footer>
         <div class="copyright">
-            &copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+            © 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
         </div>
     </footer>
 
     <script>
         const csrfToken = document.querySelector("input[name='_csrf']").value;
-    
+
         document.getElementById("photoInput").addEventListener("change", function () {
             const formData = new FormData();
             formData.append("image", this.files[0]);
             formData.append("_csrf", csrfToken);
-    
+
             fetch("/profile/upload_image", {
                 method: "POST",
                 body: formData
@@ -91,11 +103,11 @@
                 document.getElementById("profilePhoto").src = `/profile/image?ts=${timestamp}`;
             }).catch(err => alert("Error: " + err.message));
         });
-    
+
         document.getElementById("resetPhotoButton").addEventListener("click", function () {
             const formData = new FormData();
             formData.append("_csrf", csrfToken);
-        
+
             fetch("/profile/reset_image", {
                 method: "POST",
                 body: formData,
@@ -103,21 +115,34 @@
             })
             .then(response => {
                 if (!response.ok) throw new Error("Error al resetear la imagen");
-                
+
                 const img = document.getElementById("profilePhoto");
                 const timestamp = Date.now();
                 const newSrc = `/profile/image?ts=${timestamp}`;
-                
+
                 img.onerror = function () {
                     this.onerror = null;
                     this.src = "/img/default-profile.jpg";
                 };
-        
+
                 img.src = newSrc;
             })
             .catch(err => alert("Error: " + err.message));
-        });        
-        
+        });
+
+        document.getElementById("cvInput").addEventListener("change", function () {
+            const formData = new FormData();
+            formData.append("cv", this.files[0]);
+            formData.append("_csrf", csrfToken);
+
+            fetch("/profile/upload_cv", {
+                method: "POST",
+                body: formData
+            }).then(response => {
+                if (!response.ok) throw new Error("Error al subir el CV");
+                location.reload();
+            }).catch(err => alert("Error: " + err.message));
+        });
     </script>
 </body>
 

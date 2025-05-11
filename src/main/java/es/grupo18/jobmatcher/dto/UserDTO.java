@@ -12,5 +12,6 @@ public record UserDTO(
         int experience,
         byte[] image,
         String imageContentType,
-        List<String> roles
+        List<String> roles,
+        String cvFileName
 ) {}

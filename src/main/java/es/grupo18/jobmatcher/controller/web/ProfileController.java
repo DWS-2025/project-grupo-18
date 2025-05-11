@@ -1,23 +1,27 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import java.io.IOException;
-
+import es.grupo18.jobmatcher.dto.UserDTO;
+import es.grupo18.jobmatcher.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.grupo18.jobmatcher.dto.UserDTO;
-import es.grupo18.jobmatcher.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 public class ProfileController {
@@ -27,62 +31,74 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public String showProfile(Model model, HttpServletRequest request) {
-        UserDTO user = userService.getLoggedUser();
-        boolean isBioVisible = user.bio() != null && !user.bio().trim().equals("<p><br></p>");
+        try {
+            UserDTO user = userService.getLoggedUser();
+            boolean isBioVisible = user.bio() != null && !user.bio().trim().equals("<p><br></p>");
 
-        model.addAttribute("user", user);
-        model.addAttribute("currentTimeMillis", System.currentTimeMillis());
-        model.addAttribute("isBioVisible", isBioVisible);
+            model.addAttribute("user", user);
+            model.addAttribute("currentTimeMillis", System.currentTimeMillis());
+            model.addAttribute("isBioVisible", isBioVisible);
 
-        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
-        if (csrfToken != null) {
-            model.addAttribute("token", csrfToken.getToken());
+            CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+            if (csrfToken != null) {
+                model.addAttribute("token", csrfToken.getToken());
+            }
+
+            return "profile/profile";
+        } catch (IllegalStateException e) {
+            return "redirect:/login?error=" + URLEncoder.encode("Por favor, inicia sesión", StandardCharsets.UTF_8);
         }
-
-        return "profile/profile";
     }
 
     @GetMapping("/profile/image")
     public ResponseEntity<byte[]> getProfileImage() {
         try {
-            String contentType = userService.getLoggedUser().imageContentType();
-            if (contentType == null || contentType.isBlank()) {
-                contentType = "image/jpeg";
-            }
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, contentType)
-                    .body(userService.getLoggedUser().image());
-        } catch (Exception e) {
+            UserDTO user = userService.getLoggedUser();
+            String contentType = user.imageContentType() != null && !user.imageContentType().isBlank() ? user.imageContentType() : "image/jpeg";
+            byte[] image = user.image() != null ? user.image() : new byte[0];
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(image);
+        } catch (IllegalStateException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/profile/upload_image")
     @ResponseBody
-    public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) throws IOException {
-        if (!image.isEmpty()) {
-            String contentType = image.getContentType();
-            if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/jpg")
-                    || contentType.equals("image/png") || contentType.equals("image/webp"))) {
-                userService.updateUserImage(image);
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.badRequest().body("Formato de imagen no válido");
+    public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) {
+        try {
+            if (image.isEmpty()) {
+                return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
             }
+            userService.updateUserImage(image);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir la imagen");
         }
-        return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
     }
 
     @PostMapping("/profile/reset_image")
     @ResponseBody
     public ResponseEntity<?> resetProfileImage() {
-        userService.removeImage();
-        return ResponseEntity.ok().build();
+        try {
+            userService.removeImage();
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al resetear la imagen");
+        }
     }
 
     @GetMapping("/profile/edit")
     public String editProfileForm(Model model) {
-        model.addAttribute("user", userService.getLoggedUser());
-        return "profile/profile_form";
+        try {
+            model.addAttribute("user", userService.getLoggedUser());
+            return "profile/profile_form";
+        } catch (IllegalStateException e) {
+            return "redirect:/login?error=" + URLEncoder.encode("Por favor, inicia sesión", StandardCharsets.UTF_8);
+        }
     }
 
     @PostMapping("/profile/edit")
@@ -91,8 +107,42 @@ public class ProfileController {
             userService.updateProfile(updatedUser);
             return "redirect:/profile";
         } catch (Exception e) {
-            return "redirect:/profile/edit?error=" + e.getMessage();
+            return "redirect:/profile/edit?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
         }
     }
 
+    @PostMapping("/profile/upload_cv")
+    @ResponseBody
+    public ResponseEntity<?> uploadCv(@RequestParam("cv") MultipartFile cv) {
+        try {
+            userService.uploadCv(cv);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el CV");
+        }
+    }
+
+    @GetMapping("/profile/download_cv")
+    public ResponseEntity<Resource> downloadCv() {
+        try {
+            File cvFile = userService.getCvFile();
+            UserDTO user = userService.getLoggedUser();
+            String originalFilename = user.cvFileName();
+
+            try {
+                InputStreamResource resource = new InputStreamResource(new FileInputStream(cvFile));
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFilename + "\"")
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .contentLength(cvFile.length())
+                        .body(resource);
+            } catch (FileNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }
