@@ -20,12 +20,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -43,7 +48,8 @@ public class UserService {
     private CompanyMapper companyMapper;
 
     private static final String CV_STORAGE_DIR = "cv_storage";
-    private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR).toAbsolutePath().normalize();
+    private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR)
+            .toAbsolutePath().normalize();
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -70,18 +76,17 @@ public class UserService {
     public UserDTO save(UserDTO user) {
         if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
-                user.id(),
-                user.name(),
-                user.email(),
-                user.phone(),
-                user.location(),
-                user.bio(),
-                user.experience(),
-                user.image(),
-                user.imageContentType(),
-                List.of("USER"),
-                user.cvFileName()
-            );
+                    user.id(),
+                    user.name(),
+                    user.email(),
+                    user.phone(),
+                    user.location(),
+                    user.bio(),
+                    user.experience(),
+                    user.image(),
+                    user.imageContentType(),
+                    List.of("USER"),
+                    user.cvFileName());
         }
         userRepository.save(toDomain(user));
         return user;
@@ -236,110 +241,93 @@ public class UserService {
         }
     }
 
-    public void uploadCv(MultipartFile cv) throws IOException {
-        logger.debug("Iniciando subida de CV para usuario autenticado");
-        if (cv.isEmpty()) {
-            logger.error("No se ha seleccionado ningún archivo");
-            throw new IllegalArgumentException("No se ha seleccionado ningún archivo");
-        }
+    public void uploadCv(MultipartFile file) throws IOException {
+        Long userId = getLoggedUser().id();
+        uploadCv(file, userId);
+    }
 
-        String contentType = cv.getContentType();
-        if (!"application/pdf".equals(contentType)) {
-            logger.error("Tipo de archivo no permitido: {}", contentType);
-            throw new IllegalArgumentException("Solo se permiten archivos PDF");
-        }
+    public void uploadCv(MultipartFile file, Long userId) throws IOException {
+        User user = getUserOrThrow(userId);
+        validatePdf(file);
 
-        String originalFilename = cv.getOriginalFilename();
-        if (originalFilename == null || originalFilename.isBlank() || !originalFilename.toLowerCase().endsWith(".pdf")) {
-            logger.error("Nombre de archivo inválido: {}", originalFilename);
-            throw new IllegalArgumentException("Nombre de archivo inválido");
-        }
+        Path userDir = getUserCvDir(user);
+        Files.createDirectories(userDir);
 
-        String sanitizedFilename = sanitizeFilename(originalFilename);
-        UserDTO userDTO = getLoggedUser();
-        User user = userRepository.findById(userDTO.id())
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
-        logger.debug("Usuario autenticado: ID {}", user.getId());
+        deleteExistingCv(user, userDir);
 
-        // Verificar y crear directorio base
-        File baseDir = CV_STORAGE_PATH.toFile();
-        if (!baseDir.exists()) {
-            logger.debug("Creando directorio base: {}", baseDir.getAbsolutePath());
-            if (!baseDir.mkdirs()) {
-                logger.error("No se pudo crear el directorio base: {}", baseDir.getAbsolutePath());
-                throw new IOException("No se pudo crear el directorio base: " + baseDir.getAbsolutePath());
-            }
-        }
+        String newFileName = UUID.randomUUID() + ".pdf";
+        file.transferTo(userDir.resolve(newFileName));
 
-        // Verificar permisos de escritura
-        if (!Files.isWritable(CV_STORAGE_PATH)) {
-            logger.error("El directorio base no tiene permisos de escritura: {}", baseDir.getAbsolutePath());
-            throw new IOException("El directorio base no tiene permisos de escritura: " + baseDir.getAbsolutePath());
-        }
-
-        // Eliminar CV anterior
-        if (user.getCvFileName() != null) {
-            Path oldCvPath = CV_STORAGE_PATH.resolve("user_" + user.getId()).resolve(sanitizeFilename(user.getCvFileName()));
-            File oldCv = oldCvPath.toFile();
-            if (oldCv.exists()) {
-                logger.debug("Eliminando CV anterior: {}", oldCv.getAbsolutePath());
-                if (!oldCv.delete()) {
-                    logger.warn("No se pudo eliminar el CV anterior: {}", oldCv.getAbsolutePath());
-                }
-            }
-        }
-
-        // Crear directorio del usuario
-        Path userDirPath = CV_STORAGE_PATH.resolve("user_" + user.getId());
-        File userDir = userDirPath.toFile();
-        if (!userDir.exists()) {
-            logger.debug("Creando directorio de usuario: {}", userDir.getAbsolutePath());
-            if (!userDir.mkdirs()) {
-                logger.error("No se pudo crear el directorio del usuario: {}", userDir.getAbsolutePath());
-                throw new IOException("No se pudo crear el directorio del usuario: " + userDir.getAbsolutePath());
-            }
-        }
-
-        // Verificar permisos de escritura en el directorio del usuario
-        if (!Files.isWritable(userDirPath)) {
-            logger.error("El directorio del usuario no tiene permisos de escritura: {}", userDir.getAbsolutePath());
-            throw new IOException("El directorio del usuario no tiene permisos de escritura: " + userDir.getAbsolutePath());
-        }
-
-        // Guardar archivo
-        Path destFilePath = userDirPath.resolve(sanitizedFilename);
-        logger.debug("Guardando CV en: {}", destFilePath.toAbsolutePath());
-        try {
-            cv.transferTo(destFilePath);
-        } catch (IOException e) {
-            logger.error("Error al guardar el CV en disco: {}", e.getMessage());
-            throw new IOException("Error al guardar el CV en disco: " + e.getMessage(), e);
-        }
-
-        user.setCvFileName(originalFilename);
+        user.setCvFileName(newFileName);
         userRepository.save(user);
-        logger.info("Usuario {} subió CV: {}", user.getId(), sanitizedFilename);
     }
 
     public File getCvFile() {
-        UserDTO userDTO = getLoggedUser();
-        User user = userRepository.findById(userDTO.id())
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+        return getCvFile(getLoggedUser().id());
+    }
 
-        if (user.getCvFileName() == null) {
-            logger.error("No hay CV disponible para el usuario {}", user.getId());
+    public File getCvFile(Long userId) {
+        User user = getUserOrThrow(userId);
+        if (user.getCvFileName() == null)
             throw new IllegalStateException("No hay CV disponible");
-        }
 
-        Path userDirPath = CV_STORAGE_PATH.resolve("user_" + user.getId());
-        Path cvFilePath = userDirPath.resolve(sanitizeFilename(user.getCvFileName()));
-        File cvFile = cvFilePath.toFile();
-        if (!cvFile.exists()) {
-            logger.error("Archivo CV no encontrado en disco: {}", cvFile.getAbsolutePath());
-            throw new IllegalStateException("Archivo CV no encontrado en disco");
-        }
+        Path path = getUserCvDir(user).resolve(sanitizeFilename(user.getCvFileName()));
+        File file = path.toFile();
+        if (!file.exists())
+            throw new IllegalStateException("Archivo CV no encontrado");
 
-        return cvFile;
+        return file;
+    }
+
+    public void deleteCv() throws IOException {
+        deleteCv(getLoggedUser().id());
+    }
+
+    public void deleteCv(Long userId) throws IOException {
+        User user = getUserOrThrow(userId);
+        if (user.getCvFileName() == null)
+            return;
+
+        Path userDir = getUserCvDir(user);
+        Path cvPath = userDir.resolve(sanitizeFilename(user.getCvFileName()));
+        Files.deleteIfExists(cvPath);
+
+        File dir = userDir.toFile();
+        if (dir.exists() && dir.isDirectory() && dir.list().length == 0)
+            dir.delete();
+
+        user.setCvFileName(null);
+        userRepository.save(user);
+    }
+
+    private User getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+    }
+
+    private void validatePdf(MultipartFile file) throws IOException {
+        if (file.isEmpty())
+            throw new IllegalArgumentException("El archivo está vacío");
+
+        if (!"application/pdf".equals(file.getContentType()))
+            throw new IllegalArgumentException("Solo se permiten archivos PDF");
+
+        String name = file.getOriginalFilename();
+        if (name == null || !name.toLowerCase().endsWith(".pdf"))
+            throw new IllegalArgumentException("Nombre de archivo inválido");
+
+        try (InputStream in = file.getInputStream()) {
+            byte[] header = new byte[4];
+            if (in.read(header) != 4 || header[0] != '%' || header[1] != 'P' || header[2] != 'D' || header[3] != 'F')
+                throw new IllegalArgumentException("El archivo no parece un PDF válido");
+        }
+    }
+
+    private void deleteExistingCv(User user, Path userDir) throws IOException {
+        if (user.getCvFileName() != null) {
+            Path path = userDir.resolve(sanitizeFilename(user.getCvFileName()));
+            Files.deleteIfExists(path);
+        }
     }
 
     private String sanitizeFilename(String filename) {
@@ -373,18 +361,17 @@ public class UserService {
 
     public UserDTO createEmpty() {
         return new UserDTO(
-            null,
-            "",
-            "",
-            "",
-            "",
-            "",
-            0,
-            null,
-            null,
-            new ArrayList<>(),
-            null
-        );
+                null,
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                null,
+                null,
+                new ArrayList<>(),
+                null);
     }
 
     public boolean isAdmin(UserDTO user) {
@@ -400,4 +387,25 @@ public class UserService {
                 .stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
+
+    private Path getUserCvDir(User user) {
+        String input = "cv-salt-" + user.getId();
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            String hex = bytesToHex(hash).substring(0, 16); // 16 hex chars = 8 bytes
+            return CV_STORAGE_PATH.resolve("u" + hex);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 no disponible", e);
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
 }

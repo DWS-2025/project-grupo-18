@@ -54,8 +54,10 @@
                 <button type="button" onclick="document.getElementById('cvInput').click()">Subir CV</button>
             </form>
             {{#user.cvFileName}}
-            <a href="/profile/download_cv" target="_blank">Descargar CV</a>
+            <button id="downloadCvButton" type="button" class="btn">Descargar CV</button>
+            <button id="deleteCvButton" type="button">Borrar CV</button>
             {{/user.cvFileName}}
+
         </div>
 
         <!-- User details -->
@@ -113,21 +115,21 @@
                 body: formData,
                 credentials: "same-origin"
             })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al resetear la imagen");
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al resetear la imagen");
 
-                const img = document.getElementById("profilePhoto");
-                const timestamp = Date.now();
-                const newSrc = `/profile/image?ts=${timestamp}`;
+                    const img = document.getElementById("profilePhoto");
+                    const timestamp = Date.now();
+                    const newSrc = `/profile/image?ts=${timestamp}`;
 
-                img.onerror = function () {
-                    this.onerror = null;
-                    this.src = "/img/default-profile.jpg";
-                };
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = "/img/default-profile.jpg";
+                    };
 
-                img.src = newSrc;
-            })
-            .catch(err => alert("Error: " + err.message));
+                    img.src = newSrc;
+                })
+                .catch(err => alert("Error: " + err.message));
         });
 
         document.getElementById("cvInput").addEventListener("change", function () {
@@ -143,6 +145,25 @@
                 location.reload();
             }).catch(err => alert("Error: " + err.message));
         });
+
+        document.getElementById("deleteCvButton")?.addEventListener("click", function () {
+            const formData = new FormData();
+            formData.append("_csrf", csrfToken);
+
+            fetch("/profile/delete_cv", {
+                method: "POST",
+                body: formData
+            }).then(response => {
+                if (!response.ok) throw new Error("Error al borrar el CV");
+                location.reload();
+            }).catch(err => alert("Error: " + err.message));
+        });
+
+        document.getElementById("downloadCvButton")?.addEventListener("click", function () {
+            window.open(`/users/{{user.id}}/download_cv`, "_blank");
+        });
+
+
     </script>
 </body>
 

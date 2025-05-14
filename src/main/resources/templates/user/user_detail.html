@@ -30,7 +30,8 @@
     <div class="container">
 
         <!-- Encabezado del perfil con imagen -->
-        <div class="profile-header">
+        <div class="box">
+            <h2>Foto de Perfil</h2>
             <img id="userPhoto" src="/users/{{user.id}}/image?ts={{currentTimeMillis}}" alt="Foto de perfil"
                 class="profile-picture" onerror="this.onerror=null;this.src='/img/default-profile.jpg';">
 
@@ -44,6 +45,24 @@
                 </form>
             </div>
         </div>
+        <div class="box">
+            <h2>Currículum Vitae</h2>
+
+            <form id="uploadCvForm" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="{{token}}">
+                <input type="file" id="cvInput" name="cv" accept=".pdf" style="display:none;">
+                <button type="button" class="btn" onclick="document.getElementById('cvInput').click()">Subir CV</button>
+            </form>
+
+            {{#user.cvFileName}}
+            <div class="button-group">
+                <button id="downloadCvButton" type="button" class="btn">Descargar CV</button>
+                <button id="deleteCvButton" type="button" class="btn">Borrar CV</button>
+            </div>
+            {{/user.cvFileName}}
+
+        </div>
+
 
         <!-- Información del usuario -->
         <div class="box">
@@ -116,6 +135,43 @@
                 })
                 .catch(err => alert("Error: " + err.message));
         });
+
+        document.getElementById("cvInput").addEventListener("change", function () {
+            const formData = new FormData();
+            formData.append("cv", this.files[0]);
+            formData.append("_csrf", csrfToken);
+
+            fetch('/users/{{user.id}}/upload_cv', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al subir el CV");
+                    location.reload();
+                })
+                .catch(err => alert("Error: " + err.message));
+        });
+
+        document.getElementById("deleteCvButton")?.addEventListener("click", function () {
+            const formData = new FormData();
+            formData.append("_csrf", csrfToken);
+
+            fetch('/users/{{user.id}}/delete_cv', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al borrar el CV");
+                    location.reload();
+                })
+                .catch(err => alert("Error: " + err.message));
+        });
+
+        document.getElementById("downloadCvButton")?.addEventListener("click", function () {
+            window.open(`/users/{{user.id}}/download_cv`, "_blank");
+        });
+
+
     </script>
 
 </body>

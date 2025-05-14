@@ -54,7 +54,9 @@ public class ProfileController {
     public ResponseEntity<byte[]> getProfileImage() {
         try {
             UserDTO user = userService.getLoggedUser();
-            String contentType = user.imageContentType() != null && !user.imageContentType().isBlank() ? user.imageContentType() : "image/jpeg";
+            String contentType = user.imageContentType() != null && !user.imageContentType().isBlank()
+                    ? user.imageContentType()
+                    : "image/jpeg";
             byte[] image = user.image() != null ? user.image() : new byte[0];
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, contentType)
@@ -129,12 +131,13 @@ public class ProfileController {
         try {
             File cvFile = userService.getCvFile();
             UserDTO user = userService.getLoggedUser();
-            String originalFilename = user.cvFileName();
+            String sanitizedName = sanitizeForFilename(user.name());
+            String downloadFilename = "CV_" + sanitizedName + ".pdf";
 
             try {
                 InputStreamResource resource = new InputStreamResource(new FileInputStream(cvFile));
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFilename + "\"")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFilename + "\"")
                         .contentType(MediaType.APPLICATION_PDF)
                         .contentLength(cvFile.length())
                         .body(resource);
@@ -145,4 +148,20 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    @PostMapping("/profile/delete_cv")
+    @ResponseBody
+    public ResponseEntity<?> deleteCv() {
+        try {
+            userService.deleteCv();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+        }
+    }
+
+    private String sanitizeForFilename(String input) {
+        return input.replaceAll("[^a-zA-Z0-9]", "_");
+    }
+
 }
