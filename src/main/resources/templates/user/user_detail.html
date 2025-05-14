@@ -83,7 +83,7 @@
     </footer>
 
     <script>
-        const csrfToken = "{{token}}";
+        const csrfToken = document.querySelector("input[name='_csrf']").value;
 
         document.getElementById("photoInput").addEventListener("change", function () {
             const formData = new FormData();
@@ -103,16 +103,23 @@
         });
 
         document.getElementById("resetPhotoButton").addEventListener("click", function () {
+            const formData = new FormData();
+            formData.append("_csrf", csrfToken);
+
             fetch('/users/{{user.id}}/reset_image', {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                }
+                body: formData,
+                credentials: "same-origin"
             })
                 .then(response => {
                     if (!response.ok) throw new Error("Error al restablecer la imagen");
                     const timestamp = Date.now();
-                    document.getElementById("userPhoto").src = `/users/{{user.id}}/image?ts=${timestamp}`;
+                    const img = document.getElementById("userPhoto");
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = "/img/default-profile.jpg";
+                    };
+                    img.src = `/users/{{user.id}}/image?ts=${timestamp}`;
                 })
                 .catch(err => alert("Error: " + err.message));
         });
