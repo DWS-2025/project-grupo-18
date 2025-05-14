@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "5cc26fe6-05a6-4e71-9bdc-79a058df01d6",
-		"name": "Jobmatcher API",
+		"_postman_id": "1620de9a-9fc3-4f3e-8316-3f67cf45dd95",
+		"name": "Jobmatcher API Copy 4",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43680415",
-		"_collection_link": "https://daniel-8946244.postman.co/workspace/Testing~79aa3d29-820e-47e6-9edd-083fbed7c001/collection/43680415-5cc26fe6-05a6-4e71-9bdc-79a058df01d6?action=share&source=collection_link&creator=43680415"
+		"_collection_link": "https://daniel-8946244.postman.co/workspace/Testing~79aa3d29-820e-47e6-9edd-083fbed7c001/collection/43680415-1620de9a-9fc3-4f3e-8316-3f67cf45dd95?action=share&source=collection_link&creator=43680415"
 	},
 	"item": [
 		{
@@ -16,12 +16,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies?page=0&size=10",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies?page=0&size=10",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies"
@@ -46,12 +46,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -77,12 +77,12 @@
 							"raw": "{\n    \"name\": \"Tech Corp\",\n    \"email\": \"contact@techcorp.com\",\n    \"location\": \"Madrid\",\n    \"bio\": \"A tech company specializing in AI solutions.\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/companies",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies"
@@ -107,12 +107,12 @@
 							"raw": "{\n    \"name\": \"Updated Tech Corp\",\n    \"email\": \"newcontact@techcorp.com\",\n    \"location\": \"Barcelona\",\n    \"bio\": \"Updated bio for Tech Corp.\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/companies/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -128,12 +128,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -149,12 +149,12 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies/2/favourites",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/2/favourites",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -171,12 +171,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies/2/favourites",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/2/favourites",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -193,12 +193,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/companies/2/favourites",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/companies/2/favourites",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"companies",
@@ -220,12 +220,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/posts/",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -241,12 +241,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/posts/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -272,12 +272,12 @@
 							"raw": "{\n    \"title\": \"New Job Opportunity\",\n    \"content\": \"We are hiring a software engineer!\",\n    \"timestamp\": \"2025-04-01T10:00:00\",\n    \"authorId\": 1,\n    \"authorName\": \"John Doe\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/posts/",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -303,12 +303,12 @@
 							"raw": "{\n    \"title\": \"Updated Job Opportunity\",\n    \"content\": \"We are hiring a senior software engineer!\",\n    \"timestamp\": \"2025-04-01T10:00:00\",\n    \"authorId\": 1,\n    \"authorName\": \"John Doe\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/posts/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -324,12 +324,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/posts/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -345,12 +345,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/posts/filter?sort=asc&from=2025-04-01T00:00:00&to=2025-04-30T23:59:59&title=Job",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/posts/filter?sort=asc&from=2025-04-01T00:00:00&to=2025-04-30T23:59:59&title=Job",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"posts",
@@ -389,12 +389,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -429,12 +429,12 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/images/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -451,12 +451,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -473,12 +473,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/2",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/posts/2",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -508,12 +508,12 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/2",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/posts/2",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -530,12 +530,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/images/posts/2",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/images/posts/2",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"images",
@@ -557,12 +557,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/reviews",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/reviews",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"reviews"
@@ -577,12 +577,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/reviews/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/reviews/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"reviews",
@@ -608,12 +608,12 @@
 							"raw": "{\n    \"text\": \"Great job opportunity!\",\n    \"rating\": 5,\n    \"authorId\": 1,\n    \"postId\": 2,\n    \"authorName\": \"John Doe\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/reviews/post/2",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/reviews/post/2",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"reviews",
@@ -640,12 +640,12 @@
 							"raw": "{\n    \"text\": \"Updated review: Excellent opportunity!\",\n    \"rating\": 4,\n    \"authorId\": 1,\n    \"postId\": 1,\n    \"authorName\": \"John Doe\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/reviews/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/reviews/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"reviews",
@@ -661,12 +661,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/reviews/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/reviews/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"reviews",
@@ -687,12 +687,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/users",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"users"
@@ -707,12 +707,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"users",
@@ -738,12 +738,12 @@
 							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"1234567890\",\n    \"location\": \"Madrid\",\n    \"bio\": \"Software engineer with 5 years of experience\",\n    \"experience\": 5\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/users",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/users",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"users"
@@ -768,12 +768,12 @@
 							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.doe.updated@example.com\",\n    \"phone\": \"0987654321\",\n    \"location\": \"Barcelona\",\n    \"bio\": \"Senior software engineer with 6 years of experience\",\n    \"experience\": 6\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"users",
@@ -789,16 +789,168 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/users/1",
-							"protocol": "http",
+							"raw": "https://localhost:8443/api/users/1",
+							"protocol": "https",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8443",
 							"path": [
 								"api",
 								"users",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload CV",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "cv",
+									"value": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:8443/api/users/me/upload_cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"upload_cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download CV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/me/download_cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"download_cv"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@admin.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "https://localhost:8443/api/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/login/refresh",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"login",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/login/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"login",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Own Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me"
 							]
 						}
 					},

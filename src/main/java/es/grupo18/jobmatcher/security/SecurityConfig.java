@@ -59,11 +59,30 @@ public class SecurityConfig {
         public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .securityMatcher("/api/**")
-                                .csrf(csrf -> csrf.disable())
                                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
+                                .csrf(csrf -> csrf.disable())
                                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
-                                                .anyRequest().permitAll())
+                                                // Endpoints públicos
+                                                .requestMatchers("/api/login", "/api/login/**", "/api/register",
+                                                                "/api/register/**")
+                                                .permitAll()
+
+                                                // Gestión propia del usuario
+                                                .requestMatchers("/api/users/me/**").hasRole("USER")
+
+                                                // Gestión de todos los usuarios (solo ADMIN)
+                                                .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                                                // Posts, Reviews, Company
+                                                .requestMatchers("/api/posts/**", "/api/reviews/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers("/api/companies/**").hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers("/api/images/**").hasAnyRole("USER", "ADMIN")
+
+                                                // Todo lo demás, autenticado
+                                                .anyRequest().authenticated())
+
                                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();

@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class UserService {
@@ -345,6 +347,30 @@ public class UserService {
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
+    }
+
+    public void deleteCurrentUserAndLogout(HttpServletResponse response) {
+        UserDTO user = getLoggedUser();
+        userRepository.deleteById(user.id());
+
+        clearAuthCookies(response);
+
+        SecurityContextHolder.clearContext();
+    }
+
+    private void clearAuthCookies(HttpServletResponse response) {
+        Cookie accessCookie = new Cookie("AuthToken", null);
+        accessCookie.setPath("/");
+        accessCookie.setHttpOnly(true);
+        accessCookie.setMaxAge(0);
+
+        Cookie refreshCookie = new Cookie("RefreshToken", null);
+        refreshCookie.setPath("/");
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setMaxAge(0);
+
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
     }
 
     private UserDTO toDTO(User user) {
