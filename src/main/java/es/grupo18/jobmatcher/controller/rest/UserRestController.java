@@ -2,12 +2,22 @@ package es.grupo18.jobmatcher.controller.rest;
 
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
@@ -19,10 +29,10 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
-//    @GetMapping
-//   public Collection<UserDTO> getAll() {
-//        return userService.findAll();
-//    }
+    // @GetMapping
+    // public Collection<UserDTO> getAll() {
+    // return userService.findAll();
+    // }
 
     @GetMapping
     public Page<UserDTO> getAll(Pageable pageable) {
@@ -62,6 +72,42 @@ public class UserRestController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteOwnAccount(HttpServletResponse response) {
+        try {
+            userService.deleteCurrentUserAndLogout(response);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la cuenta");
+        }
+    }
+
+    @PostMapping("/me/upload_cv")
+    public ResponseEntity<?> uploadCv(@RequestParam("cv") MultipartFile cv) {
+        try {
+            userService.uploadCv(cv);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al subir CV: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/me/download_cv")
+    public ResponseEntity<Resource> downloadCv() {
+        try {
+            File file = userService.getCvFile();
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(file.length())
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
