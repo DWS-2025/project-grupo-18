@@ -3,6 +3,8 @@ package es.grupo18.jobmatcher.controller.web;
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -54,7 +56,9 @@ public class ProfileController {
     public ResponseEntity<byte[]> getProfileImage() {
         try {
             UserDTO user = userService.getLoggedUser();
-            String contentType = user.imageContentType() != null && !user.imageContentType().isBlank() ? user.imageContentType() : "image/jpeg";
+            String contentType = user.imageContentType() != null && !user.imageContentType().isBlank()
+                    ? user.imageContentType()
+                    : "image/jpeg";
             byte[] image = user.image() != null ? user.image() : new byte[0];
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, contentType)
@@ -108,6 +112,17 @@ public class ProfileController {
             return "redirect:/profile";
         } catch (Exception e) {
             return "redirect:/profile/edit?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+        }
+    }
+
+    @PostMapping("/profile/delete")
+    public String deleteOwnProfile(HttpServletResponse response) {
+        try {
+            userService.deleteCurrentUserAndLogout(response);
+            return "redirect:/login?message=Cuenta eliminada correctamente";
+        } catch (Exception e) {
+            return "redirect:/profile?error="
+                    + URLEncoder.encode("Error al eliminar la cuenta", StandardCharsets.UTF_8);
         }
     }
 

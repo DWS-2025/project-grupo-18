@@ -27,6 +27,11 @@
             <input type="hidden" name="_csrf" value="{{token}}">
             <button type="submit">Cerrar sesión</button>
         </form>
+        <form method="post" action="/profile/delete"
+            onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.');">
+            <input type="hidden" name="_csrf" value="{{token}}">
+            <button type="submit" class="danger-button">Eliminar Cuenta</button>
+        </form>
     </header>
 
     <div class="container">
@@ -113,21 +118,21 @@
                 body: formData,
                 credentials: "same-origin"
             })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al resetear la imagen");
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al resetear la imagen");
 
-                const img = document.getElementById("profilePhoto");
-                const timestamp = Date.now();
-                const newSrc = `/profile/image?ts=${timestamp}`;
+                    const img = document.getElementById("profilePhoto");
+                    const timestamp = Date.now();
+                    const newSrc = `/profile/image?ts=${timestamp}`;
 
-                img.onerror = function () {
-                    this.onerror = null;
-                    this.src = "/img/default-profile.jpg";
-                };
+                    img.onerror = function () {
+                        this.onerror = null;
+                        this.src = "/img/default-profile.jpg";
+                    };
 
-                img.src = newSrc;
-            })
-            .catch(err => alert("Error: " + err.message));
+                    img.src = newSrc;
+                })
+                .catch(err => alert("Error: " + err.message));
         });
 
         document.getElementById("cvInput").addEventListener("change", function () {

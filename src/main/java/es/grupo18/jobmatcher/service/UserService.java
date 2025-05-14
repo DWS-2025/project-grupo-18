@@ -8,6 +8,9 @@ import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 import es.grupo18.jobmatcher.security.RepositoryUserDetailsService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,8 @@ public class UserService {
     private CompanyMapper companyMapper;
 
     private static final String CV_STORAGE_DIR = "cv_storage";
-    private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR).toAbsolutePath().normalize();
+    private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR)
+            .toAbsolutePath().normalize();
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -70,18 +74,17 @@ public class UserService {
     public UserDTO save(UserDTO user) {
         if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
-                user.id(),
-                user.name(),
-                user.email(),
-                user.phone(),
-                user.location(),
-                user.bio(),
-                user.experience(),
-                user.image(),
-                user.imageContentType(),
-                List.of("USER"),
-                user.cvFileName()
-            );
+                    user.id(),
+                    user.name(),
+                    user.email(),
+                    user.phone(),
+                    user.location(),
+                    user.bio(),
+                    user.experience(),
+                    user.image(),
+                    user.imageContentType(),
+                    List.of("USER"),
+                    user.cvFileName());
         }
         userRepository.save(toDomain(user));
         return user;
@@ -236,6 +239,30 @@ public class UserService {
         }
     }
 
+    public void deleteCurrentUserAndLogout(HttpServletResponse response) {
+        UserDTO user = getLoggedUser();
+        userRepository.deleteById(user.id());
+
+        clearAuthCookies(response);
+        
+        SecurityContextHolder.clearContext();
+    }
+
+    private void clearAuthCookies(HttpServletResponse response) {
+        Cookie accessCookie = new Cookie("AuthToken", null);
+        accessCookie.setPath("/");
+        accessCookie.setHttpOnly(true);
+        accessCookie.setMaxAge(0);
+
+        Cookie refreshCookie = new Cookie("RefreshToken", null);
+        refreshCookie.setPath("/");
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setMaxAge(0);
+
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
+    }
+
     public void uploadCv(MultipartFile cv) throws IOException {
         logger.debug("Iniciando subida de CV para usuario autenticado");
         if (cv.isEmpty()) {
@@ -250,7 +277,8 @@ public class UserService {
         }
 
         String originalFilename = cv.getOriginalFilename();
-        if (originalFilename == null || originalFilename.isBlank() || !originalFilename.toLowerCase().endsWith(".pdf")) {
+        if (originalFilename == null || originalFilename.isBlank()
+                || !originalFilename.toLowerCase().endsWith(".pdf")) {
             logger.error("Nombre de archivo inválido: {}", originalFilename);
             throw new IllegalArgumentException("Nombre de archivo inválido");
         }
@@ -279,7 +307,8 @@ public class UserService {
 
         // Eliminar CV anterior
         if (user.getCvFileName() != null) {
-            Path oldCvPath = CV_STORAGE_PATH.resolve("user_" + user.getId()).resolve(sanitizeFilename(user.getCvFileName()));
+            Path oldCvPath = CV_STORAGE_PATH.resolve("user_" + user.getId())
+                    .resolve(sanitizeFilename(user.getCvFileName()));
             File oldCv = oldCvPath.toFile();
             if (oldCv.exists()) {
                 logger.debug("Eliminando CV anterior: {}", oldCv.getAbsolutePath());
@@ -303,7 +332,8 @@ public class UserService {
         // Verificar permisos de escritura en el directorio del usuario
         if (!Files.isWritable(userDirPath)) {
             logger.error("El directorio del usuario no tiene permisos de escritura: {}", userDir.getAbsolutePath());
-            throw new IOException("El directorio del usuario no tiene permisos de escritura: " + userDir.getAbsolutePath());
+            throw new IOException(
+                    "El directorio del usuario no tiene permisos de escritura: " + userDir.getAbsolutePath());
         }
 
         // Guardar archivo
@@ -373,18 +403,17 @@ public class UserService {
 
     public UserDTO createEmpty() {
         return new UserDTO(
-            null,
-            "",
-            "",
-            "",
-            "",
-            "",
-            0,
-            null,
-            null,
-            new ArrayList<>(),
-            null
-        );
+                null,
+                "",
+                "",
+                "",
+                "",
+                "",
+                0,
+                null,
+                null,
+                new ArrayList<>(),
+                null);
     }
 
     public boolean isAdmin(UserDTO user) {
