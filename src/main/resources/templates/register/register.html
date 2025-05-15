@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="/js/darkMode.js" defer></script>
 </head>
+
 <body class="page-centered">
 
     <header>
@@ -28,30 +30,36 @@
             <h1>Registro</h1>
             <form id="registerForm" action="/register" method="post">
                 <input type="hidden" name="_csrf" value="{{token}}">
+
                 <div class="input-group">
                     <label for="name">Nombre</label>
                     <input type="text" id="name" name="name" value="{{name}}" required>
                 </div>
+
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="{{email}}" required>
                 </div>
+
                 <div class="input-group">
                     <label for="password">Contraseña</label>
-                    <input type="password" id="encoded_password" name="encoded_password" required>
+                    <input type="password" id="password" name="password" required>
                 </div>
+
                 <div class="button-group">
                     <button type="submit">Registrarse</button>
                 </div>
             </form>
             {{#error}}
-                <div class="error">{{error}}</div>
+            <div class="error">{{error}}</div>
             {{/error}}
         </div>
     </div>
 
     <footer>
-        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        </div>
     </footer>
 </body>
+
 </html>

@@ -4,24 +4,22 @@ import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.web.csrf.CsrfToken;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +29,12 @@ public class ProfileController {
 
     @Autowired
     private UserService userService;
+
+    // OWASP HTML Sanitizer Policy
+    private static final PolicyFactory HTML_SANITIZER = Sanitizers.FORMATTING
+            .and(Sanitizers.BLOCKS)
+            .and(Sanitizers.LINKS)
+            .and(Sanitizers.STYLES);
 
     @GetMapping("/profile")
     public String showProfile(Model model, HttpServletRequest request) {
@@ -109,6 +113,26 @@ public class ProfileController {
     @PostMapping("/profile/edit")
     public String updateProfile(@ModelAttribute UserDTO updatedUser) {
         try {
+            // Sanitize the bio field to prevent XSS
+            if (updatedUser.bio() != null) {
+                if (updatedUser.bio().length() > 10000) {
+                    return "redirect:/profile/edit?error=" + URLEncoder.encode("La biografía es demasiado larga", StandardCharsets.UTF_8);
+                }
+                String safeBio = HTML_SANITIZER.sanitize(updatedUser.bio());
+                updatedUser = new UserDTO(
+                        updatedUser.id(),
+                        updatedUser.name(),
+                        updatedUser.email(),
+                        updatedUser.phone(),
+                        updatedUser.location(),
+                        safeBio,
+                        updatedUser.experience(),
+                        updatedUser.image(),
+                        updatedUser.imageContentType(),
+                        updatedUser.roles(),
+                        updatedUser.cvFileName()
+                );
+            }
             userService.updateProfile(updatedUser);
             return "redirect:/profile";
         } catch (Exception e) {
@@ -122,8 +146,7 @@ public class ProfileController {
             userService.deleteCurrentUserAndLogout(response);
             return "redirect:/login?message=Cuenta eliminada correctamente";
         } catch (Exception e) {
-            return "redirect:/profile?error="
-                    + URLEncoder.encode("Error al eliminar la cuenta", StandardCharsets.UTF_8);
+            return "redirect:/profile?error=" + URLEncoder.encode("Error al eliminar la cuenta", StandardCharsets.UTF_8);
         }
     }
 
@@ -168,10 +191,9 @@ public class ProfileController {
     public ResponseEntity<?> deleteCv() {
         try {
             userService.deleteCv();
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
         }
     }
-
 }

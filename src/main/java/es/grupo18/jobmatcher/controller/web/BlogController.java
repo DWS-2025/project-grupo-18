@@ -13,6 +13,10 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,12 +128,17 @@ public class BlogController {
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
 
-            long loggedId = userService.getLoggedUser().id();
-            boolean canEdit = postService.canEditOrDeletePost(postId, loggedId);
+            boolean canEdit = false;
+            try {
+                long loggedId = userService.getLoggedUser().id();
+                canEdit = postService.canEditOrDeletePost(postId, loggedId);
+            } catch (UsernameNotFoundException | NoSuchElementException ex) {
+            }
             model.addAttribute("canEditPost", canEdit);
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String formattedTimestamp = post.timestamp() != null ? post.timestamp().format(formatter) : "";
+            String formattedTimestamp = post.timestamp() != null
+                    ? post.timestamp().format(formatter)
+                    : "";
             model.addAttribute("formattedTimestamp", formattedTimestamp);
 
             return "blog/post_detail";
@@ -231,14 +240,22 @@ public class BlogController {
     }
 
     @GetMapping("/blog/posts/{postId}/reviews/{reviewId}")
-    public String getReview(Model model, @PathVariable long postId, @PathVariable long reviewId) {
+    public String getReview(Model model,
+            @PathVariable long postId,
+            @PathVariable long reviewId) {
         try {
             model.addAttribute("post", postService.findById(postId));
             ReviewDTO review = reviewService.findById(reviewId);
             model.addAttribute("review", review);
 
-            String username = userService.getLoggedUser().email();
-            boolean canEdit = reviewService.canEditOrDeleteReview(reviewId, username);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean canEdit = false;
+            if (auth != null
+                    && auth.isAuthenticated()
+                    && !(auth instanceof AnonymousAuthenticationToken)) {
+                String username = auth.getName();
+                canEdit = reviewService.canEditOrDeleteReview(reviewId, username);
+            }
             model.addAttribute("canEditReview", canEdit);
 
             return "blog/review_detail";
@@ -246,5 +263,5 @@ public class BlogController {
             return "blog/post_not_found";
         }
     }
-
+    
 }
