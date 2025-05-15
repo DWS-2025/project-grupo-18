@@ -60,28 +60,6 @@ public class SecurityConfig {
                 http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
                 http.formLogin(formLogin -> formLogin.disable());
                 http.httpBasic(httpBasic -> httpBasic.disable());
-                /**
-                 * http.authorizeHttpRequests(auth -> auth
-                 * // Endpoints públicos
-                 * .requestMatchers("/api/login", "/api/login/**", "/api/register",
-                 * "/api/register/**")
-                 * .permitAll()
-                 * 
-                 * // Gestión propia del usuario
-                 * .requestMatchers("/api/users/me/**").hasRole("USER")
-                 * 
-                 * // Gestión de todos los usuarios (solo ADMIN)
-                 * .requestMatchers("/api/users/**").hasRole("ADMIN")
-                 * 
-                 * // Posts, Reviews, Company
-                 * .requestMatchers("/api/posts/**", "/api/reviews/**")
-                 * .hasAnyRole("USER", "ADMIN")
-                 * .requestMatchers("/api/companies/**").hasAnyRole("USER", "ADMIN")
-                 * .requestMatchers("/api/images/**").hasAnyRole("USER", "ADMIN")
-                 * 
-                 * // Todo lo demás, autenticado
-                 * .anyRequest().authenticated());
-                 */
                 http
                                 .authorizeHttpRequests(authorize -> authorize
                                                 // PUBLIC ENDPOINTS
@@ -92,6 +70,7 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/images/posts/**").permitAll()
                                                 // ADMIN ENDPOINTS
                                                 .requestMatchers(HttpMethod.GET, "/api/companies/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/companies/**").hasRole("ADMIN")
