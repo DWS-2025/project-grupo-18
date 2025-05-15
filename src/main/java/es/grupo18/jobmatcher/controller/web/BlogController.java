@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,12 +125,17 @@ public class BlogController {
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
 
-            long loggedId = userService.getLoggedUser().id();
-            boolean canEdit = postService.canEditOrDeletePost(postId, loggedId);
+            boolean canEdit = false;
+            try {
+                long loggedId = userService.getLoggedUser().id();
+                canEdit = postService.canEditOrDeletePost(postId, loggedId);
+            } catch (UsernameNotFoundException | NoSuchElementException ex) {
+            }
             model.addAttribute("canEditPost", canEdit);
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String formattedTimestamp = post.timestamp() != null ? post.timestamp().format(formatter) : "";
+            String formattedTimestamp = post.timestamp() != null
+                    ? post.timestamp().format(formatter)
+                    : "";
             model.addAttribute("formattedTimestamp", formattedTimestamp);
 
             return "blog/post_detail";
