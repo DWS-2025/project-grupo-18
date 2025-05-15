@@ -24,11 +24,12 @@
     <header>
         <div class="header-left">
 
-            <!-- Button to navigate to the companies page -->
-            <button id="companies-btn" onclick="location.href='/companies'">🏢 Empresas</button>
+            {{#isAdmin}}
+                <!-- Botón solo visible para admins -->
+                <button onclick="location.href='/companies'">🏢 Empresas</button>
+                <button onclick="location.href='/users'">👤 Users</button>
+            {{/isAdmin}}
 
-            <!-- Button to navigate to the users page -->
-            <button id="companies-btn" onclick="location.href='/users'">👤 Users</button>
 
             <!-- Toggle switch for dark mode -->
             <label class="switch">
