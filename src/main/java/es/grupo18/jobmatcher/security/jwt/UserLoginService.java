@@ -69,20 +69,50 @@ public class UserLoginService {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already in use");
         }
-    
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setEncoded_password(passwordEncoder.encode(request.getPassword()));
         user.setRoles(List.of("USER"));
-    
+
         userRepository.save(user);
-    
+
         var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-    
+
         String token = jwtTokenProvider.generateAccessToken(userDetails);
         return new AuthResponse(AuthResponse.Status.SUCCESS, "User registered successfully.");
-    }    
+    }
+
+    public void registerAndAuthenticate(RegisterRequest req) {
+        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+        User user = new User();
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
+        user.setEncoded_password(passwordEncoder.encode(req.getPassword()));
+        user.setRoles(List.of("USER"));
+        userRepository.save(user);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
+        Authentication authToken =
+            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    public AuthResponse registerWithoutLogin(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return new AuthResponse(AuthResponse.Status.FAILURE, "Email already in use");
+        }
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setEncoded_password(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(List.of("USER"));
+        userRepository.save(user);
+        return new AuthResponse(AuthResponse.Status.SUCCESS, "User registered successfully.");
+    }
 
     public ResponseEntity<AuthResponse> refresh(HttpServletResponse response, String refreshToken) {
         try {
