@@ -1,12 +1,12 @@
 package es.grupo18.jobmatcher.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -221,9 +221,13 @@ public class PostService {
 
     public boolean canEditOrDeletePost(Long postId, Long userId) {
         return postRepository.findById(postId)
-                .map(post -> post.getAuthor().getId().equals(userId)
-                        || userService.hasRole(userId.toString(), "ADMIN"))
-                .orElse(false);
+            .map(post -> {
+                System.out.println(">>> POST OWNER: " + post.getAuthor().getId() + " | REQUEST USER: " + userId);
+                return post.getAuthor().getId().equals(userId)
+                    || userService.hasRole(userId.toString(), "ADMIN");
+            })
+            .orElse(false);
     }
+
 
 }

@@ -9,13 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
-import es.grupo18.jobmatcher.security.jwt.JWTTokenProvider;
+import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.service.PostService;
+import es.grupo18.jobmatcher.service.UserService;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -25,7 +35,7 @@ public class PostRestController {
     private PostService postService;
 
     @Autowired
-    private JWTTokenProvider jwtTokenProvider;
+    private UserService userService;
 
     @GetMapping("/")
     public Collection<PostDTO> getAllPosts() {
@@ -53,33 +63,30 @@ public class PostRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable long id,
-            @RequestBody PostDTO postDTO) {
+                                              @RequestBody PostDTO postDTO) {
         Long authUserId = getAuthenticatedUserId();
+
         if (!postService.canEditOrDeletePost(id, authUserId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "No tienes permiso para modificar este post.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este post.");
         }
+
         try {
             PostDTO existing = postService.findById(id);
             PostDTO updated = postService.update(existing, postDTO);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Post con id " + id + " no encontrado.",
-                    e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post con id " + id + " no encontrado.", e);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable long id) {
         Long authUserId = getAuthenticatedUserId();
+
         if (!postService.canEditOrDeletePost(id, authUserId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "No tienes permiso para eliminar este post.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para eliminar este post.");
         }
+
         postService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -98,10 +105,14 @@ public class PostRestController {
     }
 
     private Long getAuthenticatedUserId() {
-        String token = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getCredentials();
-        return jwtTokenProvider.getUserIdFromToken(token);
-    }
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        if (principal instanceof UserDetails userDetails) {
+            User user = userService.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            return user.getId();
+        } else {
+            throw new IllegalArgumentException("Usuario no autenticado");
+        }
+    }
 }
