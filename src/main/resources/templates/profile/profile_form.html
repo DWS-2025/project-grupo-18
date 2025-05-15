@@ -7,9 +7,8 @@
     <title>Editar Perfil</title>
     <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
     <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="/js/darkMode.js" defer></script>
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
 </head>
 
 <body class="page-centered">
@@ -69,7 +68,6 @@
                     value="{{#user.experience}}{{user.experience}}{{/user.experience}}{{^user.experience}}{{/user.experience}}"
                     min="0" max="50">
             </div>
-            
 
             <div class="button-group">
                 <button type="submit">Guardar Cambios</button>
@@ -77,22 +75,8 @@
         </form>
     </div>
 
-    <script>
-        const quill = new Quill('#quill-editor', {
-            theme: 'snow'
-        });
-        const form = document.getElementById('profileEditorForm');
-        form.onsubmit = function () {
-            const bioHtml = quill.root.innerHTML;
-            document.getElementById('bioInput').value = bioHtml;
-        };
-    </script>
-
-    <footer>
-        <div class="copyright">
-            &copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
-        </div>
-    </footer>
+    <script src="/js/darkMode.js"></script>
+    <script src="/js/profileForm.js"></script>
 
 </body>
 

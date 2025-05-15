@@ -125,48 +125,56 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
+       @Bean
         @Order(2)
         public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline' https://cdn.quilljs.com; " +
+                                        "style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; " +
+                                        "img-src 'self' data:; " +
+                                        "font-src 'self' https://cdn.quilljs.com; " +
+                                        "object-src 'none'; " +
+                                        "frame-src 'none'; " +
+                                        "base-uri 'self'; " +
+                                        "form-action 'self'; " +
+                                        "connect-src 'self'"
+                                )))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/main", "/register", "/login", "/loginerror", "/error/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/blog", "/blog/posts", "/blog/posts/*", "/blog/posts/*/image", "/blog/posts/*/reviews/*").permitAll()
+                        .requestMatchers("/matches/**").hasRole("USER")
+                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        .requestMatchers("/companies/**").hasRole("ADMIN")
+                        .requestMatchers("/profile/**").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/main", true)
+                        .permitAll())
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                String uri = request.getRequestURI();
+                                if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                response.sendRedirect("/main");
+                                } else {
+                                response.sendError(403);
+                                }
+                        })
+                        .authenticationEntryPoint((request, response, authException) -> {
+                                String uri = request.getRequestURI();
+                                if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                response.sendRedirect("/main");
+                                } else {
+                                response.sendRedirect("/login");
+                                }
+                        }));
 
-                http
-                                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/", "/main", "/register", "/login", "/loginerror",
-                                                                "/error/**", "/css/**", "/js/**", "/img/**")
-                                                .permitAll()
-                                                .requestMatchers("/blog", "/blog/posts", "/blog/posts/*",
-                                                                "/blog/posts/*/image", "/blog/posts/*/reviews/*")
-                                                .permitAll()
-                                                .requestMatchers("/matches/**").hasRole("USER")
-                                                .requestMatchers("/users/**").hasRole("ADMIN")
-                                                .requestMatchers("/companies/**").hasRole("ADMIN")
-                                                .requestMatchers("/profile/**").hasRole("USER")
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .anyRequest().authenticated())
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .defaultSuccessUrl("/main", true)
-                                                .permitAll())
-                                .exceptionHandling(ex -> ex
-                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                                        String uri = request.getRequestURI();
-                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                                                                response.sendRedirect("/main");
-                                                        } else {
-                                                                response.sendError(403);
-                                                        }
-                                                })
-                                                .authenticationEntryPoint((request, response, authException) -> {
-                                                        String uri = request.getRequestURI();
-                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                                                                response.sendRedirect("/main");
-                                                        } else {
-                                                                response.sendRedirect("/login");
-                                                        }
-                                                }));
-
-                return http.build();
+        return http.build();
         }
-
-}
+        }
