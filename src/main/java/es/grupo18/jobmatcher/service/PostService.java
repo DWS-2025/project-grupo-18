@@ -2,11 +2,18 @@ package es.grupo18.jobmatcher.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,14 +72,14 @@ public class PostService {
         byte[] imageBytes = null;
         String contentType = null;
 
-        if (image != null && !image.isEmpty()) {
-            imageBytes = image.getBytes();
-            contentType = image.getContentType();
-        }
-
         Post post = new Post(title, content, LocalDateTime.now(), imageBytes,
                 userMapper.toDomain(userService.getLoggedUser()));
         post.setImageContentType(contentType);
+
+        if (image != null && !image.isEmpty()) {
+            processAndSaveImage(post, image);
+        }
+
         postRepository.save(post);
         return toDTO(post);
     }
@@ -108,8 +115,7 @@ public class PostService {
         post.setTimestamp(LocalDateTime.now());
 
         if (image != null && !image.isEmpty()) {
-            post.setImage(image.getBytes());
-            post.setImageContentType(image.getContentType());
+            processAndSaveImage(post, image);
         }
 
         postRepository.save(post);
@@ -121,13 +127,61 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         if (file != null && !file.isEmpty()) {
-            post.setImage(file.getBytes());
-            post.setImageContentType(file.getContentType());
+            processAndSaveImage(post, file);
             post.setTimestamp(LocalDateTime.now());
             postRepository.save(post);
         } else {
             throw new RuntimeException("File empty");
         }
+
+    }
+
+    private void validateImage(MultipartFile file) throws IOException {
+        if (file.isEmpty())
+            throw new IllegalArgumentException("Archivo vacío.");
+        if (file.getSize() > 2 * 1024 * 1024)
+            throw new IllegalArgumentException("Máximo permitido: 2MB");
+
+        String contentType = file.getContentType();
+        if (!List.of("image/jpeg", "image/png").contains(contentType)) {
+            throw new IllegalArgumentException("Solo se permiten JPEG o PNG");
+        }
+
+        try (InputStream is = file.getInputStream()) {
+            byte[] header = new byte[8];
+            is.read(header);
+            if (!(isJpeg(header) || isPng(header))) {
+                throw new IllegalArgumentException("Cabecera inválida. El archivo no es una imagen válida.");
+            }
+        }
+
+        BufferedImage img = ImageIO.read(file.getInputStream());
+        if (img == null) {
+            throw new IllegalArgumentException("La imagen está corrupta o no se puede procesar.");
+        }
+    }
+
+    private void processAndSaveImage(Post post, MultipartFile image) throws IOException {
+        validateImage(image);
+        BufferedImage original = ImageIO.read(image.getInputStream());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String format = image.getContentType().equals("image/png") ? "png" : "jpg";
+        ImageIO.write(original, format, baos);
+        baos.flush();
+
+        post.setImage(baos.toByteArray());
+        post.setImageContentType(image.getContentType());
+        baos.close();
+    }
+
+    private boolean isJpeg(byte[] header) {
+        return header[0] == (byte) 0xFF && header[1] == (byte) 0xD8;
+    }
+
+    private boolean isPng(byte[] header) {
+        return header[0] == (byte) 0x89 && header[1] == (byte) 0x50 &&
+                header[2] == (byte) 0x4E && header[3] == (byte) 0x47;
     }
 
     public void deleteById(long id) {

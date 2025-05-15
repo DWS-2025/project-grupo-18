@@ -25,13 +25,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -104,7 +108,21 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!image.isEmpty()) {
-            existingUser.setImage(image.getBytes());
+            validateImage(image);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BufferedImage originalImage = ImageIO.read(image.getInputStream());
+            if (originalImage == null) {
+                throw new IllegalArgumentException("La imagen no se puede procesar.");
+            }
+
+            // Escribe en formato limpio (usa png o jpeg según el contentType)
+            String format = image.getContentType().equals("image/png") ? "png" : "jpg";
+            ImageIO.write(originalImage, format, baos);
+            baos.flush();
+
+            existingUser.setImage(baos.toByteArray());
+            baos.close();
+
             existingUser.setImageContentType(image.getContentType());
         }
 
@@ -198,54 +216,95 @@ public class UserService {
 
     public void removeImage() {
         UserDTO dto = getLoggedUser();
-        User existingUser = userRepository.findById(dto.id())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        existingUser.setImage(null);
-        existingUser.setImageContentType(null);
-        userRepository.save(existingUser);
+        removeImageById(dto.id());
     }
 
     public void removeImageById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        clearImage(user);
+    }
 
+    private void clearImage(User user) {
         if (user.getImage() == null) {
             throw new RuntimeException("Image not found");
         }
-
         user.setImage(null);
         user.setImageContentType(null);
         userRepository.save(user);
     }
 
-    public void updateUserImage(MultipartFile image) throws IOException {
-        if (!image.isEmpty()) {
-            UserDTO dto = getLoggedUser();
-            User existingUser = userRepository.findById(dto.id())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    private void processAndSaveImage(User user, MultipartFile image) throws IOException {
+        validateImage(image);
 
-            String contentType = image.getContentType();
-            if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/jpg") ||
-                    contentType.equals("image/png") || contentType.equals("image/webp"))) {
-                throw new IllegalArgumentException("Formato de imagen no válido");
-            }
-
-            existingUser.setImage(image.getBytes());
-            existingUser.setImageContentType(contentType);
-            userRepository.save(existingUser);
+        if (image.isEmpty()) {
+            throw new IllegalArgumentException("La imagen no puede estar vacía");
         }
+
+        BufferedImage originalImage = ImageIO.read(image.getInputStream());
+        if (originalImage == null) {
+            throw new IllegalArgumentException("La imagen no se puede procesar.");
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String format = image.getContentType().equals("image/png") ? "png" : "jpg";
+        ImageIO.write(originalImage, format, baos);
+        baos.flush();
+
+        user.setImage(baos.toByteArray());
+        user.setImageContentType(image.getContentType());
+
+        baos.close();
+        userRepository.save(user);
+    }
+
+    public void updateUserImage(MultipartFile image) throws IOException {
+        UserDTO dto = getLoggedUser();
+        User user = userRepository.findById(dto.id())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        processAndSaveImage(user, image);
     }
 
     public void updateUserImage(Long id, MultipartFile image) throws IOException {
-        if (!image.isEmpty()) {
-            User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        processAndSaveImage(user, image);
+    }
 
-            existingUser.setImage(image.getBytes());
-            existingUser.setImageContentType(image.getContentType());
-            userRepository.save(existingUser);
+    private void validateImage(MultipartFile file) throws IOException {
+        if (file.isEmpty())
+            throw new IllegalArgumentException("Archivo vacío.");
+        if (file.getSize() > 2 * 1024 * 1024)
+            throw new IllegalArgumentException("Máximo permitido: 2MB");
+
+        String contentType = file.getContentType();
+        if (!List.of("image/jpeg", "image/png").contains(contentType)) {
+            throw new IllegalArgumentException("Solo se permiten JPEG o PNG");
         }
+
+        try (InputStream is = file.getInputStream()) {
+            byte[] header = new byte[8];
+            is.read(header);
+            if (!(isJpeg(header) || isPng(header))) {
+                throw new IllegalArgumentException("Cabecera inválida. El archivo no es una imagen válida.");
+            }
+        }
+
+        // Validar que puede parsearse como imagen
+        BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
+        if (bufferedImage == null) {
+            throw new IllegalArgumentException("La imagen está corrupta o no se puede procesar.");
+        }
+
+    }
+
+    private boolean isJpeg(byte[] header) {
+        return header[0] == (byte) 0xFF && header[1] == (byte) 0xD8;
+    }
+
+    private boolean isPng(byte[] header) {
+        return header[0] == (byte) 0x89 && header[1] == (byte) 0x50 &&
+                header[2] == (byte) 0x4E && header[3] == (byte) 0x47;
     }
 
     public void uploadCv(MultipartFile file) throws IOException {
@@ -369,19 +428,6 @@ public class UserService {
         }
     }
 
-    public void removeImage(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (user.getImage() == null) {
-            throw new RuntimeException("Image not found");
-        }
-
-        user.setImage(null);
-        user.setImageContentType(null);
-        userRepository.save(user);
-    }
-
     public void deleteCurrentUserAndLogout(HttpServletResponse response) {
         UserDTO user = getLoggedUser();
         userRepository.deleteById(user.id());
@@ -389,6 +435,12 @@ public class UserService {
         clearAuthCookies(response);
 
         SecurityContextHolder.clearContext();
+    }
+
+    public void removeImage(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        clearImage(user);
     }
 
     private void clearAuthCookies(HttpServletResponse response) {
