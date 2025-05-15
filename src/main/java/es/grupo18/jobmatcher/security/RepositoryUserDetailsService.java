@@ -30,9 +30,13 @@ public class RepositoryUserDetailsService implements UserDetailsService {
             roles.add(new SimpleGrantedAuthority("ROLE_" + role));
         }
 
+        if (user.getEncoded_password() == null || user.getEncoded_password().isBlank()) {
+            throw new UsernameNotFoundException("Password not set for user with email: " + email);
+        }
+
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getEncoded_password(), roles);
     }
-    
+
 }

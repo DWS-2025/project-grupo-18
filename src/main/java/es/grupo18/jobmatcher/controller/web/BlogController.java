@@ -124,8 +124,8 @@ public class BlogController {
             model.addAttribute("postId", postId);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
 
-            String username = userService.getLoggedUser().email();
-            boolean canEdit = postService.canEditOrDeletePost(postId, username);
+            long loggedId = userService.getLoggedUser().id();
+            boolean canEdit = postService.canEditOrDeletePost(postId, loggedId);
             model.addAttribute("canEditPost", canEdit);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

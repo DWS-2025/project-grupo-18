@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,18 +24,12 @@ import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-        private final JWTRequestFilter jwtRequestFilter;
-        private final UnauthorizedHandlerJWT unauthorizedHandlerJWT;
-        private final RepositoryUserDetailsService userDetailsService;
-
         @Autowired
-        public SecurityConfig(JWTRequestFilter jwtRequestFilter,
-                        UnauthorizedHandlerJWT unauthorizedHandlerJWT,
-                        RepositoryUserDetailsService userDetailsService) {
-                this.jwtRequestFilter = jwtRequestFilter;
-                this.unauthorizedHandlerJWT = unauthorizedHandlerJWT;
-                this.userDetailsService = userDetailsService;
-        }
+        private JWTRequestFilter jwtRequestFilter;
+        @Autowired
+        private UnauthorizedHandlerJWT unauthorizedHandlerJWT;
+        @Autowired
+        private RepositoryUserDetailsService userDetailsService;
 
         @Bean
         public PasswordEncoder passwordEncoder() {
@@ -57,33 +52,75 @@ public class SecurityConfig {
         @Bean
         @Order(1)
         public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+                http.authenticationProvider(authenticationProvider());
                 http
                                 .securityMatcher("/api/**")
-                                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
-                                .csrf(csrf -> csrf.disable())
-                                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authorizeHttpRequests(auth -> auth
-                                                // Endpoints públicos
+                                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT));
+                http.csrf(csrf -> csrf.disable());
+                http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                http.formLogin(formLogin -> formLogin.disable());
+                http.httpBasic(httpBasic -> httpBasic.disable());
+                http
+                                .authorizeHttpRequests(authorize -> authorize
+                                                // PUBLIC ENDPOINTS
                                                 .requestMatchers("/api/login", "/api/login/**", "/api/register",
                                                                 "/api/register/**")
                                                 .permitAll()
-
-                                                // Gestión propia del usuario
-                                                .requestMatchers("/api/users/me/**").hasRole("USER")
-
-                                                // Gestión de todos los usuarios (solo ADMIN)
-                                                .requestMatchers("/api/users/**").hasRole("ADMIN")
-
-                                                // Posts, Reviews, Company
-                                                .requestMatchers("/api/posts/**", "/api/reviews/**")
+                                                .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/images/posts/**").permitAll()
+                                                // ADMIN ENDPOINTS
+                                                .requestMatchers(HttpMethod.GET, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/companies/**")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                                                // USER ENDPOINTS
+                                                .requestMatchers(HttpMethod.POST, "/api/companies/*/favourites")
                                                 .hasAnyRole("USER", "ADMIN")
-                                                .requestMatchers("/api/companies/**").hasAnyRole("USER", "ADMIN")
-                                                .requestMatchers("/api/images/**").hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/companies/*/favourites")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/companies/*/favourites")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/posts")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/images/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/reviews/post/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/reviews/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/users/me/cv")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/users/me/cv")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/users/me")
+                                                .hasAnyRole("USER", "ADMIN")
 
-                                                // Todo lo demás, autenticado
-                                                .anyRequest().authenticated())
-
-                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                                                .anyRequest().authenticated());
+                http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
@@ -91,9 +128,9 @@ public class SecurityConfig {
         @Bean
         @Order(2)
         public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+
                 http
-                                .csrf(csrf -> csrf
-                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/", "/main", "/register", "/login", "/loginerror",
                                                                 "/error/**", "/css/**", "/js/**", "/img/**")
@@ -102,7 +139,7 @@ public class SecurityConfig {
                                                                 "/blog/posts/*/image", "/blog/posts/*/reviews/*")
                                                 .permitAll()
                                                 .requestMatchers("/matches/**").hasRole("USER")
-                                                .requestMatchers("/users/**").hasAnyRole("ADMIN")
+                                                .requestMatchers("/users/**").hasRole("ADMIN")
                                                 .requestMatchers("/companies/**").hasRole("ADMIN")
                                                 .requestMatchers("/profile/**").hasRole("USER")
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -110,7 +147,25 @@ public class SecurityConfig {
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .defaultSuccessUrl("/main", true)
-                                                .permitAll());
+                                                .permitAll())
+                                .exceptionHandling(ex -> ex
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        String uri = request.getRequestURI();
+                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                                                response.sendRedirect("/main");
+                                                        } else {
+                                                                response.sendError(403);
+                                                        }
+                                                })
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        String uri = request.getRequestURI();
+                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                                                response.sendRedirect("/main");
+                                                        } else {
+                                                                response.sendRedirect("/login");
+                                                        }
+                                                }));
+
                 return http.build();
         }
 

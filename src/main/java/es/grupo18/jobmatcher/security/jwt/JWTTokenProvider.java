@@ -4,10 +4,13 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import es.grupo18.jobmatcher.model.User;
+import es.grupo18.jobmatcher.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
@@ -17,6 +20,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class JWTTokenProvider {
+
+    @Autowired
+    private UserService userService;
 
     private final SecretKey jwtSecret = Jwts.SIG.HS256.key().build();
     private final JwtParser jwtParser = Jwts.parser().verifyWith(jwtSecret).build();
@@ -73,13 +79,24 @@ public class JWTTokenProvider {
     private JwtBuilder buildToken(TokenType tokenType, UserDetails userDetails) {
         var currentDate = new Date();
         var expiryDate = Date.from(new Date().toInstant().plus(tokenType.duration));
+
+        User user = userService.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado para el email"));
+
         return Jwts.builder()
                 .claim("roles", userDetails.getAuthorities())
                 .claim("type", tokenType.name())
+                .claim("userId", user.getId())
                 .subject(userDetails.getUsername())
                 .issuedAt(currentDate)
                 .expiration(expiryDate)
                 .signWith(jwtSecret);
+
     }
-    
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+        return claims.get("userId", Long.class);
+    }
+
 }

@@ -1,7 +1,6 @@
 package es.grupo18.jobmatcher.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -98,8 +97,8 @@ public class PostService {
     }
 
     public PostDTO update(long id, String title, String content, MultipartFile image) throws IOException {
-        String email = userService.getLoggedUser().email();
-        if (!canEditOrDeletePost(id, email)) {
+        long loggedId = userService.getLoggedUser().id();
+        if (!canEditOrDeletePost(id, loggedId)) {
             throw new SecurityException("No tienes permiso para editar este post");
         }
 
@@ -132,8 +131,8 @@ public class PostService {
     }
 
     public void deleteById(long id) {
-        String email = userService.getLoggedUser().email();
-        if (!canEditOrDeletePost(id, email)) {
+        long loggedId = userService.getLoggedUser().id();
+        if (!canEditOrDeletePost(id, loggedId)) {
             throw new SecurityException("No tienes permiso para eliminar este post");
         }
 
@@ -220,10 +219,11 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public boolean canEditOrDeletePost(Long postId, String username) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("Post no encontrado"));
-        return post.getAuthor().getEmail().equals(username) || userService.hasRole(username, "ADMIN");
+    public boolean canEditOrDeletePost(Long postId, Long userId) {
+        return postRepository.findById(postId)
+                .map(post -> post.getAuthor().getId().equals(userId)
+                        || userService.hasRole(userId.toString(), "ADMIN"))
+                .orElse(false);
     }
 
 }
