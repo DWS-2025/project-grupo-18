@@ -24,21 +24,26 @@ public class JWTTokenProvider {
     @Autowired
     private UserService userService;
 
+    // Clave secreta generada para HS256 (puedes sustituir por tu clave real si prefieres)
     private final SecretKey jwtSecret = Jwts.SIG.HS256.key().build();
+
+    // Parser que se reutiliza para verificar tokens
     private final JwtParser jwtParser = Jwts.parser().verifyWith(jwtSecret).build();
 
+    // Para usar Authorization: Bearer ...
     public String tokenStringFromHeaders(HttpServletRequest req) {
         String bearerToken = req.getHeader(HttpHeaders.AUTHORIZATION);
-        if (bearerToken == null) {
+        if (bearerToken == null || bearerToken.isBlank()) {
             throw new IllegalArgumentException("Missing Authorization header");
         }
         if (!bearerToken.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Authorization header does not start with Bearer: " + bearerToken);
+            throw new IllegalArgumentException("Authorization header must start with Bearer");
         }
         return bearerToken.substring(7);
     }
 
-    private String tokenStringFromCookies(HttpServletRequest request) {
+    // ✅ Ahora es público: se puede usar en los controladores como PostRestController
+    public String tokenStringFromCookies(HttpServletRequest request) {
         var cookies = request.getCookies();
         if (cookies == null) {
             throw new IllegalArgumentException("No cookies found in request");
@@ -47,11 +52,9 @@ public class JWTTokenProvider {
         for (Cookie cookie : cookies) {
             if (TokenType.ACCESS.cookieName.equals(cookie.getName())) {
                 String accessToken = cookie.getValue();
-                if (accessToken == null) {
-                    throw new IllegalArgumentException(
-                            "Cookie %s has null value".formatted(TokenType.ACCESS.cookieName));
+                if (accessToken == null || accessToken.isBlank()) {
+                    throw new IllegalArgumentException("Access token cookie is empty");
                 }
-
                 return accessToken;
             }
         }
@@ -72,31 +75,38 @@ public class JWTTokenProvider {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        var token = buildToken(TokenType.REFRESH, userDetails);
-        return token.compact();
+        return buildToken(TokenType.REFRESH, userDetails).compact();
     }
 
     private JwtBuilder buildToken(TokenType tokenType, UserDetails userDetails) {
-        var currentDate = new Date();
-        var expiryDate = Date.from(new Date().toInstant().plus(tokenType.duration));
+        var now = new Date();
+        var expiry = Date.from(now.toInstant().plus(tokenType.duration));
 
         User user = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado para el email"));
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         return Jwts.builder()
                 .claim("roles", userDetails.getAuthorities())
                 .claim("type", tokenType.name())
                 .claim("userId", user.getId())
                 .subject(userDetails.getUsername())
-                .issuedAt(currentDate)
-                .expiration(expiryDate)
+                .issuedAt(now)
+                .expiration(expiry)
                 .signWith(jwtSecret);
-
     }
 
     public Long getUserIdFromToken(String token) {
-        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
-        return claims.get("userId", Long.class);
-    }
+        if (token == null || token.trim().isEmpty()) {
+            throw new IllegalArgumentException("El token JWT no puede ser nulo o vacío.");
+        }
 
+        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+
+        Object userId = claims.get("userId");
+        if (userId == null) {
+            throw new IllegalArgumentException("El token no contiene el campo 'userId'");
+        }
+
+        return Long.parseLong(userId.toString());
+    }
 }
