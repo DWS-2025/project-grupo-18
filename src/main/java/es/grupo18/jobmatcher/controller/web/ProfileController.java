@@ -191,7 +191,7 @@ public class ProfileController {
     public ResponseEntity<?> deleteCv() {
         try {
             userService.deleteCv();
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
         }

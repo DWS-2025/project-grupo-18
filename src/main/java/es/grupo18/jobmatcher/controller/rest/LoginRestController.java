@@ -4,25 +4,13 @@ import es.grupo18.jobmatcher.security.jwt.AuthResponse;
 import es.grupo18.jobmatcher.security.jwt.LoginRequest;
 import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import jakarta.servlet.http.HttpServletResponse;
-import es.grupo18.jobmatcher.security.jwt.JWTTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/login")
 public class LoginRestController {
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JWTTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Autowired
     private UserLoginService userLoginService;
