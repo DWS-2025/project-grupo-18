@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -177,18 +178,22 @@ public class UserController {
     public ResponseEntity<Resource> downloadUserCv(@PathVariable Long userId) {
         try {
             File cvFile = userService.getCvFile(userId);
-            UserDTO user = userService.findById(userId);
-            String sanitizedName = user.name().replaceAll("[^a-zA-Z0-9]", "_");
-            String downloadName = "CV_" + sanitizedName + ".pdf";
 
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(cvFile));
+            if (!cvFile.exists() || !cvFile.isFile()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            UserDTO user = userService.findById(userId);
+            String safeFilename = user.cvFileName().replaceAll("[\\r\\n\"]", "_");
+
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadName + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + safeFilename + "\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store, no-cache, must-revalidate")
                     .contentType(MediaType.APPLICATION_PDF)
                     .contentLength(cvFile.length())
-                    .body(resource);
+                    .body(new FileSystemResource(cvFile));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.notFound().build();
         }
     }
 

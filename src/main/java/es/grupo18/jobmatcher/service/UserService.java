@@ -257,10 +257,12 @@ public class UserService {
 
         deleteExistingCv(user, userDir);
 
-        String newFileName = UUID.randomUUID() + ".pdf";
-        file.transferTo(userDir.resolve(newFileName));
+        String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        Path destination = userDir.resolve(originalFileName);
+        file.transferTo(destination);
 
-        user.setCvFileName(newFileName);
+        user.setCvFileName(originalFileName);
+
         userRepository.save(user);
     }
 
@@ -273,7 +275,8 @@ public class UserService {
         if (user.getCvFileName() == null)
             throw new IllegalStateException("No hay CV disponible");
 
-        Path path = getUserCvDir(user).resolve(sanitizeFilename(user.getCvFileName()));
+        Path userDir = getUserCvDir(user);
+        Path path = userDir.resolve(Paths.get(user.getCvFileName()).getFileName().toString());
         File file = path.toFile();
         if (!file.exists())
             throw new IllegalStateException("Archivo CV no encontrado");
@@ -291,8 +294,8 @@ public class UserService {
             return;
 
         Path userDir = getUserCvDir(user);
-        Path cvPath = userDir.resolve(sanitizeFilename(user.getCvFileName()));
-        Files.deleteIfExists(cvPath);
+        Path path = userDir.resolve(Paths.get(user.getCvFileName()).getFileName().toString());
+        Files.deleteIfExists(path);
 
         File dir = userDir.toFile();
         if (dir.exists() && dir.isDirectory() && dir.list().length == 0)
@@ -308,16 +311,45 @@ public class UserService {
     }
 
     private void validatePdf(MultipartFile file) throws IOException {
+        validateNotEmpty(file);
+        validateMimeType(file);
+        validateFileName(file);
+        validateFileSize(file);
+        validatePdfHeader(file);
+    }
+
+    private void validateNotEmpty(MultipartFile file) {
         if (file.isEmpty())
             throw new IllegalArgumentException("El archivo está vacío");
+    }
 
+    private void validateMimeType(MultipartFile file) {
         if (!"application/pdf".equals(file.getContentType()))
             throw new IllegalArgumentException("Solo se permiten archivos PDF");
+    }
 
-        String name = file.getOriginalFilename();
-        if (name == null || !name.toLowerCase().endsWith(".pdf"))
+    private void validateFileName(MultipartFile file) {
+        String name = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        if (file.getOriginalFilename() == null)
+            throw new IllegalArgumentException("Nombre de archivo no válido");
+        if (!name.matches("^[a-zA-Z0-9._-]+$"))
+            throw new IllegalArgumentException("El nombre del archivo contiene caracteres no permitidos");
+        if (!name.toLowerCase().endsWith(".pdf"))
             throw new IllegalArgumentException("Nombre de archivo inválido");
+        if (name.equalsIgnoreCase(".pdf"))
+            throw new IllegalArgumentException("El nombre del archivo no puede ser solo la extensión");
+        if (name.toLowerCase().matches(".*\\.pdf\\..+"))
+            throw new IllegalArgumentException("El archivo contiene múltiples extensiones sospechosas");
+        if (name.length() > 50)
+            throw new IllegalArgumentException("El nombre del archivo es demasiado largo");
+    }
 
+    private void validateFileSize(MultipartFile file) {
+        if (file.getSize() > 10 * 1024 * 1024)
+            throw new IllegalArgumentException("File is too large");
+    }
+
+    private void validatePdfHeader(MultipartFile file) throws IOException {
         try (InputStream in = file.getInputStream()) {
             byte[] header = new byte[4];
             if (in.read(header) != 4 || header[0] != '%' || header[1] != 'P' || header[2] != 'D' || header[3] != 'F')
@@ -327,13 +359,9 @@ public class UserService {
 
     private void deleteExistingCv(User user, Path userDir) throws IOException {
         if (user.getCvFileName() != null) {
-            Path path = userDir.resolve(sanitizeFilename(user.getCvFileName()));
+            Path path = userDir.resolve(Paths.get(user.getCvFileName()).getFileName().toString());
             Files.deleteIfExists(path);
         }
-    }
-
-    private String sanitizeFilename(String filename) {
-        return filename.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     public void removeImage(Long id) {

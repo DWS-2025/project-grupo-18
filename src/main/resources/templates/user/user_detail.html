@@ -153,7 +153,9 @@
                 body: formData
             })
                 .then(response => {
-                    if (!response.ok) throw new Error("Error al subir el CV");
+                    if (!response.ok) {
+                        throw new Error("No se pudo subir el CV. Asegúrate de que el archivo es un PDF válido y que el nombre no contenga espacios, tildes, símbolos ni caracteres especiales. Solo se permiten letras, números, guiones (-), guiones bajos (_) y puntos (.)");
+                    }
                     location.reload();
                 })
                 .catch(err => alert("Error: " + err.message));

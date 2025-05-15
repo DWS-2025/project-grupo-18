@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -143,22 +144,22 @@ public class ProfileController {
     public ResponseEntity<Resource> downloadCv() {
         try {
             File cvFile = userService.getCvFile();
-            UserDTO user = userService.getLoggedUser();
-            String sanitizedName = sanitizeForFilename(user.name());
-            String downloadFilename = "CV_" + sanitizedName + ".pdf";
 
-            try {
-                InputStreamResource resource = new InputStreamResource(new FileInputStream(cvFile));
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFilename + "\"")
-                        .contentType(MediaType.APPLICATION_PDF)
-                        .contentLength(cvFile.length())
-                        .body(resource);
-            } catch (FileNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
+            if (!cvFile.exists() || !cvFile.isFile())
+                return ResponseEntity.notFound().build();
+
+            UserDTO user = userService.getLoggedUser();
+            String safeFilename = user.cvFileName().replaceAll("[\\r\\n\"]", "_");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + safeFilename + "\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store, no-cache, must-revalidate")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(cvFile.length())
+                    .body(new FileSystemResource(cvFile));
+
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -171,10 +172,6 @@ public class ProfileController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
         }
-    }
-
-    private String sanitizeForFilename(String input) {
-        return input.replaceAll("[^a-zA-Z0-9]", "_");
     }
 
 }

@@ -146,7 +146,9 @@
                 method: "POST",
                 body: formData
             }).then(response => {
-                if (!response.ok) throw new Error("Error al subir el CV");
+                if (!response.ok) {
+                    throw new Error("No se pudo subir el CV. Asegúrate de que el archivo es un PDF válido, no supera el tamaño permitido y que el nombre no contenga espacios, tildes, símbolos ni caracteres especiales. Solo se permiten letras, números, guiones (-), guiones bajos (_) y puntos (.)");
+                }
                 location.reload();
             }).catch(err => alert("Error: " + err.message));
         });
@@ -165,7 +167,7 @@
         });
 
         document.getElementById("downloadCvButton")?.addEventListener("click", function () {
-            window.open(`/users/{{user.id}}/download_cv`, "_blank");
+            window.open(`/profile/download_cv`, "_blank");
         });
 
 
