@@ -84,13 +84,20 @@ public class SecurityConfig {
                  */
                 http
                                 .authorizeHttpRequests(authorize -> authorize
+                                                // PUBLIC ENDPOINTS
+                                                .requestMatchers("/api/login", "/api/login/**", "/api/register",
+                                                                "/api/register/**")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
                                                 // ADMIN ENDPOINTS
                                                 .requestMatchers(HttpMethod.GET, "/api/companies/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/companies/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.PUT, "/api/companies/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/companies/**")
                                                 .hasRole("ADMIN")
-                                                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
                                                 .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
@@ -132,11 +139,8 @@ public class SecurityConfig {
                                                 .hasAnyRole("USER", "ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/users/me")
                                                 .hasAnyRole("USER", "ADMIN")
-                                                // PUBLIC ENDPOINTS
-                                                .requestMatchers("/api/login", "/api/login/**", "/api/register",
-                                                                "/api/register/**")
-                                                .permitAll()
-                                                .anyRequest().permitAll());
+
+                                                .anyRequest().authenticated());
                 http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
