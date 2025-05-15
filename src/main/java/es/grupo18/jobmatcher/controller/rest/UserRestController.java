@@ -85,7 +85,7 @@ public class UserRestController {
         }
     }
 
-    @PostMapping("/me/upload_cv")
+    @PostMapping("/me/cv")
     public ResponseEntity<?> uploadCv(@RequestParam("cv") MultipartFile cv) {
         try {
             userService.uploadCv(cv);
@@ -95,7 +95,7 @@ public class UserRestController {
         }
     }
 
-    @GetMapping("/me/download_cv")
+    @GetMapping("/me/cv")
     public ResponseEntity<Resource> downloadCv() {
         try {
             File file = userService.getCvFile();

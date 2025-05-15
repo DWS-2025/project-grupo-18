@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,97 +24,166 @@ import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JWTRequestFilter jwtRequestFilter;
-    private final UnauthorizedHandlerJWT unauthorizedHandlerJWT;
-    private final RepositoryUserDetailsService userDetailsService;
+        @Autowired
+        private JWTRequestFilter jwtRequestFilter;
+        @Autowired
+        private UnauthorizedHandlerJWT unauthorizedHandlerJWT;
+        @Autowired
+        private RepositoryUserDetailsService userDetailsService;
 
-    @Autowired
-    public SecurityConfig(JWTRequestFilter jwtRequestFilter,
-                          UnauthorizedHandlerJWT unauthorizedHandlerJWT,
-                          RepositoryUserDetailsService userDetailsService) {
-        this.jwtRequestFilter = jwtRequestFilter;
-        this.unauthorizedHandlerJWT = unauthorizedHandlerJWT;
-        this.userDetailsService = userDetailsService;
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider() {
+                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+                authProvider.setUserDetailsService(userDetailsService);
+                authProvider.setPasswordEncoder(passwordEncoder());
+                return authProvider;
+        }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+        @Bean
+        @Order(1)
+        public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+                http.authenticationProvider(authenticationProvider());
+                http
+                                .securityMatcher("/api/**")
+                                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT));
+                http.csrf(csrf -> csrf.disable());
+                http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                http.formLogin(formLogin -> formLogin.disable());
+                http.httpBasic(httpBasic -> httpBasic.disable());
+                /**
+                 * http.authorizeHttpRequests(auth -> auth
+                 * // Endpoints públicos
+                 * .requestMatchers("/api/login", "/api/login/**", "/api/register",
+                 * "/api/register/**")
+                 * .permitAll()
+                 * 
+                 * // Gestión propia del usuario
+                 * .requestMatchers("/api/users/me/**").hasRole("USER")
+                 * 
+                 * // Gestión de todos los usuarios (solo ADMIN)
+                 * .requestMatchers("/api/users/**").hasRole("ADMIN")
+                 * 
+                 * // Posts, Reviews, Company
+                 * .requestMatchers("/api/posts/**", "/api/reviews/**")
+                 * .hasAnyRole("USER", "ADMIN")
+                 * .requestMatchers("/api/companies/**").hasAnyRole("USER", "ADMIN")
+                 * .requestMatchers("/api/images/**").hasAnyRole("USER", "ADMIN")
+                 * 
+                 * // Todo lo demás, autenticado
+                 * .anyRequest().authenticated());
+                 */
+                http
+                                .authorizeHttpRequests(authorize -> authorize
+                                                // ADMIN ENDPOINTS
+                                                .requestMatchers(HttpMethod.GET, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/companies/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/companies/**")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                                                // USER ENDPOINTS
+                                                .requestMatchers(HttpMethod.POST, "/api/companies/*/favourites")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/companies/*/favourites")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/companies/*/favourites")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/posts")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/images/users/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/images/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/images/posts/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/reviews/post/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/reviews/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/users/me/cv")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/users/me/cv")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/users/me")
+                                                .hasAnyRole("USER", "ADMIN")
+                                                // PUBLIC ENDPOINTS
+                                                .requestMatchers("/api/login", "/api/login/**", "/api/register",
+                                                                "/api/register/**")
+                                                .permitAll()
+                                                .anyRequest().permitAll());
+                http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http
-            .securityMatcher("/api/**")
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login", "/api/login/**", "/api/register", "/api/register/**").permitAll()
-                .requestMatchers("/api/users/me/**").hasRole("USER")
-                .requestMatchers("/api/users/**").hasRole("ADMIN")
-                .requestMatchers("/api/posts/**", "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/companies/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/images/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated())
-            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
+                return http.build();
+        }
 
         @Bean
         @Order(2)
         public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/main", "/register", "/login", "/loginerror", "/error/**", "/css/**", "/js/**", "/img/**").permitAll()
-                .requestMatchers("/blog", "/blog/posts", "/blog/posts/*", "/blog/posts/*/image", "/blog/posts/*/reviews/*").permitAll()
-                .requestMatchers("/matches/**").hasRole("USER")
-                .requestMatchers("/users/**").hasRole("ADMIN")
-                .requestMatchers("/companies/**").hasRole("ADMIN")
-                .requestMatchers("/profile/**").hasRole("USER")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
-                .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/main", true)
-                .permitAll())
-                .exceptionHandling(ex -> ex
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                        String uri = request.getRequestURI();
-                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                        response.sendRedirect("/main");
-                        } else {
-                        response.sendError(403);
-                        }
-                })
-                .authenticationEntryPoint((request, response, authException) -> {
-                        String uri = request.getRequestURI();
-                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                        response.sendRedirect("/main");
-                        } else {
-                        response.sendRedirect("/login");
-                        }
-                })
-                );
+                http
+                                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/", "/main", "/register", "/login", "/loginerror",
+                                                                "/error/**", "/css/**", "/js/**", "/img/**")
+                                                .permitAll()
+                                                .requestMatchers("/blog", "/blog/posts", "/blog/posts/*",
+                                                                "/blog/posts/*/image", "/blog/posts/*/reviews/*")
+                                                .permitAll()
+                                                .requestMatchers("/matches/**").hasRole("USER")
+                                                .requestMatchers("/users/**").hasRole("ADMIN")
+                                                .requestMatchers("/companies/**").hasRole("ADMIN")
+                                                .requestMatchers("/profile/**").hasRole("USER")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .defaultSuccessUrl("/main", true)
+                                                .permitAll())
+                                .exceptionHandling(ex -> ex
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        String uri = request.getRequestURI();
+                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                                                response.sendRedirect("/main");
+                                                        } else {
+                                                                response.sendError(403);
+                                                        }
+                                                })
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        String uri = request.getRequestURI();
+                                                        if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                                                response.sendRedirect("/main");
+                                                        } else {
+                                                                response.sendRedirect("/login");
+                                                        }
+                                                }));
 
-        return http.build();
+                return http.build();
         }
 
 }
