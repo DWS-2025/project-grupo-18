@@ -6,11 +6,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.grupo18.jobmatcher.dto.PostDTO;
+import es.grupo18.jobmatcher.security.jwt.JWTTokenProvider;
 import es.grupo18.jobmatcher.service.PostService;
 
 @RestController
@@ -19,6 +23,9 @@ public class PostRestController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private JWTTokenProvider jwtTokenProvider;
 
     @GetMapping("/")
     public Collection<PostDTO> getAllPosts() {
@@ -45,22 +52,36 @@ public class PostRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostDTO> updatePost(@PathVariable long id,
+            @RequestBody PostDTO postDTO) {
+        Long authUserId = getAuthenticatedUserId();
+        if (!postService.canEditOrDeletePost(id, authUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permiso para modificar este post.");
+        }
         try {
-            return ResponseEntity.ok(postService.update(postService.findById(id), postDTO));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            PostDTO existing = postService.findById(id);
+            PostDTO updated = postService.update(existing, postDTO);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Post con id " + id + " no encontrado.",
+                    e);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<PostDTO> deletePost(@PathVariable long id) {
-        try {
-            postService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> deletePost(@PathVariable long id) {
+        Long authUserId = getAuthenticatedUserId();
+        if (!postService.canEditOrDeletePost(id, authUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permiso para eliminar este post.");
         }
+        postService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/filter")
@@ -74,6 +95,13 @@ public class PostRestController {
         LocalDateTime toDate = to != null ? LocalDateTime.parse(to, DateTimeFormatter.ISO_DATE_TIME) : null;
 
         return postService.findFilteredPosts(sort, fromDate, toDate, title);
+    }
+
+    private Long getAuthenticatedUserId() {
+        String token = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getCredentials();
+        return jwtTokenProvider.getUserIdFromToken(token);
     }
 
 }

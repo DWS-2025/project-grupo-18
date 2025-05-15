@@ -30,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,6 +74,10 @@ public class UserService {
 
     public Page<UserDTO> findAll(Pageable pageable) {
         return userRepository.findAll(pageable).map(this::toDTO);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public UserDTO save(UserDTO user) {
