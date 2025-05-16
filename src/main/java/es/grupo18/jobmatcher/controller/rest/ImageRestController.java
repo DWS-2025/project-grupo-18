@@ -115,11 +115,4 @@ public class ImageRestController {
         }
     }
 
-    private Long getAuthenticatedUserId() {
-        String token = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getCredentials();
-        return jwtTokenProvider.getUserIdFromToken(token);
-    }
-
 }

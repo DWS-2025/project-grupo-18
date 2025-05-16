@@ -5,14 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 
 public class RegisterRequest {
 
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email no tiene un formato válido")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     public String getName() {
