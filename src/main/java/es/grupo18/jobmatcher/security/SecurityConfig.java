@@ -91,10 +91,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers("/api/users/me/cv").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/me").hasAnyRole("USER", "ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+
                         // Admin-only API
+                        .requestMatchers(HttpMethod.POST, "/api/users/*/cv").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/cv").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/*/cv").hasRole("ADMIN")
+                        
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/companies/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
 

@@ -5,6 +5,7 @@ import es.grupo18.jobmatcher.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,10 @@ import org.springframework.http.MediaType;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,11 +30,6 @@ public class UserRestController {
 
     @Autowired
     private UserService userService;
-
-    // @GetMapping
-    // public Collection<UserDTO> getAll() {
-    // return userService.findAll();
-    // }
 
     @GetMapping
     public Page<UserDTO> getAll(Pageable pageable) {
@@ -117,6 +112,44 @@ public class UserRestController {
     public ResponseEntity<?> deleteCv() {
         try {
             userService.deleteCv();
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+        }
+    }
+
+    @PostMapping("/{id}/cv")
+    public ResponseEntity<?> uploadUserCv(
+            @PathVariable("id") Long userId,
+            @RequestParam("cv") MultipartFile file) throws IOException {
+        try {
+            userService.uploadCv(file, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al subir CV: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/cv")
+    public ResponseEntity<Resource> downloadUserCv(@PathVariable("id") Long userId) throws IOException {
+        try {
+            File cvFile = userService.getCvFile(userId);
+            InputStreamResource body = new InputStreamResource(new FileInputStream(cvFile));
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + cvFile.getName() + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(body);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}/cv")
+    public ResponseEntity<?> deleteUserCv(@PathVariable("id") Long userId) throws IOException {
+        try {
+            userService.deleteCv(userId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
