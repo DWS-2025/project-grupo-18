@@ -5,6 +5,7 @@ import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -44,6 +45,7 @@ public class ReviewRestController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @reviewService.canModifyReview(#id)")
     public ResponseEntity<ReviewDTO> update(@PathVariable Long id, @RequestBody ReviewDTO dto) {
         try {
             reviewService.update(reviewService.findById(id), dto);
@@ -54,6 +56,7 @@ public class ReviewRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @reviewService.canModifyReview(#id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             reviewService.deleteById(id);

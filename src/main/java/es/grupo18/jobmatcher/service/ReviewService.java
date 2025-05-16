@@ -146,4 +146,14 @@ public class ReviewService {
                 || userService.hasRole(username, "ADMIN");
     }
 
+    public boolean canModifyReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        Long currentUserId = userService.getLoggedUser().id();
+        boolean isOwner = review.getAuthor().getId().equals(currentUserId);
+        boolean isAdmin = userService.getLoggedUser().roles().contains("ROLE_ADMIN");
+        return isOwner || isAdmin;
+    }
+
 }
