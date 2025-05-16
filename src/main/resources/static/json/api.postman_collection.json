@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1620de9a-9fc3-4f3e-8316-3f67cf45dd95",
-		"name": "Jobmatcher API Copy 4",
+		"name": "Jobmatcher API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43680415",
 		"_collection_link": "https://daniel-8946244.postman.co/workspace/Testing~79aa3d29-820e-47e6-9edd-083fbed7c001/collection/43680415-1620de9a-9fc3-4f3e-8316-3f67cf45dd95?action=share&source=collection_link&creator=43680415"
@@ -345,7 +345,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:8443/api/posts/filter?sort=asc&from=2025-04-01T00:00:00&to=2025-04-30T23:59:59&title=Job",
+							"raw": "https://localhost:8443/api/posts/filter?sort=asc&from=2025-04-01T00:00:00&to=2025-05-30T23:59:59&title=Job",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -367,7 +367,7 @@
 								},
 								{
 									"key": "to",
-									"value": "2025-04-30T23:59:59"
+									"value": "2025-05-30T23:59:59"
 								},
 								{
 									"key": "title",
@@ -577,7 +577,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:8443/api/reviews/1",
+							"raw": "https://localhost:8443/api/reviews/3",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -586,7 +586,7 @@
 							"path": [
 								"api",
 								"reviews",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -640,7 +640,7 @@
 							"raw": "{\n    \"text\": \"Updated review: Excellent opportunity!\",\n    \"rating\": 4,\n    \"authorId\": 1,\n    \"postId\": 1,\n    \"authorName\": \"John Doe\"\n}"
 						},
 						"url": {
-							"raw": "https://localhost:8443/api/reviews/1",
+							"raw": "https://localhost:8443/api/reviews/3",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -649,7 +649,7 @@
 							"path": [
 								"api",
 								"reviews",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -661,7 +661,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:8443/api/reviews/1",
+							"raw": "https://localhost:8443/api/reviews/3",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -670,7 +670,7 @@
 							"path": [
 								"api",
 								"reviews",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -768,7 +768,7 @@
 							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.doe.updated@example.com\",\n    \"phone\": \"0987654321\",\n    \"location\": \"Barcelona\",\n    \"bio\": \"Senior software engineer with 6 years of experience\",\n    \"experience\": 6\n}"
 						},
 						"url": {
-							"raw": "https://localhost:8443/api/users/1",
+							"raw": "https://localhost:8443/api/users/2",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -777,7 +777,7 @@
 							"path": [
 								"api",
 								"users",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -789,7 +789,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:8443/api/users/1",
+							"raw": "https://localhost:8443/api/users/2",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -798,7 +798,29 @@
 							"path": [
 								"api",
 								"users",
-								"1"
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download CV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/3/cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"3",
+								"cv"
 							]
 						}
 					},
@@ -814,13 +836,13 @@
 							"formdata": [
 								{
 									"key": "cv",
-									"value": "",
-									"type": "file"
+									"type": "file",
+									"src": "g9XnaXuyy/EnunciadoPractica.pdf"
 								}
 							]
 						},
 						"url": {
-							"raw": "https://localhost:8443/api/users/me/upload_cv",
+							"raw": "https://localhost:8443/api/users/3/cv",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -829,20 +851,42 @@
 							"path": [
 								"api",
 								"users",
-								"me",
-								"upload_cv"
+								"3",
+								"cv"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Download CV",
+					"name": "Delete CV",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/3/cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"3",
+								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Own CV",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:8443/api/users/me/download_cv",
+							"raw": "https://localhost:8443/api/users/me/cv",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -852,7 +896,86 @@
 								"api",
 								"users",
 								"me",
-								"download_cv"
+								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Own CV",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "cv",
+									"type": "file",
+									"src": "g9XnaXuyy/EnunciadoPractica.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:8443/api/users/me/cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Own CV",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "https://localhost:8443/api/users/me/cv",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Own Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me"
 							]
 						}
 					},
@@ -936,12 +1059,22 @@
 					"response": []
 				},
 				{
-					"name": "Delete Own Account",
+					"name": "Register",
 					"request": {
-						"method": "DELETE",
-						"header": [],
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user3@example.com\",\n    \"password\": \"password123\"\n}"
+						},
 						"url": {
-							"raw": "https://localhost:8443/api/users/me",
+							"raw": "https://localhost:8443/api/register",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -949,8 +1082,7 @@
 							"port": "8443",
 							"path": [
 								"api",
-								"users",
-								"me"
+								"register"
 							]
 						}
 					},
