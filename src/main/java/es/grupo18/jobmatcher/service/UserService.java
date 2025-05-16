@@ -180,6 +180,8 @@ public class UserService {
         updatedUser.setPosts(originalUser.getPosts());
         updatedUser.setReviews(originalUser.getReviews());
 
+        updatedUser.setEncoded_password(originalUser.getEncoded_password());
+
         List<Company> favourites = new ArrayList<>(originalUser.getFavouriteCompaniesList());
 
         if (favourites.stream().anyMatch(c -> c.getId() == companyDTO.id())) {

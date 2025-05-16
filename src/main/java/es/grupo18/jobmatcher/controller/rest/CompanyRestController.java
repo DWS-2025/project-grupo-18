@@ -37,7 +37,7 @@ public class CompanyRestController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-    }    
+    }
 
     @PostMapping
     public ResponseEntity<CompanyDTO> create(@RequestBody CompanyDTO companyDTO) {
@@ -89,7 +89,8 @@ public class CompanyRestController {
     @GetMapping("/{id}/favourites")
     public ResponseEntity<Boolean> isFavourite(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(userService.isCompanyFavourite(companyService.findById(id)));
+            boolean fav = userService.isCompanyFavourite(companyService.findById(id));
+            return ResponseEntity.ok(fav);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -103,7 +104,5 @@ public class CompanyRestController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    
 
 }

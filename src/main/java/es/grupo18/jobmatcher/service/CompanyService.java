@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
-import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
+import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.CompanyRepository;
+import es.grupo18.jobmatcher.repository.UserRepository;
 
 @Service
 public class CompanyService {
@@ -27,32 +28,20 @@ public class CompanyService {
     private CompanyMapper companyMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     public Page<CompanyDTO> findAll(Pageable pageable) {
         return companyRepository.findAll(pageable).map(this::toDTO);
     }
 
-//    public Collection<CompanyDTO> findAll() {
-//        return toDTOs(companyRepository.findAll());
-//    }
-
     public CompanyDTO findById(long id) {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
         return toDTO(company);
-    }    
-
-//    public Page<CompanyDTO> findPaginated(Pageable pageable) {
-//        return companyRepository.findAll(pageable).map(this::toDTO);
-//    }
-
-//    public long count() {
-//        return companyRepository.count();
-//    }
+    }
 
     public CompanyDTO save(CompanyDTO company) {
         Company companyDomain = toDomain(company);
@@ -82,29 +71,21 @@ public class CompanyService {
         companyRepository.delete(company);
     }
 
-//    public CompanyDTO delete(CompanyDTO company) {
-//        Company companyDomain = toDomain(company);
-//       companyRepository.deleteById(companyDomain.getId());
-//        return toDTO(companyDomain);
-//    }
-
     public CompanyDTO addOrRemoveFavouriteUser(long companyId, UserDTO userDTO) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
 
-        Long userId = userDTO.id();
+        User userEntity = userRepository.findById(userDTO.id())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        boolean alreadyFavourite = company.getFavouriteUsersList().stream()
-                .anyMatch(u -> u.getId().equals(userId));
-
-        if (alreadyFavourite) {
-            company.getFavouriteUsersList().removeIf(u -> u.getId().equals(userId));
+        if (company.getFavouriteUsersList().contains(userEntity)) {
+            company.getFavouriteUsersList().remove(userEntity);
         } else {
-            company.getFavouriteUsersList().add(userMapper.toDomain(userDTO));
+            company.getFavouriteUsersList().add(userEntity);
         }
 
         companyRepository.save(company);
-        return toDTO(company);
+        return companyMapper.toDTO(company);
     }
 
     public boolean isUserFavourite(long companyId, UserDTO userDTO) {
@@ -121,7 +102,6 @@ public class CompanyService {
     }
 
     public List<CompanyDTO> getNonFavouriteCompaniesForCurrentUser() {
-//        Collection<CompanyDTO> all = findAll();
         Collection<CompanyDTO> all = findAll(Pageable.unpaged()).getContent();
         Collection<CompanyDTO> favourites = userService.getFavouriteCompanies();
 
@@ -146,12 +126,10 @@ public class CompanyService {
         addOrRemoveFavouriteUser(companyId, user);
     }
 
-    
     public boolean isCompanyFavouriteForCurrentUser(long companyId) {
         UserDTO user = userService.getLoggedUser();
         return isUserFavourite(companyId, user);
     }
-   
 
     CompanyDTO toDTO(Company company) {
         return companyMapper.toDTO(company);
