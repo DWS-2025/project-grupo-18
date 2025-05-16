@@ -501,6 +501,11 @@ public class UserService {
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
 
+    public boolean isOwner(Long id) {
+        UserDTO current = getLoggedUser();
+        return current.id().equals(id);
+    }
+
     public boolean currentUserIsAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth != null &&

@@ -7,6 +7,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class ImageRestController {
     // === USER PROFILE IMAGE ===
 
     @GetMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
     public ResponseEntity<Resource> getUserImage(@PathVariable Long id) {
         try {
             if (userService.findById(id) != null && userService.findById(id).image() != null) {
@@ -51,6 +53,7 @@ public class ImageRestController {
     }
 
     @PostMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
     public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             userService.save(userService.findById(id), file);
@@ -61,6 +64,7 @@ public class ImageRestController {
     }
 
     @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
     public ResponseEntity<?> deleteUserImage(@PathVariable Long id) {
         try {
             userService.removeImageById(id);
