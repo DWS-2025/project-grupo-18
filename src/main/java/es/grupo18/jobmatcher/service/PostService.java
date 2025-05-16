@@ -192,6 +192,11 @@ public class PostService {
         postRepository.deleteById(toDomain(post).getId());
     }
 
+    public boolean canEditImage(Long postId) {
+        Long me = userService.getLoggedUser().id();
+        return canEditOrDeletePost(postId, me);
+    }
+
     public List<PostDTO> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
         List<Post> posts = new ArrayList<>(postRepository.findAll());
 

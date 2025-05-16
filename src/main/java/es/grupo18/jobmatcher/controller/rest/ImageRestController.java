@@ -92,6 +92,7 @@ public class ImageRestController {
     }
 
     @PostMapping("/posts/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @postService.canEditImage(#id)")
     public ResponseEntity<?> uploadPostImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             if (file == null || file.isEmpty()) {
@@ -105,6 +106,7 @@ public class ImageRestController {
     }
 
     @DeleteMapping("/posts/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @postService.canEditImage(#id)")
     public ResponseEntity<?> deletePostImage(@PathVariable Long id) {
         try {
             postService.removeImageByPostId(id);
