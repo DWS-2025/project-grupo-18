@@ -4,6 +4,8 @@
 
 > JobMatcher is a web application that connects users with companies through a system of likes, posts, and reviews. Each user can explore companies and discover opportunities. It is designed to boost business visibility and encourage direct engagement between users and organizations.
 
+🔒 **See the [Security Configuration](#-security-configuration) section below for deployment instructions.**
+
 ---
 
 ## 📘 Entities
@@ -48,6 +50,33 @@ The following users are available for testing purposes:
 
 
 > 🔒 All passwords are set to `password123` for testing convenience.
+
+---
+
+### 🔐 Security Configuration
+
+> For evaluation purposes, the application has been secured using best practices to prevent unauthorized access and common web vulnerabilities.
+
+- **Database access is restricted**:  
+  The application does **not use the `root` user**.  
+  Instead, it connects with the restricted user: `jobmatcher_user`.
+
+- **Environment variables required**:  
+  To run the application with MySQL, two environment variables must be defined:
+
+  ```bash
+  DB_USER=jobmatcher_user
+  DB_PASS=Jobmatcher_123
+  mvn clean spring-boot:run
+  ```
+
+  In PowerShell, use:
+
+  ```powershell
+  $env:DB_USER="jobmatcher_user"
+  $env:DB_PASS="Jobmatcher_123"
+  mvn clean spring-boot:run
+  ```
 
 ---
 
