@@ -37,16 +37,15 @@ public class UserRestController {
     }
 
     private void validateFileName(String fileName) {
-    if (!fileName.matches("^[a-zA-Z0-9._-]+$")) {
-        throw new IllegalArgumentException("Invalid file name");
+        if (!fileName.matches("^[a-zA-Z0-9._-]+$")) {
+            throw new IllegalArgumentException("Invalid file name");
+        }
     }
-}
 
     @Autowired
     private UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Page<UserDTO> getAll(Pageable pageable) {
         return userService.findAll(pageable);
     }
@@ -64,29 +63,6 @@ public class UserRestController {
     @PostMapping
     public ResponseEntity<UserDTO> create(@RequestBody UserDTO dto) {
         UserDTO sanitizedDto = new UserDTO(
-            dto.id(),
-            sanitizeText(dto.name()),
-            sanitizeText(dto.email()),
-            sanitizeText(dto.phone()),
-            sanitizeText(dto.location()),
-            sanitizeText(dto.bio()),
-            dto.experience(),
-            dto.image(),
-            dto.imageContentType(),
-            dto.roles(),
-            dto.cvFileName()
-        );
-        UserDTO created = userService.save(sanitizedDto);
-        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(created.id()).toUri();
-        return ResponseEntity.created(location).body(created);
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
-        try {
-            // Sanitizamos los campos de texto
-            UserDTO sanitizedDto = new UserDTO(
                 dto.id(),
                 sanitizeText(dto.name()),
                 sanitizeText(dto.email()),
@@ -97,8 +73,28 @@ public class UserRestController {
                 dto.image(),
                 dto.imageContentType(),
                 dto.roles(),
-                dto.cvFileName()
-            );
+                dto.cvFileName());
+        UserDTO created = userService.save(sanitizedDto);
+        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
+        try {
+            UserDTO sanitizedDto = new UserDTO(
+                    dto.id(),
+                    sanitizeText(dto.name()),
+                    sanitizeText(dto.email()),
+                    sanitizeText(dto.phone()),
+                    sanitizeText(dto.location()),
+                    sanitizeText(dto.bio()),
+                    dto.experience(),
+                    dto.image(),
+                    dto.imageContentType(),
+                    dto.roles(),
+                    dto.cvFileName());
             userService.update(id, sanitizedDto);
             return ResponseEntity.ok(userService.findById(id));
         } catch (Exception e) {
@@ -131,7 +127,7 @@ public class UserRestController {
         try {
             String safeFileName = Paths.get(cv.getOriginalFilename()).getFileName().toString();
             validateFileName(safeFileName);
-            userService.uploadCv(cv); // Asegurarse que el servicio use safeFileName
+            userService.uploadCv(cv);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error uploading CV: " + e.getMessage());
@@ -141,7 +137,7 @@ public class UserRestController {
     @GetMapping("/me/cv")
     public ResponseEntity<Resource> downloadCv() {
         try {
-            File file = userService.getCvFile(); // Verificar que getCvFile no permita path traversal
+            File file = userService.getCvFile();
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")

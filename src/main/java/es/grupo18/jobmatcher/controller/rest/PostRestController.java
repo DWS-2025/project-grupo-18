@@ -40,6 +40,7 @@ public class PostRestController {
     private String sanitizeText(String text) {
         return text != null ? TEXT_SANITIZER.sanitize(text) : null;
     }
+
     @Autowired
     private PostService postService;
 
@@ -65,18 +66,16 @@ public class PostRestController {
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
         Long authUserId = getAuthenticatedUserId();
 
-        // Sanitizamos los campos de texto
         PostDTO sanitizedDto = new PostDTO(
-            postDTO.id(),
-            sanitizeText(postDTO.title()),
-            sanitizeText(postDTO.content()),
-            LocalDateTime.now(), 
-            authUserId, 
-            postDTO.image(),
-            postDTO.imageContentType(),
-            sanitizeText(postDTO.authorName()),
-            postDTO.reviews() != null ? postDTO.reviews() : List.of() 
-        );
+                postDTO.id(),
+                sanitizeText(postDTO.title()),
+                sanitizeText(postDTO.content()),
+                LocalDateTime.now(),
+                authUserId,
+                postDTO.image(),
+                postDTO.imageContentType(),
+                sanitizeText(postDTO.authorName()),
+                postDTO.reviews() != null ? postDTO.reviews() : List.of());
 
         sanitizedDto = postService.save(sanitizedDto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -87,29 +86,16 @@ public class PostRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @postService.canEditOrDeletePost(#id, #authUserId)")
-    public ResponseEntity<PostDTO> updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostDTO> updatePost(@PathVariable long id,
+            @RequestBody PostDTO postDTO) {
         Long authUserId = getAuthenticatedUserId();
 
         if (!postService.canEditOrDeletePost(id, authUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to edit this post");
         }
-
         try {
             PostDTO existing = postService.findById(id);
-            // Sanitizamos los campos de texto
-            PostDTO sanitizedDto = new PostDTO(
-                postDTO.id(),
-                sanitizeText(postDTO.title()),
-                sanitizeText(postDTO.content()),
-                postDTO.timestamp(),
-                postDTO.authorId(),
-                postDTO.image(),
-                postDTO.imageContentType(),
-                sanitizeText(postDTO.authorName()), // Sanitizamos el nombre del autor
-                postDTO.reviews()
-            );
-            PostDTO updated = postService.update(existing, sanitizedDto);
+            PostDTO updated = postService.update(existing, postDTO);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post with id " + id + " not found.", e);
@@ -117,6 +103,7 @@ public class PostRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @postService.canEditOrDeletePost(#id)")
     public ResponseEntity<Void> deletePost(@PathVariable long id) {
         Long authUserId = getAuthenticatedUserId();
 
@@ -134,17 +121,16 @@ public class PostRestController {
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
             @RequestParam(required = false) String title) {
-        // Validar sort
         if (sort != null && !sort.matches("^[a-zA-Z0-9]+$")) {
             throw new IllegalArgumentException("Invalid sort parameter");
         }
-        // Sanitizar title
         String safeTitle = sanitizeText(title);
-        // Parsear fechas con manejo de excepciones
         LocalDateTime fromDate = null, toDate = null;
         try {
-            if (from != null) fromDate = LocalDateTime.parse(from, DateTimeFormatter.ISO_DATE_TIME);
-            if (to != null) toDate = LocalDateTime.parse(to, DateTimeFormatter.ISO_DATE_TIME);
+            if (from != null)
+                fromDate = LocalDateTime.parse(from, DateTimeFormatter.ISO_DATE_TIME);
+            if (to != null)
+                toDate = LocalDateTime.parse(to, DateTimeFormatter.ISO_DATE_TIME);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format");
         }
@@ -162,5 +148,5 @@ public class PostRestController {
             throw new IllegalArgumentException("User not authenticated");
         }
     }
-    
+
 }
