@@ -21,9 +21,11 @@
         <div class="title">
             <a href="/main">JOBMATCHER</a>
         </div>
+        {{#isAdmin}}
         <div class="header-right">
             <button onclick="location.href='/companies/{{company.id}}/edit'">Editar Empresa</button>
         </div>
+        {{/isAdmin}}
     </header>
 
     <main class="company-page">
@@ -40,6 +42,7 @@
             </div>
         </div>
 
+        {{#isAdmin}}
         <div class="company-delete-button">
             <form method="post" action="/companies/{{company.id}}/delete"
                 onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta empresa?');">
@@ -47,6 +50,7 @@
                 <button type="submit">🗑️ Eliminar Empresa</button>
             </form>
         </div>
+        {{/isAdmin}}
 
     </main>
 

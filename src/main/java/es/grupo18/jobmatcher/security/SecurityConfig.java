@@ -133,6 +133,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .failureUrl("/loginerror")
                         .defaultSuccessUrl("/main", true)
                         .permitAll())
                 .exceptionHandling(ex -> ex

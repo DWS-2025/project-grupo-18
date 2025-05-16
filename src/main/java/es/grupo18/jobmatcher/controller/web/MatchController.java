@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import es.grupo18.jobmatcher.service.CompanyService;
+import es.grupo18.jobmatcher.service.UserService;
 
 @Controller
 public class MatchController {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/matches")
     public String showCompanies(Model model) {
@@ -44,9 +48,11 @@ public class MatchController {
     }
 
     @GetMapping("/company/{companyId}")
-    public String getCompanyPage(@PathVariable("companyId") Long companyId, Model model) {
+    public String getCompanyPage(@PathVariable Long companyId, Model model) {
         try {
             model.addAttribute("company", companyService.findById(companyId));
+            model.addAttribute("isAdmin",
+                    userService.currentUserIsAdmin());
             return "company/show_company";
         } catch (NoSuchElementException e) {
             return "error";
