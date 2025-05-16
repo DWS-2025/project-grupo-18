@@ -2,6 +2,7 @@ package es.grupo18.jobmatcher.controller.web;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.service.CompanyService;
+import es.grupo18.jobmatcher.service.UserService;
 
 import java.util.NoSuchElementException;
 
@@ -18,6 +19,9 @@ public class CompaniesController {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/companies")
     public String listCompanies(Model model, Pageable page) {
@@ -53,6 +57,8 @@ public class CompaniesController {
     public String getCompany(Model model, @PathVariable("companyId") long id) {
         try {
             model.addAttribute("company", companyService.findById(id));
+            model.addAttribute("isAdmin",
+                    userService.currentUserIsAdmin());
             return "company/show_company";
         } catch (NoSuchElementException e) {
             return "company/company_not_found";
