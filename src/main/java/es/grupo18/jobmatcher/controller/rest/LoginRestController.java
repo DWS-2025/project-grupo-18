@@ -28,29 +28,22 @@ public class LoginRestController {
             @CookieValue(name = "RefreshToken", required = false) String refreshToken,
             HttpServletResponse response) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            return ResponseEntity
-                    .badRequest()
+            return ResponseEntity.badRequest()
                     .body(new AuthResponse(AuthResponse.Status.FAILURE, "Empty refresh token cookie"));
         }
         try {
             return userLoginService.refresh(response, refreshToken);
-
         } catch (ExpiredJwtException ex) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Refresh token outdated"));
-
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Refresh token expired"));
         } catch (JwtException ex) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthResponse(AuthResponse.Status.FAILURE, "Invalid refresh token"));
-
         } catch (Exception ex) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Internal error while refreshing token"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Error processing refresh token"));
         }
-    }
+}
 
     @PostMapping("/logout")
     public ResponseEntity<AuthResponse> logout(
