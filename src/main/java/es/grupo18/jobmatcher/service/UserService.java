@@ -18,7 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +62,13 @@ public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    private static final PolicyFactory TEXT_SANITIZER = Sanitizers.FORMATTING;
+
+    private String sanitizeText(String text) {
+        if (text == null) return null;
+        return TEXT_SANITIZER.sanitize(text);
+    }
+
     public UserDTO getLoggedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return toDTO(userRepository.findByEmail(email)
@@ -89,11 +97,11 @@ public class UserService {
         if (user.roles() == null || user.roles().isEmpty()) {
             user = new UserDTO(
                     user.id(),
-                    user.name(),
-                    user.email(),
-                    user.phone(),
-                    user.location(),
-                    user.bio(),
+                    sanitizeText(user.name()),    
+                    sanitizeText(user.email()),   
+                    sanitizeText(user.phone()),   
+                    sanitizeText(user.location()),
+                    user.bio(),                   
                     user.experience(),
                     user.image(),
                     user.imageContentType(),
@@ -149,11 +157,11 @@ public class UserService {
         User currentUser = userRepository.findById(getLoggedUser().id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        currentUser.setName(updatedDto.name());
-        currentUser.setEmail(updatedDto.email());
-        currentUser.setPhone(updatedDto.phone());
-        currentUser.setLocation(updatedDto.location());
-        currentUser.setBio(updatedDto.bio());
+        currentUser.setName(sanitizeText(updatedDto.name()));     
+        currentUser.setEmail(sanitizeText(updatedDto.email()));   
+        currentUser.setPhone(sanitizeText(updatedDto.phone()));   
+        currentUser.setLocation(sanitizeText(updatedDto.location())); 
+        currentUser.setBio(updatedDto.bio());                     
         currentUser.setExperience(updatedDto.experience());
 
         userRepository.save(currentUser);

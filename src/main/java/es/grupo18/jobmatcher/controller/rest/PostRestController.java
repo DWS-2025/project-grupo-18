@@ -3,11 +3,16 @@ package es.grupo18.jobmatcher.controller.rest;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
+import java.util.List;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +35,11 @@ import es.grupo18.jobmatcher.service.UserService;
 @RestController
 @RequestMapping("/api/posts")
 public class PostRestController {
+    private static final PolicyFactory TEXT_SANITIZER = Sanitizers.FORMATTING;
 
+    private String sanitizeText(String text) {
+        return text != null ? TEXT_SANITIZER.sanitize(text) : null;
+    }
     @Autowired
     private PostService postService;
 
@@ -52,18 +61,34 @@ public class PostRestController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
-        postDTO = postService.save(postDTO);
+        Long authUserId = getAuthenticatedUserId();
+
+        // Sanitizamos los campos de texto
+        PostDTO sanitizedDto = new PostDTO(
+            postDTO.id(),
+            sanitizeText(postDTO.title()),
+            sanitizeText(postDTO.content()),
+            LocalDateTime.now(), 
+            authUserId, 
+            postDTO.image(),
+            postDTO.imageContentType(),
+            sanitizeText(postDTO.authorName()),
+            postDTO.reviews() != null ? postDTO.reviews() : List.of() 
+        );
+
+        sanitizedDto = postService.save(sanitizedDto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(postDTO.id())
+                .buildAndExpand(sanitizedDto.id())
                 .toUri();
-        return ResponseEntity.created(location).body(postDTO);
+        return ResponseEntity.created(location).body(sanitizedDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@PathVariable long id,
-            @RequestBody PostDTO postDTO) {
+    @PreAuthorize("hasRole('ADMIN') or @postService.canEditOrDeletePost(#id, #authUserId)")
+    public ResponseEntity<PostDTO> updatePost(@PathVariable long id, @RequestBody PostDTO postDTO) {
         Long authUserId = getAuthenticatedUserId();
 
         if (!postService.canEditOrDeletePost(id, authUserId)) {
@@ -72,7 +97,19 @@ public class PostRestController {
 
         try {
             PostDTO existing = postService.findById(id);
-            PostDTO updated = postService.update(existing, postDTO);
+            // Sanitizamos los campos de texto
+            PostDTO sanitizedDto = new PostDTO(
+                postDTO.id(),
+                sanitizeText(postDTO.title()),
+                sanitizeText(postDTO.content()),
+                postDTO.timestamp(),
+                postDTO.authorId(),
+                postDTO.image(),
+                postDTO.imageContentType(),
+                sanitizeText(postDTO.authorName()), // Sanitizamos el nombre del autor
+                postDTO.reviews()
+            );
+            PostDTO updated = postService.update(existing, sanitizedDto);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post with id " + id + " not found.", e);
@@ -97,11 +134,21 @@ public class PostRestController {
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
             @RequestParam(required = false) String title) {
-
-        LocalDateTime fromDate = from != null ? LocalDateTime.parse(from, DateTimeFormatter.ISO_DATE_TIME) : null;
-        LocalDateTime toDate = to != null ? LocalDateTime.parse(to, DateTimeFormatter.ISO_DATE_TIME) : null;
-
-        return postService.findFilteredPosts(sort, fromDate, toDate, title);
+        // Validar sort
+        if (sort != null && !sort.matches("^[a-zA-Z0-9]+$")) {
+            throw new IllegalArgumentException("Invalid sort parameter");
+        }
+        // Sanitizar title
+        String safeTitle = sanitizeText(title);
+        // Parsear fechas con manejo de excepciones
+        LocalDateTime fromDate = null, toDate = null;
+        try {
+            if (from != null) fromDate = LocalDateTime.parse(from, DateTimeFormatter.ISO_DATE_TIME);
+            if (to != null) toDate = LocalDateTime.parse(to, DateTimeFormatter.ISO_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format");
+        }
+        return postService.findFilteredPosts(sort, fromDate, toDate, safeTitle);
     }
 
     private Long getAuthenticatedUserId() {
