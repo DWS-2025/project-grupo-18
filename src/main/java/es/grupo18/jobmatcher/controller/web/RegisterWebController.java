@@ -35,7 +35,7 @@ public class RegisterWebController {
             Model model,
             HttpServletRequest request) {
         if (result.hasErrors()) {
-            model.addAttribute("error", "Datos inválidos");
+            model.addAttribute("error", "Invalid data");
             addAttributesToModel(model, req, request);
             return "register/register";
         }

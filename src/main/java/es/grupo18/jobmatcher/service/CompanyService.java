@@ -146,4 +146,5 @@ public class CompanyService {
     List<Company> toDomains(List<CompanyDTO> dtos) {
         return companyMapper.toDomains(dtos);
     }
+    
 }

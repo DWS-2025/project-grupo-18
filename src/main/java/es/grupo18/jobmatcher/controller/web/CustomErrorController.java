@@ -24,19 +24,19 @@ public class CustomErrorController implements ErrorController {
         model.addAttribute("status", statusCode);
 
         if (statusCode == HttpStatus.NOT_FOUND.value()) {
-            model.addAttribute("error", "Página no encontrada");
+            model.addAttribute("error", "Page not found");
             return "error/404";
         } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-            model.addAttribute("error", "Acceso denegado");
+            model.addAttribute("error", "Access denied");
             return "error/403";
         } else if (statusCode == HttpStatus.METHOD_NOT_ALLOWED.value()) {
-            model.addAttribute("error", "Método HTTP no permitido");
+            model.addAttribute("error", "HTTP method not allowed");
             return "error/405";
         } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-            model.addAttribute("error", "Error interno del servidor");
+            model.addAttribute("error", "Internal server error");
             return "error/500";
         } else {
-            model.addAttribute("error", "Error inesperado");
+            model.addAttribute("error", "Unexpected error");
             return "error/error";
         }
     }

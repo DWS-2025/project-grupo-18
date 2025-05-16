@@ -18,10 +18,11 @@ public interface ReviewMapper {
 
     @Mapping(source = "authorId", target = "author.id")
     @Mapping(source = "postId", target = "post.id")
-    @Mapping(target = "author.name", ignore = true) 
+    @Mapping(target = "author.name", ignore = true)
     Review toDomain(ReviewDTO dto);
 
     List<ReviewDTO> toDTOs(List<Review> reviews);
 
     List<Review> toDomains(List<ReviewDTO> dtos);
+    
 }

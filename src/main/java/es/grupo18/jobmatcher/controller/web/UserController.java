@@ -86,7 +86,7 @@ public class UserController {
             model.addAttribute("isAdmin", userService.isAdmin(currentUser));
             model.addAttribute("isUser", userService.isUser(currentUser));
             model.addAttribute("isAdminOrUser", userService.isAdmin(currentUser) || userService.isUser(currentUser));
-            model.addAttribute("isSelf", false); // Nunca entra aquí, ya fue redirigido arriba
+            model.addAttribute("isSelf", false);
 
             return "user/user_detail";
         } catch (NoSuchElementException e) {
@@ -159,10 +159,10 @@ public class UserController {
                 userService.updateUserImage(userId, image);
                 return ResponseEntity.ok().build();
             } else {
-                return ResponseEntity.badRequest().body("Formato de imagen no válido");
+                return ResponseEntity.badRequest().body("Invalid image format");
             }
         }
-        return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
+        return ResponseEntity.badRequest().body("No image selected");
     }
 
     @PostMapping("/{userId}/reset_image")
@@ -204,7 +204,7 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading CV");
         }
     }
 
@@ -215,7 +215,7 @@ public class UserController {
             userService.deleteCv(userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting CV");
         }
     }
 

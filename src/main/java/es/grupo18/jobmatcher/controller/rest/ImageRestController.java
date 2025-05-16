@@ -7,7 +7,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.grupo18.jobmatcher.security.jwt.JWTTokenProvider;
 import es.grupo18.jobmatcher.service.PostService;
 import es.grupo18.jobmatcher.service.UserService;
 
@@ -30,9 +28,6 @@ public class ImageRestController {
 
     @Autowired
     private PostService postService;
-
-    @Autowired
-    private JWTTokenProvider jwtTokenProvider;
 
     // === USER PROFILE IMAGE ===
 

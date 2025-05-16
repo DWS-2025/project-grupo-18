@@ -7,10 +7,6 @@ public enum TokenType {
     ACCESS(Duration.ofMinutes(5), "AuthToken"),
     REFRESH(Duration.ofDays(7), "RefreshToken");
 
-    /**
-     * Token lifetime in seconds
-     */
-    
     public final Duration duration;
     public final String cookieName;
 

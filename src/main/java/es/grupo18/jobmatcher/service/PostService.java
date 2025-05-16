@@ -43,12 +43,6 @@ public class PostService {
     @Autowired
     private ReviewService reviewService;
 
-    /*
-     * public Collection<PostDTO> findAllWithAuthors() { // Returns the posts list
-     * with authors
-     * return toDTOs(postRepository.findAllWithAuthors());
-     * }
-     */
     public Collection<PostDTO> findAll() { // Returns the posts list in reverse order
         return toDTOs(postRepository.findAll());
     }
@@ -105,7 +99,7 @@ public class PostService {
     public PostDTO update(long id, String title, String content, MultipartFile image) throws IOException {
         long loggedId = userService.getLoggedUser().id();
         if (!canEditOrDeletePost(id, loggedId)) {
-            throw new SecurityException("No tienes permiso para editar este post");
+            throw new SecurityException("You do not have permission to edit this post");
         }
 
         Post post = toDomain(findById(id));
@@ -137,26 +131,26 @@ public class PostService {
 
     private void validateImage(MultipartFile file) throws IOException {
         if (file.isEmpty())
-            throw new IllegalArgumentException("Archivo vacío.");
+            throw new IllegalArgumentException("File is empty");
         if (file.getSize() > 2 * 1024 * 1024)
-            throw new IllegalArgumentException("Máximo permitido: 2MB");
+            throw new IllegalArgumentException("Maximum allowed: 2MB");
 
         String contentType = file.getContentType();
         if (!List.of("image/jpeg", "image/png").contains(contentType)) {
-            throw new IllegalArgumentException("Solo se permiten JPEG o PNG");
+            throw new IllegalArgumentException("Only JPEG or PNG are allowed");
         }
 
         try (InputStream is = file.getInputStream()) {
             byte[] header = new byte[8];
             is.read(header);
             if (!(isJpeg(header) || isPng(header))) {
-                throw new IllegalArgumentException("Cabecera inválida. El archivo no es una imagen válida.");
+                throw new IllegalArgumentException("Invalid header. The file is not a valid image");
             }
         }
 
         BufferedImage img = ImageIO.read(file.getInputStream());
         if (img == null) {
-            throw new IllegalArgumentException("La imagen está corrupta o no se puede procesar.");
+            throw new IllegalArgumentException("Image is corrupted or cannot be found");
         }
     }
 
@@ -186,7 +180,7 @@ public class PostService {
     public void deleteById(long id) {
         long loggedId = userService.getLoggedUser().id();
         if (!canEditOrDeletePost(id, loggedId)) {
-            throw new SecurityException("No tienes permiso para eliminar este post");
+            throw new SecurityException("You do not have permission to delete this post");
         }
 
         Post post = postRepository.findById(id)
@@ -274,13 +268,12 @@ public class PostService {
 
     public boolean canEditOrDeletePost(Long postId, Long userId) {
         return postRepository.findById(postId)
-            .map(post -> {
-                System.out.println(">>> POST OWNER: " + post.getAuthor().getId() + " | REQUEST USER: " + userId);
-                return post.getAuthor().getId().equals(userId)
-                    || userService.hasRole(userId.toString(), "ADMIN");
-            })
-            .orElse(false);
+                .map(post -> {
+                    System.out.println(">>> POST OWNER: " + post.getAuthor().getId() + " | REQUEST USER: " + userId);
+                    return post.getAuthor().getId().equals(userId)
+                            || userService.hasRole(userId.toString(), "ADMIN");
+                })
+                .orElse(false);
     }
-
 
 }

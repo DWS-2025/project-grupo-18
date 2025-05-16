@@ -63,7 +63,7 @@ public class UserService {
     public UserDTO getLoggedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return toDTO(userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email)));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email)));
     }
 
     public Collection<UserDTO> findAll() {
@@ -112,10 +112,9 @@ public class UserService {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             BufferedImage originalImage = ImageIO.read(image.getInputStream());
             if (originalImage == null) {
-                throw new IllegalArgumentException("La imagen no se puede procesar.");
+                throw new IllegalArgumentException("The image cannot be processed");
             }
 
-            // Escribe en formato limpio (usa png o jpeg según el contentType)
             String format = image.getContentType().equals("image/png") ? "png" : "jpg";
             ImageIO.write(originalImage, format, baos);
             baos.flush();
@@ -240,12 +239,12 @@ public class UserService {
         validateImage(image);
 
         if (image.isEmpty()) {
-            throw new IllegalArgumentException("La imagen no puede estar vacía");
+            throw new IllegalArgumentException("The image cannot be empty");
         }
 
         BufferedImage originalImage = ImageIO.read(image.getInputStream());
         if (originalImage == null) {
-            throw new IllegalArgumentException("La imagen no se puede procesar.");
+            throw new IllegalArgumentException("The image cannot be processed");
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -275,20 +274,20 @@ public class UserService {
 
     private void validateImage(MultipartFile file) throws IOException {
         if (file.isEmpty())
-            throw new IllegalArgumentException("Archivo vacío.");
+            throw new IllegalArgumentException("File is empty");
         if (file.getSize() > 2 * 1024 * 1024)
-            throw new IllegalArgumentException("Máximo permitido: 2MB");
+            throw new IllegalArgumentException("Maximum allowed: 2MB");
 
         String contentType = file.getContentType();
         if (!List.of("image/jpeg", "image/png").contains(contentType)) {
-            throw new IllegalArgumentException("Solo se permiten JPEG o PNG");
+            throw new IllegalArgumentException("Only JPEG or PNG are allowed");
         }
 
         try (InputStream is = file.getInputStream()) {
             byte[] header = new byte[8];
             is.read(header);
             if (!(isJpeg(header) || isPng(header))) {
-                throw new IllegalArgumentException("Cabecera inválida. El archivo no es una imagen válida.");
+                throw new IllegalArgumentException("Invalid header. The file is not a valid image");
             }
         }
 
@@ -339,13 +338,13 @@ public class UserService {
     public File getCvFile(Long userId) {
         User user = getUserOrThrow(userId);
         if (user.getCvFileName() == null)
-            throw new IllegalStateException("No hay CV disponible");
+            throw new IllegalStateException("No CV available");
 
         Path userDir = getUserCvDir(user);
         Path path = userDir.resolve(Paths.get(user.getCvFileName()).getFileName().toString());
         File file = path.toFile();
         if (!file.exists())
-            throw new IllegalStateException("Archivo CV no encontrado");
+            throw new IllegalStateException("CV file not found");
 
         return file;
     }
@@ -373,7 +372,7 @@ public class UserService {
 
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
     }
 
     private void validatePdf(MultipartFile file) throws IOException {
@@ -386,28 +385,28 @@ public class UserService {
 
     private void validateNotEmpty(MultipartFile file) {
         if (file.isEmpty())
-            throw new IllegalArgumentException("El archivo está vacío");
+            throw new IllegalArgumentException("The file is empty");
     }
 
     private void validateMimeType(MultipartFile file) {
         if (!"application/pdf".equals(file.getContentType()))
-            throw new IllegalArgumentException("Solo se permiten archivos PDF");
+            throw new IllegalArgumentException("Only PDF files are allowed");
     }
 
     private void validateFileName(MultipartFile file) {
         String name = Paths.get(file.getOriginalFilename()).getFileName().toString();
         if (file.getOriginalFilename() == null)
-            throw new IllegalArgumentException("Nombre de archivo no válido");
+            throw new IllegalArgumentException("Invalid file name");
         if (!name.matches("^[a-zA-Z0-9._-]+$"))
-            throw new IllegalArgumentException("El nombre del archivo contiene caracteres no permitidos");
+            throw new IllegalArgumentException("The file name contains invalid characters");
         if (!name.toLowerCase().endsWith(".pdf"))
-            throw new IllegalArgumentException("Nombre de archivo inválido");
+            throw new IllegalArgumentException("Invalid file name");
         if (name.equalsIgnoreCase(".pdf"))
-            throw new IllegalArgumentException("El nombre del archivo no puede ser solo la extensión");
+            throw new IllegalArgumentException("The file name cannot be just the extension");
         if (name.toLowerCase().matches(".*\\.pdf\\..+"))
-            throw new IllegalArgumentException("El archivo contiene múltiples extensiones sospechosas");
+            throw new IllegalArgumentException("The file contains multiple suspicious extensions");
         if (name.length() > 50)
-            throw new IllegalArgumentException("El nombre del archivo es demasiado largo");
+            throw new IllegalArgumentException("Name too long");
     }
 
     private void validateFileSize(MultipartFile file) {
@@ -419,7 +418,7 @@ public class UserService {
         try (InputStream in = file.getInputStream()) {
             byte[] header = new byte[4];
             if (in.read(header) != 4 || header[0] != '%' || header[1] != 'P' || header[2] != 'D' || header[3] != 'F')
-                throw new IllegalArgumentException("El archivo no parece un PDF válido");
+                throw new IllegalArgumentException("The file does not appear to be a valid PDF");
         }
     }
 
@@ -506,10 +505,10 @@ public class UserService {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-            String hex = bytesToHex(hash).substring(0, 16); // 16 hex chars = 8 bytes
+            String hex = bytesToHex(hash).substring(0, 16);
             return CV_STORAGE_PATH.resolve("u" + hex);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 no disponible", e);
+            throw new RuntimeException("SHA-256 not available", e);
         }
     }
 

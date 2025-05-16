@@ -81,7 +81,7 @@ public class ReviewService {
     public ReviewDTO update(long reviewId, String text, int rating) {
         String email = userService.getLoggedUser().email();
         if (!canEditOrDeleteReview(reviewId, email)) {
-            throw new SecurityException("No tienes permiso para editar esta review");
+            throw new SecurityException("You do not have permission to edit this review");
         }
 
         Review review = toDomain(findById(reviewId));
@@ -94,7 +94,7 @@ public class ReviewService {
     public void deleteById(long id) {
         String email = userService.getLoggedUser().email();
         if (!canEditOrDeleteReview(id, email)) {
-            throw new SecurityException("No tienes permiso para eliminar esta review");
+            throw new SecurityException("You do not have permission to delete this review");
         }
 
         Review review = reviewRepository.findById(id)

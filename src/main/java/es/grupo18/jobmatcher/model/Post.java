@@ -111,6 +111,7 @@ public class Post {
     }
 
     // Setters
+    
     public void setImageContentType(String imageContentType) {
         this.imageContentType = imageContentType;
     }

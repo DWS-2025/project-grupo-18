@@ -263,5 +263,5 @@ public class BlogController {
             return "blog/post_not_found";
         }
     }
-    
+
 }

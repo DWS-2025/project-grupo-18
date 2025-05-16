@@ -90,12 +90,11 @@ img {
 }
 
 /* Change slider background when the switch is checked */
-input:checked + .slider {
+input:checked+.slider {
     background-color: #0077b6;
 }
 
 /* Move the slider circle when the switch is checked */
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(26px);
 }
-

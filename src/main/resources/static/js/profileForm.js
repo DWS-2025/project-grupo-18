@@ -12,7 +12,7 @@ try {
 
     const form = document.getElementById('profileEditorForm');
     if (!form) {
-        console.error('Formulario profileEditorForm no encontrado');
+        console.error('profileEditorForm not found');
     } else {
         form.addEventListener('submit', () => {
             try {
@@ -21,13 +21,13 @@ try {
                 if (bioInput) {
                     bioInput.value = bioHtml;
                 } else {
-                    console.error('Input bioInput no encontrado');
+                    console.error('Input bioInput not found');
                 }
             } catch (error) {
-                console.error('Error al procesar el formulario:', error);
+                console.error('Error processing the form:', error);
             }
         });
     }
 } catch (error) {
-    console.error('Error al inicializar Quill.js:', error);
+    console.error('Error inicializating Quill.js:', error);
 }

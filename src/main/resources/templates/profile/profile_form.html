@@ -46,14 +46,14 @@
                     value="{{#user.phone}}{{user.phone}}{{/user.phone}}{{^user.phone}}{{/user.phone}}"
                     pattern="^\+?[0-9\s\-]{7,15}$">
             </div>
-            
+
             <div class="input-group">
                 <label for="location">Ubicación:</label>
                 <input type="text" id="location" name="location"
                     value="{{#user.location}}{{user.location}}{{/user.location}}{{^user.location}}{{/user.location}}"
                     maxlength="100">
             </div>
-            
+
             <div class="input-group">
                 <label for="bio">Biografía:</label>
                 <div id="quill-editor" style="height: 200px;">
@@ -61,7 +61,7 @@
                 </div>
                 <input type="hidden" name="bio" id="bioInput">
             </div>
-            
+
             <div class="input-group">
                 <label for="experience">Experiencia (años):</label>
                 <input type="number" id="experience" name="experience"

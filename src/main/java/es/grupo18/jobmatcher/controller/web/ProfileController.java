@@ -53,7 +53,7 @@ public class ProfileController {
 
             return "profile/profile";
         } catch (IllegalStateException e) {
-            return "redirect:/login?error=" + URLEncoder.encode("Por favor, inicia sesión", StandardCharsets.UTF_8);
+            return "redirect:/login?error=" + URLEncoder.encode("Login, please", StandardCharsets.UTF_8);
         }
     }
 
@@ -78,14 +78,14 @@ public class ProfileController {
     public ResponseEntity<?> uploadProfileImage(@RequestParam("image") MultipartFile image) {
         try {
             if (image.isEmpty()) {
-                return ResponseEntity.badRequest().body("No se ha seleccionado ninguna imagen");
+                return ResponseEntity.badRequest().body("No image selected");
             }
             userService.updateUserImage(image);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir la imagen");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
         }
     }
 
@@ -96,7 +96,7 @@ public class ProfileController {
             userService.removeImage();
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al resetear la imagen");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resetting image");
         }
     }
 
@@ -106,17 +106,17 @@ public class ProfileController {
             model.addAttribute("user", userService.getLoggedUser());
             return "profile/profile_form";
         } catch (IllegalStateException e) {
-            return "redirect:/login?error=" + URLEncoder.encode("Por favor, inicia sesión", StandardCharsets.UTF_8);
+            return "redirect:/login?error=" + URLEncoder.encode("Login, please", StandardCharsets.UTF_8);
         }
     }
 
     @PostMapping("/profile/edit")
     public String updateProfile(@ModelAttribute UserDTO updatedUser) {
         try {
-            // Sanitize the bio field to prevent XSS
             if (updatedUser.bio() != null) {
                 if (updatedUser.bio().length() > 10000) {
-                    return "redirect:/profile/edit?error=" + URLEncoder.encode("La biografía es demasiado larga", StandardCharsets.UTF_8);
+                    return "redirect:/profile/edit?error="
+                            + URLEncoder.encode("User bio too long", StandardCharsets.UTF_8);
                 }
                 String safeBio = HTML_SANITIZER.sanitize(updatedUser.bio());
                 updatedUser = new UserDTO(
@@ -130,8 +130,7 @@ public class ProfileController {
                         updatedUser.image(),
                         updatedUser.imageContentType(),
                         updatedUser.roles(),
-                        updatedUser.cvFileName()
-                );
+                        updatedUser.cvFileName());
             }
             userService.updateProfile(updatedUser);
             return "redirect:/profile";
@@ -144,9 +143,10 @@ public class ProfileController {
     public String deleteOwnProfile(HttpServletResponse response) {
         try {
             userService.deleteCurrentUserAndLogout(response);
-            return "redirect:/login?message=Cuenta eliminada correctamente";
+            return "redirect:/login?message=Account deleted successfully";
         } catch (Exception e) {
-            return "redirect:/profile?error=" + URLEncoder.encode("Error al eliminar la cuenta", StandardCharsets.UTF_8);
+            return "redirect:/profile?error="
+                    + URLEncoder.encode("Error deleting account", StandardCharsets.UTF_8);
         }
     }
 
@@ -159,7 +159,7 @@ public class ProfileController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading CV");
         }
     }
 
@@ -193,7 +193,8 @@ public class ProfileController {
             userService.deleteCv();
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting CV");
         }
     }
+
 }

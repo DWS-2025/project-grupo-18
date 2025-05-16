@@ -45,7 +45,7 @@ body {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .current-image {
@@ -56,7 +56,7 @@ body {
     max-width: 100%;
     height: auto;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .filter-form {
@@ -118,4 +118,3 @@ form select {
     width: 100%;
     margin-bottom: 0.8em;
 }
-

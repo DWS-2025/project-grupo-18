@@ -63,11 +63,11 @@ public class PostRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable long id,
-                                              @RequestBody PostDTO postDTO) {
+            @RequestBody PostDTO postDTO) {
         Long authUserId = getAuthenticatedUserId();
 
         if (!postService.canEditOrDeletePost(id, authUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este post.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to edit this post");
         }
 
         try {
@@ -75,7 +75,7 @@ public class PostRestController {
             PostDTO updated = postService.update(existing, postDTO);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post con id " + id + " no encontrado.", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post with id " + id + " not found.", e);
         }
     }
 
@@ -84,7 +84,7 @@ public class PostRestController {
         Long authUserId = getAuthenticatedUserId();
 
         if (!postService.canEditOrDeletePost(id, authUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para eliminar este post.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this post.");
         }
 
         postService.deleteById(id);
@@ -109,10 +109,11 @@ public class PostRestController {
 
         if (principal instanceof UserDetails userDetails) {
             User user = userService.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             return user.getId();
         } else {
-            throw new IllegalArgumentException("Usuario no autenticado");
+            throw new IllegalArgumentException("User not authenticated");
         }
     }
+    
 }

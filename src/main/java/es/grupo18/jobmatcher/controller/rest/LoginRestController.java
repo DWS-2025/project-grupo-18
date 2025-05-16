@@ -30,7 +30,7 @@ public class LoginRestController {
         if (refreshToken == null || refreshToken.isBlank()) {
             return ResponseEntity
                     .badRequest()
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Falta la cookie de refresh token"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Empty refresh token cookie"));
         }
         try {
             return userLoginService.refresh(response, refreshToken);
@@ -38,17 +38,17 @@ public class LoginRestController {
         } catch (ExpiredJwtException ex) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "El refresh token ha caducado"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Refresh token outdated"));
 
         } catch (JwtException ex) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Refresh token inválido"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Invalid refresh token"));
 
         } catch (Exception ex) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Error interno al refrescar el token"));
+                    .body(new AuthResponse(AuthResponse.Status.FAILURE, "Internal error while refreshing token"));
         }
     }
 
@@ -60,11 +60,11 @@ public class LoginRestController {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse(AuthResponse.Status.FAILURE,
-                            "No hay sesión iniciada, no se pudo cerrar sesión"));
+                            "No user logged, cannot logout"));
         }
         userLoginService.logout(response);
         return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS,
-                "Sesión cerrada correctamente"));
+                "Session closed successfully"));
     }
-    
+
 }

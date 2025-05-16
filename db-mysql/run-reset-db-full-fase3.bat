@@ -1,16 +1,16 @@
 @echo off
-REM Ruta del ejecutable MySQL
+REM Executable path for MySQL
 set MYSQL_BIN="C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"
 
-REM Usuario, contraseña y base de datos
+REM Username, password, and database name
 set USER=root
 set PASSWORD=Jobmatcher_123
 set DATABASE=jobmatcher
 
-REM Usamos la ruta del .bat + nombre del archivo SQL
+REM .bat + SQL file name
 set SQLFILE=%~dp0reset-db-full-fase3.sql
 
-REM Verificar si mysql.exe existe
+REM Verify if the MySQL executable exists
 if not exist %MYSQL_BIN% (
     echo ERROR: No se pudo encontrar mysql.exe en:
     echo    %MYSQL_BIN%
@@ -19,7 +19,7 @@ if not exist %MYSQL_BIN% (
     exit /b
 )
 
-REM Verificar si el archivo SQL existe
+REM Verify if the SQL file exists
 if not exist "%SQLFILE%" (
     echo ERROR: No se pudo encontrar el archivo SQL:
     echo    "%SQLFILE%"
@@ -28,10 +28,10 @@ if not exist "%SQLFILE%" (
     exit /b
 )
 
-REM Ejecutamos el comando con opciones para silenciar advertencias
+REM Execute the command with options to silence warnings
 %MYSQL_BIN% -u %USER% -p%PASSWORD% -D %DATABASE% --silent --skip-column-names 2>nul < "%SQLFILE%"
 
-REM Mensaje de éxito
+REM Success message
 echo.
 echo Base de datos "%DATABASE%" restaurada correctamente desde:
 echo    "%SQLFILE%"

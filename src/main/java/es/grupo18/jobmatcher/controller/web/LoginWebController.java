@@ -46,5 +46,5 @@ public class LoginWebController {
 
         return "redirect:/index.html";
     }
-    
+
 }

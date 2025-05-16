@@ -95,8 +95,7 @@ public class UserLoginService {
         user.setRoles(List.of("USER"));
         userRepository.save(user);
         UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
-        Authentication authToken =
-            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+        Authentication authToken = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }

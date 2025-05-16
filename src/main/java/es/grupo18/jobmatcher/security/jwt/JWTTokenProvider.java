@@ -24,13 +24,12 @@ public class JWTTokenProvider {
     @Autowired
     private UserService userService;
 
-    // Clave secreta generada para HS256 (puedes sustituir por tu clave real si prefieres)
+    // HS256 generated secret key
     private final SecretKey jwtSecret = Jwts.SIG.HS256.key().build();
 
-    // Parser que se reutiliza para verificar tokens
+    // Parser that will be used to validate the JWT
     private final JwtParser jwtParser = Jwts.parser().verifyWith(jwtSecret).build();
 
-    // Para usar Authorization: Bearer ...
     public String tokenStringFromHeaders(HttpServletRequest req) {
         String bearerToken = req.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearerToken == null || bearerToken.isBlank()) {
@@ -42,7 +41,6 @@ public class JWTTokenProvider {
         return bearerToken.substring(7);
     }
 
-    // ✅ Ahora es público: se puede usar en los controladores como PostRestController
     public String tokenStringFromCookies(HttpServletRequest request) {
         var cookies = request.getCookies();
         if (cookies == null) {
@@ -83,7 +81,7 @@ public class JWTTokenProvider {
         var expiry = Date.from(now.toInstant().plus(tokenType.duration));
 
         User user = userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         return Jwts.builder()
                 .claim("roles", userDetails.getAuthorities())
@@ -97,16 +95,17 @@ public class JWTTokenProvider {
 
     public Long getUserIdFromToken(String token) {
         if (token == null || token.trim().isEmpty()) {
-            throw new IllegalArgumentException("El token JWT no puede ser nulo o vacío.");
+            throw new IllegalArgumentException("JWT token cannot be null or empty");
         }
 
         Claims claims = jwtParser.parseSignedClaims(token).getPayload();
 
         Object userId = claims.get("userId");
         if (userId == null) {
-            throw new IllegalArgumentException("El token no contiene el campo 'userId'");
+            throw new IllegalArgumentException("Token does not contain 'userId' field");
         }
 
         return Long.parseLong(userId.toString());
     }
+
 }

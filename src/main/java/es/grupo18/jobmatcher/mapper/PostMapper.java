@@ -23,6 +23,3 @@ public interface PostMapper {
 
     List<Post> toDomains(List<PostDTO> dtos);
 }
-
-
-

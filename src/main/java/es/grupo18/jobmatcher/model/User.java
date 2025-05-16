@@ -56,13 +56,14 @@ public class User {
 
     // Complete constructor
 
-	public User(String name, String encoded_password, String... roles) {
-		this.name = name;
-		this.encoded_password = encoded_password;
-		this.roles = List.of(roles);
-	}
+    public User(String name, String encoded_password, String... roles) {
+        this.name = name;
+        this.encoded_password = encoded_password;
+        this.roles = List.of(roles);
+    }
 
-    public User(String name, String email, String encoded_password, String phone, String location, String bio, int experience,
+    public User(String name, String email, String encoded_password, String phone, String location, String bio,
+            int experience,
             byte[] image,
             List<Review> reviewsList, List<Post> postsList, List<Company> favouriteCompaniesList, String... roles) {
         this.name = name;
@@ -144,7 +145,7 @@ public class User {
     public List<String> getRoles() {
         return roles;
     }
-    
+
     // Setters
     public void setCvFileName(String cvFileName) {
         this.cvFileName = cvFileName;
@@ -201,7 +202,7 @@ public class User {
     public void setFavouriteCompaniesList(List<Company> favouriteCompaniesList) {
         this.favouriteCompaniesList = favouriteCompaniesList;
     }
-    
+
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }

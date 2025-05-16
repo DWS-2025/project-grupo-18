@@ -69,8 +69,7 @@ footer {
     justify-content: center;
     align-items: center;
     height: 100%;
-    gap: 20px; /* Espaciado entre las cajas */
-
+    gap: 20px;
 }
 
 /* Box styles for content sections */
@@ -109,7 +108,7 @@ p {
     color: black;
     font-size: 1.2rem;
     text-decoration: none;
-    
+
 }
 
 /* Link styles */

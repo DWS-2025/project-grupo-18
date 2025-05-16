@@ -14,51 +14,53 @@
 
 <body class="page-centered">
 
-<header>
-    <div class="header-left">
-        <button class="back-btn" onclick="location.href='/users'">⬅️ Atrás</button>
+    <header>
+        <div class="header-left">
+            <button class="back-btn" onclick="location.href='/users'">⬅️ Atrás</button>
+        </div>
+        <div class="title">
+            <a href="/main">JOBMATCHER</a>
+        </div>
+        <div class="header-right">
+            <button class="hidden-button"></button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="box">
+            <h2>Editar Usuario</h2>
+            <form method="post"
+                action="{{#user.id}}/users/{{user.id}}/edit{{/user.id}}{{^user.id}}/users/new{{/user.id}}">
+                <input type="hidden" name="_csrf" value="{{token}}">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" name="name" value="{{user.name}}" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{user.email}}" required>
+
+                <label for="phone">Teléfono</label>
+                <input type="text" id="phone" name="phone" value="{{user.phone}}">
+
+                <label for="location">Ubicación</label>
+                <input type="text" id="location" name="location" value="{{user.location}}">
+
+                <label for="bio">Acerca de mí</label>
+                <textarea id="bio" name="bio">{{user.bio}}</textarea>
+
+                <label for="experience">Experiencia (años)</label>
+                <input type="number" id="experience" name="experience" value="{{user.experience}}" min="0">
+
+                <div class="button-group">
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="title">
-        <a href="/main">JOBMATCHER</a>
-    </div>
-    <div class="header-right">
-        <button class="hidden-button"></button>
-    </div>
-</header>
 
-<div class="container">
-    <div class="box">
-        <h2>Editar Usuario</h2>
-        <form method="post" action="{{#user.id}}/users/{{user.id}}/edit{{/user.id}}{{^user.id}}/users/new{{/user.id}}">
-            <input type="hidden" name="_csrf" value="{{token}}">
-            <label for="name">Nombre</label>
-            <input type="text" id="name" name="name" value="{{user.name}}" required>
-
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{user.email}}" required>
-
-            <label for="phone">Teléfono</label>
-            <input type="text" id="phone" name="phone" value="{{user.phone}}">
-
-            <label for="location">Ubicación</label>
-            <input type="text" id="location" name="location" value="{{user.location}}">
-
-            <label for="bio">Acerca de mí</label>
-            <textarea id="bio" name="bio">{{user.bio}}</textarea>
-
-            <label for="experience">Experiencia (años)</label>
-            <input type="number" id="experience" name="experience" value="{{user.experience}}" min="0">
-
-            <div class="button-group">
-                <button type="submit">Guardar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<footer>
-    <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.</div>
-</footer>
+    <footer>
+        <div class="copyright">&copy; 2025 Desarrollado por el equipo de Cibercatalejo. Todos los derechos reservados.
+        </div>
+    </footer>
 
 </body>
 

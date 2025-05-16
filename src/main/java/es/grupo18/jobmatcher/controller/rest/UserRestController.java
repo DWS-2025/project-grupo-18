@@ -77,7 +77,7 @@ public class UserRestController {
             userService.deleteCurrentUserAndLogout(response);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la cuenta");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting account");
         }
     }
 
@@ -87,7 +87,7 @@ public class UserRestController {
             userService.uploadCv(cv);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al subir CV: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error uploading CV: " + e.getMessage());
         }
     }
 
@@ -113,7 +113,7 @@ public class UserRestController {
             userService.deleteCv();
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting CV");
         }
     }
 
@@ -125,7 +125,7 @@ public class UserRestController {
             userService.uploadCv(file, userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al subir CV: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error uploading CV: " + e.getMessage());
         }
     }
 
@@ -151,7 +151,7 @@ public class UserRestController {
             userService.deleteCv(userId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar el CV");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting CV");
         }
     }
 
