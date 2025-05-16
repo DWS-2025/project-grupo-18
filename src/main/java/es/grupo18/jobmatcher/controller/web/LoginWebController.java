@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.csrf.CsrfToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -15,14 +18,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginWebController {
 
     @GetMapping("/login")
-    public String login(Model model, HttpServletRequest request) {
+    public String login(Model model, HttpServletRequest request, Authentication auth) {
+        if (isLoggedIn(auth)) {
+            return "redirect:/main";
+        }
         CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
         model.addAttribute("token", token.getToken());
         return "login/login";
     }
 
     @GetMapping("/loginerror")
-    public String loginError(Model model) {
+    public String loginError(Model model, Authentication auth) {
+        if (isLoggedIn(auth)) {
+            return "redirect:/main";
+        }
         model.addAttribute("loginError");
         return "login/loginerror";
     }
@@ -44,7 +53,13 @@ public class LoginWebController {
 
         SecurityContextHolder.clearContext();
 
-        return "redirect:/index.html";
+        return "redirect:/";
+    }
+
+    private boolean isLoggedIn(Authentication auth) {
+        return auth != null
+                && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken);
     }
 
 }
