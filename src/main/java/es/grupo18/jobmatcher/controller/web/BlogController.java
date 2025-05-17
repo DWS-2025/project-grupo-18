@@ -161,6 +161,10 @@ public class BlogController {
     @GetMapping("/blog/posts/{postId}/edit")
     public String editPost(Model model, @PathVariable long postId) {
         try {
+            if (!postService.findById(postId).authorId().equals(userService.getLoggedUser().id()) &&
+                    !userService.getLoggedUser().roles().contains("ADMIN")) {
+                return "error/403";
+            }
             model.addAttribute("post", postService.findById(postId));
             model.addAttribute("isEdit", true);
             model.addAttribute("currentTimeMillis", System.currentTimeMillis());
@@ -208,6 +212,10 @@ public class BlogController {
     @GetMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
     public String editReview(Model model, @PathVariable long reviewId, @PathVariable long postId) {
         try {
+            if (!reviewService.findById(reviewId).authorId().equals(userService.getLoggedUser().id()) &&
+                    !userService.getLoggedUser().roles().contains("ADMIN")) {
+                return "error/403";
+            }
             model.addAttribute("post", postService.findById(postId));
             model.addAttribute("review", reviewService.findById(reviewId));
             return "blog/review_form";
