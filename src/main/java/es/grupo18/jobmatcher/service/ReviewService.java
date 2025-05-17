@@ -16,6 +16,7 @@ import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.model.Review;
 import es.grupo18.jobmatcher.repository.PostRepository;
 import es.grupo18.jobmatcher.repository.ReviewRepository;
+import es.grupo18.jobmatcher.util.InputSanitizer;
 
 @Service
 public class ReviewService {
@@ -49,7 +50,15 @@ public class ReviewService {
     }
 
     public ReviewDTO save(PostDTO postDTO, ReviewDTO reviewDTO) { // Saves a review
-        Review review = toDomain(reviewDTO);
+        ReviewDTO cleanDto = new ReviewDTO(
+                reviewDTO.id(),
+                InputSanitizer.sanitizePlain(reviewDTO.text()),
+                reviewDTO.rating(),
+                reviewDTO.authorId(),
+                reviewDTO.postId(),
+                reviewDTO.authorName());
+        Review review = toDomain(cleanDto);
+
         Post post = postMapper.toDomain(postDTO);
         post.getReviews().add(review);
         review.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
@@ -61,7 +70,8 @@ public class ReviewService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("Post not found"));
 
-        Review review = new Review(text, rating);
+        String safeText = InputSanitizer.sanitizePlain(text);
+        Review review = new Review(safeText, rating);
         review.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
         review.setPost(post);
 
@@ -72,7 +82,9 @@ public class ReviewService {
     public ReviewDTO update(ReviewDTO oldReviewDTO, ReviewDTO updatedReviewDTO) {
         Review oldReview = toDomain(oldReviewDTO);
         Review updatedReview = toDomain(updatedReviewDTO);
-        oldReview.setText(updatedReview.getText());
+        String safeText = InputSanitizer.sanitizePlain(updatedReview.getText());
+        oldReview.setText(safeText);
+
         oldReview.setRating(updatedReview.getRating());
         reviewRepository.save(oldReview);
         return toDTO(oldReview);
@@ -85,7 +97,9 @@ public class ReviewService {
         }
 
         Review review = toDomain(findById(reviewId));
-        review.setText(text);
+        String safeText = InputSanitizer.sanitizePlain(text);
+        review.setText(safeText);
+
         review.setRating(rating);
         reviewRepository.save(review);
         return toDTO(review);

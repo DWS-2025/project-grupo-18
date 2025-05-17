@@ -24,6 +24,8 @@ import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Post;
 import es.grupo18.jobmatcher.repository.PostRepository;
 
+import es.grupo18.jobmatcher.util.InputSanitizer;
+
 @Service
 public class PostService {
 
@@ -53,7 +55,12 @@ public class PostService {
     }
 
     public PostDTO save(PostDTO postDTO) { // Saves a post
+        String safeTitle = InputSanitizer.sanitizePlain(postDTO.title());
+        String safeContent = InputSanitizer.sanitizePlain(postDTO.content());
         Post post = toDomain(postDTO);
+        post.setTitle(safeTitle);
+        post.setContent(safeContent);
+
         post.setAuthor(userMapper.toDomain(userService.getLoggedUser()));
         post.setTimestamp(LocalDateTime.now());
         postRepository.save(post);
@@ -64,8 +71,11 @@ public class PostService {
         byte[] imageBytes = null;
         String contentType = null;
 
-        Post post = new Post(title, content, LocalDateTime.now(), imageBytes,
+        String safeTitle = InputSanitizer.sanitizePlain(title);
+        String safeContent = InputSanitizer.sanitizePlain(content);
+        Post post = new Post(safeTitle, safeContent, LocalDateTime.now(), imageBytes,
                 userMapper.toDomain(userService.getLoggedUser()));
+
         post.setImageContentType(contentType);
 
         if (image != null && !image.isEmpty()) {
@@ -82,8 +92,12 @@ public class PostService {
 
     public PostDTO update(PostDTO oldPostDTO, PostDTO updatedPostDTO) {
         Post post = toDomain(oldPostDTO);
-        post.setTitle(updatedPostDTO.title());
-        post.setContent(updatedPostDTO.content());
+        String safeTitle = InputSanitizer.sanitizePlain(updatedPostDTO.title());
+        String safeContent = InputSanitizer.sanitizePlain(updatedPostDTO.content());
+        post.setTitle(safeTitle);
+        post.setContent(safeContent);
+        post.setTimestamp(LocalDateTime.now());
+
         post.setTimestamp(LocalDateTime.now());
 
         if (updatedPostDTO.image() != null && updatedPostDTO.image().length > 0) {
@@ -102,8 +116,11 @@ public class PostService {
         }
 
         Post post = toDomain(findById(id));
-        post.setTitle(title);
-        post.setContent(content);
+        String safeTitle = InputSanitizer.sanitizePlain(title);
+        String safeContent = InputSanitizer.sanitizePlain(content);
+        post.setTitle(safeTitle);
+        post.setContent(safeContent);
+
         post.setTimestamp(LocalDateTime.now());
 
         if (image != null && !image.isEmpty()) {
