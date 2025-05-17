@@ -1,8 +1,14 @@
 package es.grupo18.jobmatcher.security;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -20,13 +26,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.grupo18.jobmatcher.security.jwt.JWTRequestFilter;
 import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
+import es.grupo18.jobmatcher.security.jwt.UserLoginService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +141,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain webFilterChain(HttpSecurity http, UserLoginService userLoginService) throws Exception {
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(auth -> auth
@@ -148,6 +162,9 @@ public class SecurityConfig {
                         .failureUrl("/loginerror")
                         .defaultSuccessUrl("/main", true)
                         .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler(userLoginService)))
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             String uri = request.getRequestURI();
@@ -181,6 +198,23 @@ public class SecurityConfig {
                     "message", ex.getMessage());
             new ObjectMapper().writeValue(res.getWriter(), err);
         };
+    }
+
+    @Bean
+    public LogoutSuccessHandler customLogoutSuccessHandler(UserLoginService userLoginService) {
+        return (request, response, authentication) -> {
+            userLoginService.logout(request, response, true);
+            response.sendRedirect("/login?logout");
+        };
+    }
+
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
+        return factory -> factory.addContextCustomizers(context -> {
+            Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+            cookieProcessor.setSameSiteCookies("Strict");
+            context.setCookieProcessor(cookieProcessor);
+        });
     }
 
 }

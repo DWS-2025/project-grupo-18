@@ -5,7 +5,6 @@ import es.grupo18.jobmatcher.security.jwt.LoginRequest;
 import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -70,7 +69,7 @@ public class LoginRestController {
                             "No user logged, cannot logout"));
         }
 
-        userLoginService.logout(request, response);
+        userLoginService.logout(request, response, false);
 
         return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS,
                 "Session closed successfully"));
