@@ -109,97 +109,98 @@ This diagram illustrates the main entities of the application and their relation
 
 ---
 
-#### DISCLAIMER #####
-
-Most of the commits appear to be done by dmartinm2023, due to the file exchange between web and REST controllers, specially in the top 5 files contributed section. When we wrote this, we selected the files that we felt that were the most significative for each member of the team, not only based in Github but in the time we spent developing the app.
 
 ### 👤 Daniel Martín Muñoz
 
 #### Tasks completed:
-- DTOs, mappers and REST Controllers created (not all of them finished).
-- Special focus on companies and profile section.
-- AJAX pagination.
+- Session management
+- Implementation of rich text
+- Security in cookies and tokens
+- Configuration of SecurityConfig
 
 #### Top 5 commits:
-1. [`Most of the API operations were fixed and also some web issues`](https://github.com/DWS-2025/project-grupo-18/commit/845a2550b71c6af7eb50795eb381f1bf18d4cff3)
-2. [`AJAX pagination totally functional`](https://github.com/DWS-2025/project-grupo-18/commit/d859329db5e5bb68a8dafaff4cdafedd6ddbf435)
-3. [`Separation between web and REST controllers + CompanyRestController created`](https://github.com/DWS-2025/project-grupo-18/commit/056adf497d0e66d35a45f2f02c846b3eab585e48)
-4. [`DTOs created`](https://github.com/DWS-2025/project-grupo-18/commit/9bff96ac12b3d3eb0899f8be32c0181b6623c477)
-5. [`Mappers created + dependencies`](https://github.com/DWS-2025/project-grupo-18/commit/704d9692a074bd2b11f41ecb6cfe58f466ec9937)
+1. [`API and web bugs fixed`](https://github.com/DWS-2025/project-grupo-18/commit/0e94849eacaf90333dc975f3a1820cd6e7600d57)
+2. [`quill.js implemented`](https://github.com/DWS-2025/project-grupo-18/commit/c03a854a8001e3f8b7809655a4071cacb7ba8caa)
+3. [`Logout added`](https://github.com/DWS-2025/project-grupo-18/commit/50155efb866e5bdf4f6e1f61bd30e44601d710d3)
+4. [`Delete and close session`](https://github.com/DWS-2025/project-grupo-18/commit/c3bd10afe25f89dbdd1528636e3132df65b1cef0)
+5. [`Cookies same-site strict`](https://github.com/DWS-2025/project-grupo-18/commit/bf83efeeb3f0648aec890c887ebe03f855d15eac)
 
 #### Top 5 files contributed to:
-- `src\main\java\es\grupo18\jobmatcher\controller\web\CompaniesController.java`
-- `src\main\java\es\grupo18\jobmatcher\controller\rest\CompanyRestController.java`
-- `src\main\java\es\grupo18\jobmatcher\service\CompanyService.java`
-- `src\main\resources\static\js\companiesAjax.js`
-- `src\main\java\es\grupo18\jobmatcher\controller\web\ProfileController.java`
+- `src\main\java\es\grupo18\jobmatcher\security\SecurityConfig.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\rest\PostRestController.java`
+- `src\main\java\es\grupo18\jobmatcher\service\UserService.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\rest\UserRestController.java`
+- `src\main\java\es\grupo18\jobmatcher\security\jwt\AuthResponse.java`
 
 ### 👤 Carlos Marrón Benito
 
 #### Tasks completed:
-- Bug fixing.
-- Special focus on matches and users.
-- UserRestController created.
+- Implementation of the CSRF token
+- AJAX security measures
+- Security enhancements with Content Security Policy
+- User roles added
 
 #### Top 5 commits:
-1. [`Match system fixed`](https://github.com/DWS-2025/project-grupo-18/commit/db3e44a0df82a85e5bbe1733aa260f1fca8f6a51)
-2. [`Company visualization in match consulting section`](https://github.com/DWS-2025/project-grupo-18/commit/09bc7c891cb837b1280d60ea29151f4e0a51d4c1)
-3. [`Review visualization when SQL database is enabled`](https://github.com/DWS-2025/project-grupo-18/commit/5fd9938a8642c9add9ee490d87c17061815ef2f7)
-4. [`Match consulting page fixed`](https://github.com/DWS-2025/project-grupo-18/commit/09bc7c891cb837b1280d60ea29151f4e0a51d4c1)
-5. [`REST controllers fixed and README.md creation`](https://github.com/DWS-2025/project-grupo-18/commit/ba73988850868c30aa6a321f2118e2f8f4b010fb)
+1. [`ContentSecurityPolicy`](https://github.com/DWS-2025/project-grupo-18/commit/ce6dd1b4732f0574c42c3bd14ef075b39afa951c)
+2. [`Roles added`](https://github.com/DWS-2025/project-grupo-18/commit/825f8ac135e32b2f657de3f34a80bd5e0d17b91a)
+3. [`Security on CSRF and AJAX`](https://github.com/DWS-2025/project-grupo-18/commit/8f3f3070a7ba9e8c3fb24235aa5b3bc954c4bf95)
+4. [`API fixing`](https://github.com/DWS-2025/project-grupo-18/commit/a2feab4b44a23ce018b498745b3a77ebd9dd0d25)
+5. [`Update config redirection`](https://github.com/DWS-2025/project-grupo-18/commit/3976501c9f33680214070c1358e3e2507497e8de)
 
 #### Top 5 files contributed to:
-- `src\main\java\es\grupo18\jobmatcher\controller\rest\UserRestController.java`
-- `src\main\java\es\grupo18\jobmatcher\controller\rest\ImageRestController.java`
-- `src\main\java\es\grupo18\jobmatcher\controller\rest\PostRestController.java`
-- `src\main\java\es\grupo18\jobmatcher\controller\web\MatchController.java`
-- `src\main\java\es\grupo18\jobmatcher\service\UserService.java`
+- `src\main\resources\static\js\usersAjax.js`
+- `src\main\resources\static\js\companiesAjax.js`
+- `src\main\java\es\grupo18\jobmatcher\security\CSRFHandlerConfiguration.java`
+- `src\main\resources\templates`
+- `src\main\java\es\grupo18\jobmatcher\controller\rest`
 
 
 ### 👤 Héctor Julián Alijas
 
 #### Tasks completed:
-- Major bug fixes.
-- Special focus on all of the blog page.
-- Database created and configured.
-- Separation between MySQL and H2 databases in application.properties.
+- Roles in the database.
+- Security and validations for images
+- Encoded passwords
+- Role-based distinction for CV uploads
+- User management for the admin
 
 #### Top 5 commits:
-1. [`Blog posts working perfectly with creation, editing, deletion and filtering`](https://github.com/DWS-2025/project-grupo-18/commit/f71220048f0b8b59962ba10db20039e98d8a2b66)
-2. [`The database is fully functional with images included.`](https://github.com/DWS-2025/project-grupo-18/commit/5777f2c44d3b44e82f063f00f66bde5046f71ed5)
-3. [`H2 & MySQL profile created in application.properties`](https://github.com/DWS-2025/project-grupo-18/commit/ed39cb7ceb67f84091627d428431d4c29678a6a5)
-4. [`Major bug fixing`](https://github.com/DWS-2025/project-grupo-18/commit/a65c3a0dfb9490e8c7a33ba9d2d8b41d6b056d1a)
-5. [`Early blog creation`](https://github.com/DWS-2025/project-grupo-18/commit/f71220048f0b8b59962ba10db20039e98d8a2b66)
+1. [`Basic Users`](https://github.com/DWS-2025/project-grupo-18/commit/db9fe8cda88e73cbbb85488de4bdc5a122e664f7)
+2. [`Roles for DB.`](https://github.com/DWS-2025/project-grupo-18/commit/378e84b49614785e6d539c3c3dc5ccd214082133)
+3. [`Password encoder`](https://github.com/DWS-2025/project-grupo-18/commit/080349f8187101e816012c66bb37feb0d881c0c2)
+4. [`Security and roles for CV`](https://github.com/DWS-2025/project-grupo-18/commit/e83aced4c8b287751bf2ba6ae3b7a3d4190ed7bb)
+5. [`Image Security for Post`](https://github.com/DWS-2025/project-grupo-18/commit/ef2574ae2f5e3eb9d919384dccee2cc6682b68c6)
 
 #### Top 5 files contributed to:
-- `src\main\java\es\grupo18\jobmatcher\controller\web\BlogController.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\web\ProfileController.java`
+- `src\main\java\es\grupo18\jobmatcher\service\UserService.java`
 - `src\main\java\es\grupo18\jobmatcher\service\PostService.java`
-- `src\main\resources\application-h2.properties`
-- `src\main\resources\application-mysql.properties`
-- `db-mysql\run-reset-db-full.bat`
+- `src\main\java\es\grupo18\jobmatcher\controller\web\UserController.java`
+- `db-mysql\reset-db-full-fase3.sql`
 
 
 ### 👤 Álvaro Mota Lucena
 
 #### Tasks completed:
-- Review entity creation.
-- All reviews operations implemented.
-- Front-end formating.
-- Postman collection created. It does not appear as his commit but it was created by him and uploaded by someone else.
+- Implementation of logic for user registration and login in the API.
+- Development of functionality to upload and download PDF files.
+- Testing for potential SQL injection and XSS vulnerabilities.
+- Attribute sanitization and resolution of known security vulnerabilities.
 
 #### Top 5 commits:
-1. [`REST controller for reviews`](https://github.com/DWS-2025/project-grupo-18/commit/1b7d814500c144958ba11f4076f8f996f2d06dd5)
-2. [`Query and operation of reviews, operational and completed.`](https://github.com/DWS-2025/project-grupo-18/commit/5f8183399de2a848e59ddfbad41f5505b4021146)
-3. [`Reviews integrated into each post and known issues resolved`](https://github.com/DWS-2025/project-grupo-18/commit/5d9f261b778ce459e13d2cd1f4c6556d9ead5115)
-4. [`Postman uploaded. Shared commit`](https://github.com/DWS-2025/project-grupo-18/commit/845a2550b71c6af7eb50795eb381f1bf18d4cff3)
-5. [`Posts updated and new showposts.html`](https://github.com/DWS-2025/project-grupo-18/commit/da40b8885586490b4e98f0df50a2bf19f86b0a46)
+1. [`Added REST controllers for login and register`](https://github.com/DWS-2025/project-grupo-18/commit/35684272f7d9aa680695b152f42f781b87771799)
+2. [`Added option to upload PDF file to profile.`](https://github.com/DWS-2025/project-grupo-18/commit/ba6d6b9ccc42f54dc417bec6b1f17a5038e29137)
+3. [`Known XSS patched.`](https://github.com/DWS-2025/project-grupo-18/commit/0a272a76a8655b25c2727e77859d665769adfda4)
+4. [`Resolved more known XSS and fortified API REST`](https://github.com/DWS-2025/project-grupo-18/commit/0c5dc0de6fbc25097297c7cc6f3f8f70b251cf69)
+5. [`Fixed csrf problem.`](https://github.com/DWS-2025/project-grupo-18/commit/08eb290385ff5264defa7980edc68d6d303419fd)
+
 
 #### Top 5 files contributed to:
-- `src\main\java\es\grupo18\jobmatcher\controller\web\BlogController.java`
-- `src\main\java\es\grupo18\jobmatcher\model\Review.java`
-- `src\main\java\es\grupo18\jobmatcher\service\ReviewService.java`
-- `src\main\resources\static\json\api.postman_collection.json`
-- `src\main\java\es\grupo18\jobmatcher\controller\rest\ReviewRestController.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\rest\LoginRestController.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\rest\RegisterRestController.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\web\RegisterWebController.java`
+- `src\main\java\es\grupo18\jobmatcher\controller\web\ProfileController.java`
+- `src\main\java\es\grupo18\jobmatcher\security\SecurityConfig.java`
 
 ---
 
