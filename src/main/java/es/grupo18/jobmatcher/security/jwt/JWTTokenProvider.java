@@ -17,6 +17,7 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.JwtException;
 
 @Component
 public class JWTTokenProvider {
@@ -106,6 +107,18 @@ public class JWTTokenProvider {
         }
 
         return Long.parseLong(userId.toString());
+    }
+
+    public void validateRefreshToken(String token) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("Refresh token cannot be null or empty");
+        }
+
+        Claims claims = validateToken(token);
+        String type = claims.get("type", String.class);
+        if (!TokenType.REFRESH.name().equals(type)) {
+            throw new JwtException("Token is not a refresh token");
+        }
     }
 
 }

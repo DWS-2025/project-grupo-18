@@ -1,11 +1,11 @@
 package es.grupo18.jobmatcher.controller.rest;
 
 import es.grupo18.jobmatcher.security.jwt.AuthResponse;
+import es.grupo18.jobmatcher.security.jwt.JWTTokenProvider;
 import es.grupo18.jobmatcher.security.jwt.LoginRequest;
 import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -25,8 +25,28 @@ public class LoginRestController {
     @Autowired
     private UserLoginService userLoginService;
 
+    @Autowired
+    private JWTTokenProvider jwtTokenProvider;
+
     @PostMapping
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> login(
+            @CookieValue(name = "RefreshToken", required = false) String refreshToken,
+            @RequestBody LoginRequest request,
+            HttpServletResponse response) {
+
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            try {
+                jwtTokenProvider.validateRefreshToken(refreshToken);
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(new AuthResponse(
+                                AuthResponse.Status.FAILURE,
+                                "Session already active"));
+            } catch (JwtException ex) {
+                System.out.println("JWT exception");
+            }
+        }
+
         return userLoginService.login(response, request);
     }
 
