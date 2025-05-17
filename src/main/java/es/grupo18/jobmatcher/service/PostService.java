@@ -1,7 +1,7 @@
 package es.grupo18.jobmatcher.service;
 
-import javax.imageio.ImageIO;
-
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -11,8 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -276,9 +275,10 @@ public class PostService {
                 .map(post -> {
                     System.out.println(">>> POST OWNER: " + post.getAuthor().getId() + " | REQUEST USER: " + userId);
                     return post.getAuthor().getId().equals(userId)
-                            || userService.hasRole(userId.toString(), "ADMIN");
+                            || userService.hasRoleById(userId, "ADMIN");
                 })
                 .orElse(false);
     }
+
 
 }

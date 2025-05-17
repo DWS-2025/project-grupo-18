@@ -508,6 +508,12 @@ public class UserService {
                 .stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
+    public boolean hasRoleById(Long userId, String role) {
+        return userRepository.findById(userId)
+            .map(user -> user.getRoles().contains(role))
+            .orElse(false);
+    }
+
 
     public boolean isOwner(Long id) {
         UserDTO current = getLoggedUser();

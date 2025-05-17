@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,16 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import es.grupo18.jobmatcher.security.jwt.JWTRequestFilter;
 import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
@@ -33,8 +23,6 @@ import es.grupo18.jobmatcher.security.jwt.UnauthorizedHandlerJWT;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     private JWTRequestFilter jwtRequestFilter;
@@ -70,12 +58,10 @@ public class SecurityConfig {
 
         http.securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandlerJWT))
                 .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(unauthorizedHandlerJWT)
-                        .accessDeniedHandler(forbiddenHandler()))
                 .authorizeHttpRequests(authorize -> authorize
                         // Public API endpoints
                         .requestMatchers("/api/login", "/api/login/**", "/api/register", "/api/register/**").permitAll()
@@ -169,20 +155,6 @@ public class SecurityConfig {
                         }));
 
         return http.build();
-    }
-
-    @Bean
-    public AccessDeniedHandler forbiddenHandler() {
-        return (req, res, ex) -> {
-            logger.warn("Access denied: {}", ex.getMessage());
-            res.setStatus(HttpStatus.FORBIDDEN.value());
-            res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            Map<String, Object> err = Map.of(
-                    "status", 403,
-                    "error", "FORBIDDEN",
-                    "message", ex.getMessage());
-            new ObjectMapper().writeValue(res.getWriter(), err);
-        };
     }
 
 }

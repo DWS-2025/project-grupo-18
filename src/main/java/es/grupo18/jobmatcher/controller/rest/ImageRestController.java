@@ -1,7 +1,6 @@
 package es.grupo18.jobmatcher.controller.rest;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -31,13 +30,6 @@ public class ImageRestController {
     @Autowired
     private PostService postService;
 
-    // OWASP HTML Sanitizer Policy
-    private void validateFileName(String fileName) {
-    if (!fileName.matches("^[a-zA-Z0-9._-]+$")) {
-        throw new IllegalArgumentException("Invalid file name");
-    }
-}
-
     // === USER PROFILE IMAGE ===
 
     @GetMapping("/users/{id}")
@@ -64,8 +56,6 @@ public class ImageRestController {
     @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
     public ResponseEntity<?> uploadUserImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
-            String safeFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
-            validateFileName(safeFileName);
             userService.save(userService.findById(id), file);
             return ResponseEntity.ok().build();
         } catch (IOException e) {
