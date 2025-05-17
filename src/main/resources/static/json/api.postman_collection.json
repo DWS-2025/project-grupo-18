@@ -735,7 +735,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"1234567890\",\n    \"location\": \"Madrid\",\n    \"bio\": \"Software engineer with 5 years of experience\",\n    \"experience\": 5\n}"
+							"raw": "{\n    \"name\": \"user3\",\n    \"email\": \"user3@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
 							"raw": "https://localhost:8443/api/users",
@@ -1071,7 +1071,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user3@example.com\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"name\": \"user4\",\n    \"email\": \"user4@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
 							"raw": "https://localhost:8443/api/register",

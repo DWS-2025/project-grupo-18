@@ -43,18 +43,16 @@ public class SecurityConfig {
     @Autowired
     private RepositoryUserDetailsService userDetailsService;
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 

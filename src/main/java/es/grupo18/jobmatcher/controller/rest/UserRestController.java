@@ -1,11 +1,14 @@
 package es.grupo18.jobmatcher.controller.rest;
 
 import es.grupo18.jobmatcher.dto.UserDTO;
+import es.grupo18.jobmatcher.security.jwt.AuthResponse;
+import es.grupo18.jobmatcher.security.jwt.RegisterRequest;
+import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import es.grupo18.jobmatcher.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -22,19 +25,11 @@ import org.springframework.http.MediaType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Paths;
-
-import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserRestController {
-    private static final PolicyFactory TEXT_SANITIZER = Sanitizers.FORMATTING;
-
-    private String sanitizeText(String text) {
-        return text != null ? TEXT_SANITIZER.sanitize(text) : null;
-    }
 
     private void validateFileName(String fileName) {
         if (!fileName.matches("^[a-zA-Z0-9._-]+$")) {
@@ -44,6 +39,9 @@ public class UserRestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserLoginService userLoginService;
 
     @GetMapping
     public Page<UserDTO> getAll(Pageable pageable) {
@@ -61,22 +59,10 @@ public class UserRestController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO dto) {
-        UserDTO sanitizedDto = new UserDTO(
-                dto.id(),
-                sanitizeText(dto.name()),
-                sanitizeText(dto.email()),
-                sanitizeText(dto.phone()),
-                sanitizeText(dto.location()),
-                sanitizeText(dto.bio()),
-                dto.experience(),
-                dto.image(),
-                dto.imageContentType(),
-                dto.roles(),
-                dto.cvFileName());
-        UserDTO created = userService.save(sanitizedDto);
-        URI location = fromCurrentRequest().path("/{id}").buildAndExpand(created.id()).toUri();
-        return ResponseEntity.created(location).body(created);
+    public ResponseEntity<AuthResponse> createUser(@Valid @RequestBody RegisterRequest request) {
+        request.setName(request.getName());
+        AuthResponse response = userLoginService.register(request);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -85,11 +71,11 @@ public class UserRestController {
         try {
             UserDTO sanitizedDto = new UserDTO(
                     dto.id(),
-                    sanitizeText(dto.name()),
-                    sanitizeText(dto.email()),
-                    sanitizeText(dto.phone()),
-                    sanitizeText(dto.location()),
-                    sanitizeText(dto.bio()),
+                    dto.name(),
+                    dto.email(),
+                    dto.phone(),
+                    dto.location(),
+                    dto.bio(),
                     dto.experience(),
                     dto.image(),
                     dto.imageContentType(),
@@ -113,9 +99,10 @@ public class UserRestController {
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<?> deleteOwnAccount(HttpServletResponse response) {
+    public ResponseEntity<?> deleteOwnAccount(HttpServletRequest req,
+            HttpServletResponse res) {
         try {
-            userService.deleteCurrentUserAndLogout(response);
+            userService.deleteCurrentUserAndLogout(req, res);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting account");

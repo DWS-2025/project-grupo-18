@@ -140,9 +140,10 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/delete")
-    public String deleteOwnProfile(HttpServletResponse response) {
+    public String deleteOwnProfile(HttpServletRequest req,
+            HttpServletResponse res) {
         try {
-            userService.deleteCurrentUserAndLogout(response);
+            userService.deleteCurrentUserAndLogout(req, res);
             return "redirect:/login?message=Account deleted successfully";
         } catch (Exception e) {
             return "redirect:/profile?error="

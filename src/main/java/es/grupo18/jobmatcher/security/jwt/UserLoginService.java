@@ -16,10 +16,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import es.grupo18.jobmatcher.exception.EmailAlreadyExistsException;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UserLoginService {
@@ -67,7 +70,7 @@ public class UserLoginService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use");
+            throw new EmailAlreadyExistsException(request.getEmail());
         }
 
         User user = new User();
@@ -133,11 +136,14 @@ public class UserLoginService {
         }
     }
 
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextHolder.clearContext();
         response.addCookie(removeTokenCookie(TokenType.ACCESS));
         response.addCookie(removeTokenCookie(TokenType.REFRESH));
 
+        HttpSession session = request.getSession(false);
+        if (session != null)
+            session.invalidate();
         return "logout successfully";
     }
 

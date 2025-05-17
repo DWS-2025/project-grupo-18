@@ -20,8 +20,9 @@ public interface UserMapper {
     @Mapping(target = "roles", source = "roles")
     User toDomain(UserDTO userDTO);
 
+    @Mapping(target = "password", ignore = true)
     List<UserDTO> toDTOs(List<User> users);
 
     List<User> toDomains(List<UserDTO> dtos);
-    
+
 }

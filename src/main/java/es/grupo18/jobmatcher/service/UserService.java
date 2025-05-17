@@ -16,10 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +33,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UserService {
@@ -56,18 +58,14 @@ public class UserService {
     @Autowired
     private CompanyMapper companyMapper;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     private static final String CV_STORAGE_DIR = "cv_storage";
     private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR)
             .toAbsolutePath().normalize();
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
-    private static final PolicyFactory TEXT_SANITIZER = Sanitizers.FORMATTING;
-
-    private String sanitizeText(String text) {
-        if (text == null) return null;
-        return TEXT_SANITIZER.sanitize(text);
-    }
 
     public UserDTO getLoggedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -93,23 +91,35 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public UserDTO save(UserDTO user) {
-        if (user.roles() == null || user.roles().isEmpty()) {
-            user = new UserDTO(
-                    user.id(),
-                    sanitizeText(user.name()),    
-                    sanitizeText(user.email()),   
-                    sanitizeText(user.phone()),   
-                    sanitizeText(user.location()),
-                    user.bio(),                   
-                    user.experience(),
-                    user.image(),
-                    user.imageContentType(),
-                    List.of("USER"),
-                    user.cvFileName());
+    public UserDTO save(UserDTO dto) {
+        if (userRepository.existsByEmail(dto.email()))
+            throw new RuntimeException("Email already exists");
+
+        User user = userMapper.toDomain(dto);
+
+        if (user.getRoles() == null || user.getRoles().isEmpty())
+            user.setRoles(List.of("USER"));
+
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    public UserDTO save(UserDTO dto, String rawPassword) {
+
+        User user = userMapper.toDomain(dto);
+
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            user.setRoles(List.of("USER"));
         }
-        userRepository.save(toDomain(user));
-        return user;
+
+        user.setEncoded_password(
+                encoder.encode(
+                        (rawPassword == null || rawPassword.isBlank())
+                                ? UUID.randomUUID().toString()
+                                : rawPassword));
+
+        userRepository.save(user);
+
+        return userMapper.toDTO(user);
     }
 
     public UserDTO save(UserDTO userDTO, MultipartFile image) throws IOException {
@@ -157,11 +167,11 @@ public class UserService {
         User currentUser = userRepository.findById(getLoggedUser().id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        currentUser.setName(sanitizeText(updatedDto.name()));     
-        currentUser.setEmail(sanitizeText(updatedDto.email()));   
-        currentUser.setPhone(sanitizeText(updatedDto.phone()));   
-        currentUser.setLocation(sanitizeText(updatedDto.location())); 
-        currentUser.setBio(updatedDto.bio());                     
+        currentUser.setName(updatedDto.name());
+        currentUser.setEmail(updatedDto.email());
+        currentUser.setPhone(updatedDto.phone());
+        currentUser.setLocation(updatedDto.location());
+        currentUser.setBio(updatedDto.bio());
         currentUser.setExperience(updatedDto.experience());
 
         userRepository.save(currentUser);
@@ -300,10 +310,9 @@ public class UserService {
             }
         }
 
-        // Validar que puede parsearse como imagen
         BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
         if (bufferedImage == null) {
-            throw new IllegalArgumentException("La imagen está corrupta o no se puede procesar.");
+            throw new IllegalArgumentException("Corrupted image or it cannot be processed");
         }
 
     }
@@ -438,13 +447,18 @@ public class UserService {
         }
     }
 
-    public void deleteCurrentUserAndLogout(HttpServletResponse response) {
+    public void deleteCurrentUserAndLogout(HttpServletRequest request, HttpServletResponse response) {
         UserDTO user = getLoggedUser();
         userRepository.deleteById(user.id());
 
         clearAuthCookies(response);
 
         SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
     }
 
     public void removeImage(Long id) {
@@ -508,12 +522,12 @@ public class UserService {
                 .stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
+
     public boolean hasRoleById(Long userId, String role) {
         return userRepository.findById(userId)
-            .map(user -> user.getRoles().contains(role))
-            .orElse(false);
+                .map(user -> user.getRoles().contains(role))
+                .orElse(false);
     }
-
 
     public boolean isOwner(Long id) {
         UserDTO current = getLoggedUser();
