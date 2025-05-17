@@ -79,7 +79,7 @@ public class CompanyRestController {
             if (!userService.isCompanyFavourite(company)) {
                 userService.addOrRemoveFavouriteCompany(userService.getLoggedUser().id(), company);
             }
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
