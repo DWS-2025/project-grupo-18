@@ -136,32 +136,15 @@ public class UserLoginService {
         }
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response, boolean isWeb) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextHolder.clearContext();
         response.addCookie(removeTokenCookie(TokenType.ACCESS));
         response.addCookie(removeTokenCookie(TokenType.REFRESH));
-        if (isWeb) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
-            }
 
-            Cookie cookie = new Cookie("JSESSIONID", null);
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        }
-
-        Cookie tokenCookie = new Cookie("accessToken", null);
-        tokenCookie.setPath("/");
-        tokenCookie.setHttpOnly(true);
-        tokenCookie.setSecure(true);
-        tokenCookie.setMaxAge(0);
-        response.addCookie(tokenCookie);
-
-        SecurityContextHolder.clearContext();
-
+        HttpSession session = request.getSession(false);
+        if (session != null)
+            session.invalidate();
+        return "logout successfully";
     }
 
     private Cookie buildTokenCookie(TokenType type, String token) {
