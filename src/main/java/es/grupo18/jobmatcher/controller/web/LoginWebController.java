@@ -1,18 +1,17 @@
 package es.grupo18.jobmatcher.controller.web;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.web.csrf.CsrfToken;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class LoginWebController {
@@ -22,19 +21,36 @@ public class LoginWebController {
         if (isLoggedIn(auth)) {
             return "redirect:/main";
         }
+
+        Long blockedUntil = (Long) request.getSession().getAttribute("loginBlockedUntil");
+        long now = System.currentTimeMillis();
+
+        if (blockedUntil != null && now < blockedUntil) {
+            long seg = (blockedUntil - now) / 1000;
+            System.out.println("⏳ Usuario bloqueado. Tiempo restante: " + seg + "s");
+            model.addAttribute("loginBlocked", true);
+            model.addAttribute("secondsRemaining", seg);
+            return "login/loginerror"; 
+        }
+
         CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
         model.addAttribute("token", token.getToken());
         return "login/login";
     }
 
     @GetMapping("/loginerror")
-    public String loginError(Model model, Authentication auth) {
+    public String loginError(Model model, Authentication auth, HttpServletRequest request) {
         if (isLoggedIn(auth)) {
             return "redirect:/main";
         }
-        model.addAttribute("loginError");
+
+        long now = System.currentTimeMillis();
+        request.getSession().setAttribute("loginBlockedUntil", now + 10_000);
+
+        model.addAttribute("loginError", true);
         return "login/loginerror";
     }
+
 
     @PostMapping("/logout")
     public String logout(HttpServletResponse response) {
