@@ -32,7 +32,7 @@ The application manages the following main entities, which can be created, edite
 
 | User Type   | Permissions                                                                                |
 |-------------|--------------------------------------------------------------------------------------------|
-| GUEST       | Can navigate through the matches and blog pages.                                           |
+| GUEST       | Can navigate through the blog pages.                                                       |
 | USER        | Can create and edit their own posts, give likes and manage their profile.                  |
 | ADMIN       | Can create, edit, and delete companies, users, posts, reviews, and manage their profile.   |
 
@@ -42,11 +42,11 @@ The application manages the following main entities, which can be created, edite
 
 The following users are available for testing purposes:
 
-| Username         | Email                    | Password     | Roles        |
-|------------------|--------------------------|--------------|--------------|
-| Admin User       | admin@example.com        | Password_123 | USER, ADMIN  |
-| Test User 1      | testuser1@example.com    | Password_123 | USER         |
-| Test User 2      | testuser2@example.com    | Password_123 | USER         |
+| Username    | Email                    | Password     | Roles        |
+|-------------|--------------------------|--------------|--------------|
+| Admin       | admin@admin.com          | Password_123 | USER, ADMIN  |
+| User1       | testuser1@example.com    | Password_123 | USER         |
+| User2       | testuser2@example.com    | Password_123 | USER         |
 
 
 > 🔒 All passwords are set to `Password_123` for testing convenience.
@@ -86,6 +86,14 @@ The following entities include associated images:
 
 - **User**: Profile picture  
 - **Post**: Main post image  
+
+---
+
+### 📄 FILES
+
+The following entity include associated files:
+
+- **User**: CV file     
 
 ---
 
@@ -158,16 +166,16 @@ This diagram illustrates the main entities of the application and their relation
 ### 👤 Héctor Julián Alijas
 
 #### Tasks completed:
-- Roles in the database.
-- Security and validations for images
-- Encoded passwords
-- Role-based distinction for CV uploads
-- User management for the admin
+- Database configuration.
+- Security and validations.
+- Encoded passwords.
+- Security and validations for files and images.
+- User management for the admin.
 
 #### Top 5 commits:
 1. [`Basic Users`](https://github.com/DWS-2025/project-grupo-18/commit/db9fe8cda88e73cbbb85488de4bdc5a122e664f7)
 2. [`Roles for DB.`](https://github.com/DWS-2025/project-grupo-18/commit/378e84b49614785e6d539c3c3dc5ccd214082133)
-3. [`Password encoder`](https://github.com/DWS-2025/project-grupo-18/commit/080349f8187101e816012c66bb37feb0d881c0c2)
+3. [`Validations`](https://github.com/DWS-2025/project-grupo-18/commit/892458739f7875cc3077fdbfb117a46b88bb9d21)
 4. [`Security and roles for CV`](https://github.com/DWS-2025/project-grupo-18/commit/e83aced4c8b287751bf2ba6ae3b7a3d4190ed7bb)
 5. [`Image Security for Post`](https://github.com/DWS-2025/project-grupo-18/commit/ef2574ae2f5e3eb9d919384dccee2cc6682b68c6)
 
