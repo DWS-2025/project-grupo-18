@@ -101,9 +101,18 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/new")
-    public String newPost(@RequestParam("image") MultipartFile image,
+    public String newPost(Model model,
+            @RequestParam("image") MultipartFile image,
             @RequestParam String title,
             @RequestParam String content) throws IOException {
+
+        if (title.isBlank() || content.isBlank()) {
+            PostDTO post = new PostDTO(null, title, content, null, null, null, null, "", List.of());
+            model.addAttribute("post", post);
+            model.addAttribute("isEdit", false);
+            model.addAttribute("error", "Title and content cannot be empty");
+            return "blog/post_form";
+        }
 
         if (!image.isEmpty()) {
             String contentType = image.getContentType();
@@ -111,7 +120,11 @@ public class BlogController {
                     || contentType.equals("image/png") || contentType.equals("image/webp"))) {
                 postService.create(title, content, image);
             } else {
-                return "redirect:/blog/posts/new?error=invalidImageType";
+                PostDTO post = new PostDTO(null, title, content, null, null, null, null, "", List.of());
+                model.addAttribute("post", post);
+                model.addAttribute("isEdit", false);
+                model.addAttribute("error", "Invalid image type");
+                return "blog/post_form";
             }
         } else {
             postService.create(title, content, null);
@@ -175,11 +188,20 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/{postId}/edit")
-    public String updatePost(@PathVariable long postId,
+    public String updatePost(Model model,
+            @PathVariable long postId,
             @RequestParam(value = "image", required = false) MultipartFile image,
             @RequestParam String title,
             @RequestParam String content) throws IOException {
         try {
+            if (title.isBlank() || content.isBlank()) {
+                PostDTO post = postService.findById(postId);
+                model.addAttribute("post", post);
+                model.addAttribute("isEdit", true);
+                model.addAttribute("error", "Title and content cannot be empty");
+                return "blog/post_form";
+            }
+
             postService.update(postId, title, content, image);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
@@ -198,10 +220,18 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/{postId}/reviews/new")
-    public String newReview(@PathVariable long postId,
+    public String newReview(Model model,
+            @PathVariable long postId,
             @RequestParam String text,
             @RequestParam int rating) {
         try {
+            if (text.isBlank()) {
+                model.addAttribute("post", postService.findById(postId));
+                model.addAttribute("review", new ReviewDTO(null, text, rating, null, postId, null));
+                model.addAttribute("error", "Comment cannot be empty");
+                return "blog/review_form";
+            }
+
             reviewService.create(postId, text, rating);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
@@ -225,11 +255,19 @@ public class BlogController {
     }
 
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/edit")
-    public String updateReview(@PathVariable long postId,
+    public String updateReview(Model model,
+            @PathVariable long postId,
             @PathVariable long reviewId,
             @RequestParam String text,
             @RequestParam int rating) {
         try {
+            if (text.isBlank()) {
+                model.addAttribute("post", postService.findById(postId));
+                model.addAttribute("review", reviewService.findById(reviewId));
+                model.addAttribute("error", "Comment cannot be empty");
+                return "blog/review_form";
+            }
+
             reviewService.update(reviewId, text, rating);
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {

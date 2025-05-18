@@ -8,6 +8,10 @@ import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 import es.grupo18.jobmatcher.security.RepositoryUserDetailsService;
+import es.grupo18.jobmatcher.util.InputSanitizer;
+
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +69,6 @@ public class UserService {
     private static final Path CV_STORAGE_PATH = Paths.get(System.getProperty("user.dir"), CV_STORAGE_DIR)
             .toAbsolutePath().normalize();
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     public UserDTO getLoggedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return toDTO(userRepository.findByEmail(email)
@@ -95,20 +97,82 @@ public class UserService {
         if (userRepository.existsByEmail(dto.email()))
             throw new RuntimeException("Email already exists");
 
-        User user = userMapper.toDomain(dto);
+        User user = new User();
+                
+        String name = InputSanitizer.sanitizePlain(dto.name());
+        ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
+        user.setName(name);
 
-        if (user.getRoles() == null || user.getRoles().isEmpty())
+        user.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+
+        String phone = InputSanitizer.sanitizePlain(dto.phone());
+        ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
+        user.setPhone(phone);
+
+        String loc = InputSanitizer.sanitizePlain(dto.location());
+        ensureNotEmptyAfterSanitization("localización", dto.location(), loc);
+        user.setLocation(loc);
+
+        String bio = InputSanitizer.sanitizeRich(dto.bio());
+        ensureNotEmptyAfterSanitization("biografía", dto.bio(), bio);
+        user.setBio(bio);
+
+        user.setExperience(dto.experience());
+        
+        String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
+        ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
+        user.setCvFileName(cv);
+
+        if (dto.roles() == null || dto.roles().isEmpty()) {
             user.setRoles(List.of("USER"));
+        } else {
+            List<String> safeRoles = dto.roles().stream()
+                    .map(String::trim)
+                    .map(String::toUpperCase)
+                    .filter(r -> r.matches("^[A-Z_]+$"))
+                    .toList();
+            user.setRoles(safeRoles.isEmpty() ? List.of("USER") : safeRoles);
+        }
 
         return userMapper.toDTO(userRepository.save(user));
     }
 
     public UserDTO save(UserDTO dto, String rawPassword) {
 
-        User user = userMapper.toDomain(dto);
+        User user = new User();
+        String name = InputSanitizer.sanitizePlain(dto.name());
+        ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
+        user.setName(name);
 
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+        user.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+
+        String phone = InputSanitizer.sanitizePlain(dto.phone());
+        ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
+        user.setPhone(phone);
+
+        String loc = InputSanitizer.sanitizePlain(dto.location());
+        ensureNotEmptyAfterSanitization("localización", dto.location(), loc);
+        user.setLocation(loc);
+
+        String bio = InputSanitizer.sanitizeRich(dto.bio());
+        ensureNotEmptyAfterSanitization("biografía", dto.bio(), bio);
+        user.setBio(bio);
+
+        user.setExperience(dto.experience());
+        
+        String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
+        ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
+        user.setCvFileName(cv);
+
+        if (dto.roles() == null || dto.roles().isEmpty()) {
             user.setRoles(List.of("USER"));
+        } else {
+            List<String> safeRoles = dto.roles().stream()
+                    .map(String::trim)
+                    .map(String::toUpperCase)
+                    .filter(r -> r.matches("^[A-Z_]+$"))
+                    .toList();
+            user.setRoles(safeRoles.isEmpty() ? List.of("USER") : safeRoles);
         }
 
         user.setEncoded_password(
@@ -152,27 +216,57 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        existingUser.setName(dto.name());
-        existingUser.setEmail(dto.email());
-        existingUser.setPhone(dto.phone());
-        existingUser.setLocation(dto.location());
-        existingUser.setBio(dto.bio());
-        existingUser.setExperience(dto.experience());
+        String name = InputSanitizer.sanitizePlain(dto.name());
+        ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
+        existingUser.setName(name);
 
+        existingUser.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+
+        String phone = InputSanitizer.sanitizePlain(dto.phone());
+        ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
+        existingUser.setPhone(phone);
+
+        String loc = InputSanitizer.sanitizePlain(dto.location());
+        ensureNotEmptyAfterSanitization("localización", dto.location(), loc);
+        existingUser.setLocation(loc);
+
+        String bio = InputSanitizer.sanitizeRich(dto.bio());
+        ensureNotEmptyAfterSanitization("biografía", dto.bio(), bio);
+        existingUser.setBio(bio);
+
+        String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
+        ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
+        existingUser.setExperience(dto.experience());
+        
         userRepository.save(existingUser);
         return toDTO(existingUser);
     }
 
-    public UserDTO updateProfile(UserDTO updatedDto) {
+    public UserDTO updateProfile(UserDTO dto) {
         User currentUser = userRepository.findById(getLoggedUser().id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        currentUser.setName(updatedDto.name());
-        currentUser.setEmail(updatedDto.email());
-        currentUser.setPhone(updatedDto.phone());
-        currentUser.setLocation(updatedDto.location());
-        currentUser.setBio(updatedDto.bio());
-        currentUser.setExperience(updatedDto.experience());
+        String name = InputSanitizer.sanitizePlain(dto.name());
+        ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
+        currentUser.setName(name);
+
+        currentUser.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+
+        String phone = InputSanitizer.sanitizePlain(dto.phone());
+        ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
+        currentUser.setPhone(phone);
+
+        String loc = InputSanitizer.sanitizePlain(dto.location());
+        ensureNotEmptyAfterSanitization("localización", dto.location(), loc);
+        currentUser.setLocation(loc);
+
+        String bio = InputSanitizer.sanitizeRich(dto.bio());
+        ensureNotEmptyAfterSanitization("biografía", dto.bio(), bio);
+        currentUser.setBio(bio);
+
+        String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
+        ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
+        currentUser.setExperience(dto.experience());
 
         userRepository.save(currentUser);
         return toDTO(currentUser);
@@ -561,4 +655,13 @@ public class UserService {
         return sb.toString();
     }
 
+    private void ensureNotEmptyAfterSanitization(String fieldName, String original, String cleaned) {
+        if (original != null
+            && !original.trim().isEmpty()
+            && (cleaned == null || cleaned.trim().isEmpty())) {
+            throw new IllegalArgumentException(
+                String.format("El campo '%s' contiene caracteres no permitidos.", fieldName)
+            );
+        }
+    }
 }

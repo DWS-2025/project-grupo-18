@@ -48,7 +48,13 @@ public class CompaniesController {
     }
 
     @PostMapping("/companies/new")
-    public String newCompany(@ModelAttribute CompanyDTO companyDTO) {
+    public String newCompany(Model model, @ModelAttribute CompanyDTO companyDTO) {
+        if (companyDTO.name().isBlank() || companyDTO.email().isBlank() || companyDTO.location().isBlank()) {
+            model.addAttribute("company", companyDTO);
+            model.addAttribute("error", "Name, email and location cannot be empty");
+            return "company/company_form";
+        }
+
         companyService.save(companyDTO);
         return "redirect:/companies";
     }
@@ -77,8 +83,17 @@ public class CompaniesController {
     }
 
     @PostMapping("/companies/{companyId}/edit")
-    public String updateCompany(@PathVariable("companyId") long id, @ModelAttribute CompanyDTO updatedCompany) {
+    public String updateCompany(Model model,
+            @PathVariable("companyId") long id,
+            @ModelAttribute CompanyDTO updatedCompany) {
         try {
+            if (updatedCompany.name().isBlank() || updatedCompany.email().isBlank()
+                    || updatedCompany.location().isBlank()) {
+                model.addAttribute("company", updatedCompany);
+                model.addAttribute("error", "Name, email and location cannot be empty");
+                return "company/company_form";
+            }
+
             companyService.update(companyService.findById(id), updatedCompany);
             return "redirect:/companies/" + id;
         } catch (NoSuchElementException e) {

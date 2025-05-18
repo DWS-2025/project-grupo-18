@@ -108,7 +108,7 @@ public class SecurityConfig {
 
         http.headers(headers -> headers
             .contentSecurityPolicy(csp -> csp
-                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-src 'self';")
+                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")
             )
         );
 
@@ -154,7 +154,7 @@ public class SecurityConfig {
 
         http.headers(headers -> headers
             .contentSecurityPolicy(csp -> csp
-                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-src 'self';")
+                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")
             )
         );
 
@@ -174,5 +174,4 @@ public class SecurityConfig {
             new ObjectMapper().writeValue(res.getWriter(), err);
         };
     }
-    
 }

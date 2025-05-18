@@ -17,6 +17,7 @@ import es.grupo18.jobmatcher.model.Company;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.CompanyRepository;
 import es.grupo18.jobmatcher.repository.UserRepository;
+import es.grupo18.jobmatcher.util.InputSanitizer;
 
 @Service
 public class CompanyService {
@@ -44,8 +45,15 @@ public class CompanyService {
     }
 
     public CompanyDTO save(CompanyDTO company) {
-        Company companyDomain = toDomain(company);
+        CompanyDTO safeDto = new CompanyDTO(
+                company.id(),
+                InputSanitizer.sanitizePlain(company.name()),
+                InputSanitizer.sanitizePlain(company.email()),
+                InputSanitizer.sanitizePlain(company.location()),
+                InputSanitizer.sanitizeRich(company.bio()));
+        Company companyDomain = toDomain(safeDto);
         companyRepository.save(companyDomain);
+
         return toDTO(companyDomain);
     }
 
@@ -55,11 +63,17 @@ public class CompanyService {
 
     public CompanyDTO update(CompanyDTO oldCompanyDTO, CompanyDTO updatedCompanyDTO) {
         Company oldCompany = toDomain(oldCompanyDTO);
-        Company updatedCompany = toDomain(updatedCompanyDTO);
-        oldCompany.setName(updatedCompany.getName());
-        oldCompany.setEmail(updatedCompany.getEmail());
-        oldCompany.setLocation(updatedCompany.getLocation());
-        oldCompany.setBio(updatedCompany.getBio());
+
+        String safeName = InputSanitizer.sanitizePlain(updatedCompanyDTO.name());
+        String safeEmail = InputSanitizer.sanitizePlain(updatedCompanyDTO.email());
+        String safeLocation = InputSanitizer.sanitizePlain(updatedCompanyDTO.location());
+        String safeBio = InputSanitizer.sanitizeRich(updatedCompanyDTO.bio());
+
+        oldCompany.setName(safeName);
+        oldCompany.setEmail(safeEmail);
+        oldCompany.setLocation(safeLocation);
+        oldCompany.setBio(safeBio);
+
         companyRepository.save(oldCompany);
         return toDTO(oldCompany);
     }

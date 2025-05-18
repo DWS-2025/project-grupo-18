@@ -65,9 +65,15 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public String newUser(@ModelAttribute UserDTO userDTO) {
-        userService.save(userDTO);
-        return "redirect:/users";
+    public String newUser(@ModelAttribute UserDTO userDTO, Model model) {
+        try {
+            userService.save(userDTO);
+            return "redirect:/users";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("user", userDTO);
+            return "user/user_form";
+        }
     }
 
     @GetMapping("/{userId}")
@@ -110,10 +116,23 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/edit")
-    public String updateUser(@PathVariable Long userId, @ModelAttribute UserDTO updatedUser) {
+    public String updateUser(
+            @PathVariable Long userId,
+            @ModelAttribute UserDTO updatedUser,
+            Model model) {
+
         try {
             userService.update(userId, updatedUser);
             return "redirect:/users/" + userId;
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("user", userService.findById(userId));
+
+            UserDTO currentUser = userService.getLoggedUser();
+            model.addAttribute("isAdmin", userService.isAdmin(currentUser));
+            model.addAttribute("isUser", userService.isUser(currentUser));
+            return "user/user_form";
         } catch (NoSuchElementException e) {
             return "user/user_not_found";
         }
