@@ -42,14 +42,14 @@ The application manages the following main entities, which can be created, edite
 
 The following users are available for testing purposes:
 
-| Username         | Email                    | Password    | Roles        |
-|------------------|--------------------------|-------------|--------------|
-| Admin User       | admin@example.com        | password123 | USER, ADMIN  |
-| Test User 1      | testuser1@example.com    | password123 | USER         |
-| Test User 2      | testuser2@example.com    | password123 | USER         |
+| Username         | Email                    | Password     | Roles        |
+|------------------|--------------------------|--------------|--------------|
+| Admin User       | admin@example.com        | Password_123 | USER, ADMIN  |
+| Test User 1      | testuser1@example.com    | Password_123 | USER         |
+| Test User 2      | testuser2@example.com    | Password_123 | USER         |
 
 
-> 🔒 All passwords are set to `password123` for testing convenience.
+> 🔒 All passwords are set to `Password_123` for testing convenience.
 
 ---
 

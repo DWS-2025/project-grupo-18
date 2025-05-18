@@ -999,7 +999,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@admin.com\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"email\": \"admin@admin.com\",\n    \"password\": \"Password_123\"\n}"
 						},
 						"url": {
 							"raw": "https://localhost:8443/api/login",
