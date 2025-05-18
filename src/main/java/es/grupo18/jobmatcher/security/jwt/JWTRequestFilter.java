@@ -50,7 +50,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception ex) {
-            System.out.println("No se pudo establecer autenticación JWT: " + ex.getMessage());
+            System.out.println("JWT authentication error: " + ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
