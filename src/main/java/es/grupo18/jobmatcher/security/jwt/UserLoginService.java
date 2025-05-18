@@ -98,7 +98,7 @@ public class UserLoginService {
         if (userRepository.findByEmail(req.getEmail()).isPresent()) {
             throw new RuntimeException("Email already in use");
         }
-         if (!PasswordConstraintValidator.isValid(req.getPassword())) {
+        if (!PasswordConstraintValidator.isValid(req.getPassword())) {
             throw new WeakPasswordException(
                     "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
         }
@@ -148,6 +148,10 @@ public class UserLoginService {
     }
 
     public String logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = jwtTokenProvider.tokenStringFromCookies(request);
+        if (token != null) {
+            jwtTokenProvider.revokeToken(token);
+        }
         SecurityContextHolder.clearContext();
         response.addCookie(removeTokenCookie(TokenType.ACCESS));
         response.addCookie(removeTokenCookie(TokenType.REFRESH));

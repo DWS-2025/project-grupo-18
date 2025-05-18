@@ -25,6 +25,9 @@ public class JWTTokenProvider {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RevokedTokenStore revokedTokenStore;
+
     // HS256 generated secret key
     private final SecretKey jwtSecret = Jwts.SIG.HS256.key().build();
 
@@ -66,6 +69,9 @@ public class JWTTokenProvider {
     }
 
     public Claims validateToken(String token) {
+        if (revokedTokenStore.isRevoked(token)) {
+            throw new JwtException("Revoked token");
+        }
         return jwtParser.parseSignedClaims(token).getPayload();
     }
 
@@ -118,6 +124,15 @@ public class JWTTokenProvider {
         String type = claims.get("type", String.class);
         if (!TokenType.REFRESH.name().equals(type)) {
             throw new JwtException("Token is not a refresh token");
+        }
+    }
+
+    public void revokeToken(String token) {
+        try {
+            Claims claims = validateToken(token);
+            revokedTokenStore.revoke(token, claims.getExpiration().toInstant());
+        } catch (JwtException e) {
+            throw new IllegalArgumentException("Invalid token", e);
         }
     }
 
