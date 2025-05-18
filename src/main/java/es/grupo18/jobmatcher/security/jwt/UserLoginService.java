@@ -21,6 +21,7 @@ import es.grupo18.jobmatcher.exception.WeakPasswordException;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
 import es.grupo18.jobmatcher.security.PasswordConstraintValidator;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -129,21 +130,31 @@ public class UserLoginService {
 
     public ResponseEntity<AuthResponse> refresh(HttpServletResponse response, String refreshToken) {
         try {
-            var claims = jwtTokenProvider.validateToken(refreshToken);
+            Claims claims = jwtTokenProvider.validateToken(refreshToken);
+
+            jwtTokenProvider.validateRefreshToken(refreshToken);
+
+            jwtTokenProvider.revokeToken(refreshToken);
+
             UserDetails user = userDetailsService.loadUserByUsername(claims.getSubject());
 
-            var newAccessToken = jwtTokenProvider.generateAccessToken(user);
-            response.addCookie(buildTokenCookie(TokenType.ACCESS, newAccessToken));
+            String newAccessToken = jwtTokenProvider.generateAccessToken(user);
+            String newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
-                    "Auth successful. Tokens are created in cookie.");
-            return ResponseEntity.ok().body(loginResponse);
+            response.addCookie(buildTokenCookie(TokenType.ACCESS, newAccessToken));
+            response.addCookie(buildTokenCookie(TokenType.REFRESH, newRefreshToken));
+
+            AuthResponse loginResponse = new AuthResponse(
+                    AuthResponse.Status.SUCCESS,
+                    "Auth successful. Tokens renewed and old refresh token revoked.");
+            return ResponseEntity.ok(loginResponse);
 
         } catch (Exception e) {
             log.error("Error while processing refresh token", e);
-            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
-                    "Failure while processing refresh token");
-            return ResponseEntity.ok().body(loginResponse);
+            AuthResponse loginResponse = new AuthResponse(
+                    AuthResponse.Status.FAILURE,
+                    "Error while processing refresh token");
+            return ResponseEntity.ok(loginResponse);
         }
     }
 
