@@ -17,8 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.grupo18.jobmatcher.exception.EmailAlreadyExistsException;
+import es.grupo18.jobmatcher.exception.WeakPasswordException;
 import es.grupo18.jobmatcher.model.User;
 import es.grupo18.jobmatcher.repository.UserRepository;
+import es.grupo18.jobmatcher.security.PasswordConstraintValidator;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,6 +75,11 @@ public class UserLoginService {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
+        if (!PasswordConstraintValidator.isValid(request.getPassword())) {
+            throw new WeakPasswordException(
+                    "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -90,6 +97,10 @@ public class UserLoginService {
     public void registerAndAuthenticate(RegisterRequest req) {
         if (userRepository.findByEmail(req.getEmail()).isPresent()) {
             throw new RuntimeException("Email already in use");
+        }
+         if (!PasswordConstraintValidator.isValid(req.getPassword())) {
+            throw new WeakPasswordException(
+                    "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
         }
         User user = new User();
         user.setName(req.getName());

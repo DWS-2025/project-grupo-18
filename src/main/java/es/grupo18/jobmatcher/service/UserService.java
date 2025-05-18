@@ -10,10 +10,6 @@ import es.grupo18.jobmatcher.repository.UserRepository;
 import es.grupo18.jobmatcher.security.RepositoryUserDetailsService;
 import es.grupo18.jobmatcher.util.InputSanitizer;
 
-import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
