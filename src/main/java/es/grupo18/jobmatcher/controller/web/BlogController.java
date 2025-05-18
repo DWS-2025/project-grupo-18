@@ -194,16 +194,25 @@ public class BlogController {
             @RequestParam String title,
             @RequestParam String content) throws IOException {
         try {
-            if (title.isBlank() || content.isBlank()) {
-                PostDTO post = postService.findById(postId);
-                model.addAttribute("post", post);
-                model.addAttribute("isEdit", true);
-                model.addAttribute("error", "Title and content cannot be empty");
-                return "blog/post_form";
+            if (!postService.findById(postId).authorId().equals(userService.getLoggedUser().id()) &&
+                    !userService.getLoggedUser().roles().contains("ADMIN")) {
+                return "error/403";
+            }
+
+            if (image != null && !image.isEmpty()) {
+                String contentType = image.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    PostDTO post = postService.findById(postId);
+                    model.addAttribute("post", post);
+                    model.addAttribute("isEdit", true);
+                    model.addAttribute("error", "Invalid image type");
+                    return "blog/post_form";
+                }
             }
 
             postService.update(postId, title, content, image);
-            return "redirect:/blog/posts/" + postId;
+            return "redirect:/blog/posts/" + postId + "/edit";
+
         } catch (NoSuchElementException e) {
             return "blog/post_not_found";
         }
