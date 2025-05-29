@@ -66,7 +66,7 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
         try {
             UserDTO sanitizedDto = new UserDTO(
@@ -95,6 +95,38 @@ public class UserRestController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> getSelf() {
+        return ResponseEntity.ok(userService.getLoggedUser());
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> updateSelf(@RequestBody UserDTO dto) {
+        try {
+            UserDTO current = userService.getLoggedUser();
+            Long myId = current.id();
+            UserDTO sanitizedDto = new UserDTO(
+                    myId,
+                    dto.name(),
+                    dto.email(),
+                    dto.phone(),
+                    dto.location(),
+                    dto.bio(),
+                    dto.experience(),
+                    dto.image(),
+                    dto.imageContentType(),
+                    current.roles(),
+                    dto.cvFileName());
+
+            userService.update(myId, sanitizedDto);
+            return ResponseEntity.ok(userService.findById(myId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
