@@ -297,4 +297,15 @@ public class PostService {
                 .orElse(false);
     }
 
+    public List<PostDTO> searchPosts(String query) {
+        if (query == null || query.isBlank()) {
+            return postRepository.findAll().stream()
+                    .map(postMapper::toDTO)
+                    .toList();
+        }
+        return postRepository.searchPosts(query).stream()
+                .map(postMapper::toDTO)
+                .toList();
+    }
+
 }
