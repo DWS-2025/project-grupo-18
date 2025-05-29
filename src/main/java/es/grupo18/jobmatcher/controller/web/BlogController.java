@@ -221,6 +221,11 @@ public class BlogController {
     @PostMapping("/blog/posts/{postId}/delete")
     public String deletePost(@PathVariable long postId) {
         try {
+            long userId = userService.getLoggedUser().id();
+
+            if (!postService.canEditOrDeletePost(postId, userId)) {
+                return "error/403";
+            }
             postService.delete(postService.findById(postId));
             return "redirect:/blog/posts";
         } catch (NoSuchElementException e) {
@@ -287,12 +292,20 @@ public class BlogController {
     @PostMapping("/blog/posts/{postId}/reviews/{reviewId}/delete")
     public String deleteReview(@PathVariable long postId, @PathVariable long reviewId) {
         try {
+            long userId = userService.getLoggedUser().id();
+            if (!reviewService.canEditOrDeleteReview(reviewId, userId)) {
+                return "error/403"; 
+            }
+
+
             reviewService.delete(reviewId, postService.findById(postId));
             return "redirect:/blog/posts/" + postId;
         } catch (NoSuchElementException e) {
             return "blog/post_not_found";
         }
     }
+
+
 
     @GetMapping("/blog/posts/{postId}/reviews/{reviewId}")
     public String getReview(Model model,
@@ -303,13 +316,13 @@ public class BlogController {
             ReviewDTO review = reviewService.findById(reviewId);
             model.addAttribute("review", review);
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             boolean canEdit = false;
-            if (auth != null
-                    && auth.isAuthenticated()
-                    && !(auth instanceof AnonymousAuthenticationToken)) {
-                String username = auth.getName();
-                canEdit = reviewService.canEditOrDeleteReview(reviewId, username);
+            if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                    SecurityContextHolder.getContext().getAuthentication().isAuthenticated() &&
+                    !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
+
+                long userId = userService.getLoggedUser().id();
+                canEdit = reviewService.canEditOrDeleteReview(reviewId, userId);
             }
             model.addAttribute("canEditReview", canEdit);
 
@@ -318,5 +331,6 @@ public class BlogController {
             return "blog/post_not_found";
         }
     }
+
 
 }
