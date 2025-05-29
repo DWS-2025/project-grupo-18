@@ -65,52 +65,53 @@ public class SecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http.securityMatcher("/api/**")
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(unauthorizedHandlerJWT)
-                .accessDeniedHandler(forbiddenHandler()))
-            .formLogin(formLogin -> formLogin.disable())
-            .httpBasic(httpBasic -> httpBasic.disable())
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/login", "/api/login/**", "/api/register", "/api/register/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/images/posts/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/images/posts/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/images/posts/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/reviews/post/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/users/me").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/users/*/cv").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/users/*/cv").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/users/*/cv").hasRole("ADMIN")
-                .requestMatchers("/api/users/**").hasRole("ADMIN")
-                .requestMatchers("/api/companies/**").hasRole("ADMIN")
-                .anyRequest().authenticated());
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(unauthorizedHandlerJWT)
+                        .accessDeniedHandler(forbiddenHandler()))
+                .formLogin(formLogin -> formLogin.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/login", "/api/login/**", "/api/register", "/api/register/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/companies").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/images/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/companies/*/favourites").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/images/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/images/posts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/images/posts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/post/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/me/cv").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/*/cv").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/cv").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/*/cv").hasRole("ADMIN")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/companies/**").hasRole("ADMIN")
+                        .anyRequest().authenticated());
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.headers(headers -> headers
-            .contentSecurityPolicy(csp -> csp
-                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")
-            )
-        );
+                .contentSecurityPolicy(csp -> csp
+                        .policyDirectives(
+                                "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")));
 
         return http.build();
     }
@@ -119,44 +120,47 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/main", "/register", "/login", "/loginerror", "/error/**", "/css/**", "/js/**", "/img/**").permitAll()
-                .requestMatchers("/blog", "/blog/posts", "/blog/posts/*", "/blog/posts/*/image", "/blog/posts/*/reviews/*").permitAll()
-                .requestMatchers("/matches/**").hasRole("USER")
-                .requestMatchers("/users/**").hasRole("ADMIN")
-                .requestMatchers("/companies/**").hasRole("ADMIN")
-                .requestMatchers("/profile/**").hasRole("USER")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
-            .formLogin(form -> form
-                .loginPage("/login")
-                .failureUrl("/loginerror")
-                .defaultSuccessUrl("/main", true)
-                .permitAll())
-            .exceptionHandling(ex -> ex
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    String uri = request.getRequestURI();
-                    if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                        response.sendRedirect("/main");
-                    } else {
-                        response.sendError(403);
-                    }
-                })
-                .authenticationEntryPoint((request, response, authException) -> {
-                    String uri = request.getRequestURI();
-                    if (uri.startsWith("/companies") || uri.startsWith("/users")) {
-                        response.sendRedirect("/main");
-                    } else {
-                        response.sendRedirect("/login");
-                    }
-                }));
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/main", "/register", "/login", "/loginerror", "/error/**", "/css/**",
+                                "/js/**", "/img/**")
+                        .permitAll()
+                        .requestMatchers("/blog", "/blog/posts", "/blog/posts/*", "/blog/posts/*/image",
+                                "/blog/posts/*/reviews/*")
+                        .permitAll()
+                        .requestMatchers("/matches/**").hasRole("USER")
+                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        .requestMatchers("/companies/**").hasRole("ADMIN")
+                        .requestMatchers("/profile/**").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .failureUrl("/loginerror")
+                        .defaultSuccessUrl("/main", true)
+                        .permitAll())
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            String uri = request.getRequestURI();
+                            if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                response.sendRedirect("/main");
+                            } else {
+                                response.sendError(403);
+                            }
+                        })
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            String uri = request.getRequestURI();
+                            if (uri.startsWith("/companies") || uri.startsWith("/users")) {
+                                response.sendRedirect("/main");
+                            } else {
+                                response.sendRedirect("/login");
+                            }
+                        }));
 
         http.headers(headers -> headers
-            .contentSecurityPolicy(csp -> csp
-                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")
-            )
-        );
+                .contentSecurityPolicy(csp -> csp
+                        .policyDirectives(
+                                "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'self';")));
 
         return http.build();
     }
@@ -168,9 +172,9 @@ public class SecurityConfig {
             res.setStatus(HttpStatus.FORBIDDEN.value());
             res.setContentType(MediaType.APPLICATION_JSON_VALUE);
             Map<String, Object> err = Map.of(
-                "status", 403,
-                "error", "FORBIDDEN",
-                "message", ex.getMessage());
+                    "status", 403,
+                    "error", "FORBIDDEN",
+                    "message", ex.getMessage());
             new ObjectMapper().writeValue(res.getWriter(), err);
         };
     }
