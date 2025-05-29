@@ -2,6 +2,7 @@ package es.grupo18.jobmatcher.service;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
+import es.grupo18.jobmatcher.exception.EmailAlreadyExistsException;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
@@ -216,7 +217,14 @@ public class UserService {
         ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
         existingUser.setName(name);
 
-        existingUser.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+        String newEmail = InputSanitizer.normalizeEmail(dto.email());
+        if (!existingUser.getEmail().equalsIgnoreCase(newEmail)
+            && userRepository.existsByEmail(newEmail)) {
+            throw new RuntimeException(
+                "Email already exists"
+            );
+        }
+        existingUser.setEmail(newEmail);
 
         String phone = InputSanitizer.sanitizePlain(dto.phone());
         ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
@@ -240,7 +248,7 @@ public class UserService {
 
     public UserDTO updateProfile(UserDTO dto) {
         User currentUser = userRepository.findById(getLoggedUser().id())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EmailAlreadyExistsException("User not found"));
 
         String name = InputSanitizer.sanitizePlain(dto.name());
         ensureNotEmptyAfterSanitization("nombre", dto.name(), name);

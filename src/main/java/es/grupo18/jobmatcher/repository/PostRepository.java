@@ -14,5 +14,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
        "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')))")
     List<Post> searchPosts(@Param("query") String query);
 
-
 }

@@ -5,6 +5,7 @@ import es.grupo18.jobmatcher.security.jwt.AuthResponse;
 import es.grupo18.jobmatcher.security.jwt.RegisterRequest;
 import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import es.grupo18.jobmatcher.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -121,12 +122,15 @@ public class UserRestController {
                     dto.image(),
                     dto.imageContentType(),
                     current.roles(),
-                    dto.cvFileName());
+                    current.cvFileName());
 
             userService.update(myId, sanitizedDto);
             return ResponseEntity.ok(userService.findById(myId));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
