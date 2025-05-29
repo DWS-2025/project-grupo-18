@@ -275,6 +275,11 @@ public class BlogController {
             @RequestParam String text,
             @RequestParam int rating) {
         try {
+            long userId = userService.getLoggedUser().id();
+            if (!reviewService.canEditOrDeleteReview(reviewId, userId)) {
+                return "error/403";
+            }
+
             if (text.isBlank()) {
                 model.addAttribute("post", postService.findById(postId));
                 model.addAttribute("review", reviewService.findById(reviewId));
