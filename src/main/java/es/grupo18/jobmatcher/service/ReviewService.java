@@ -91,8 +91,8 @@ public class ReviewService {
     }
 
     public ReviewDTO update(long reviewId, String text, int rating) {
-        String email = userService.getLoggedUser().email();
-        if (!canEditOrDeleteReview(reviewId, email)) {
+        long userId = userService.getLoggedUser().id();
+        if (!canEditOrDeleteReview(reviewId, userId)) {
             throw new SecurityException("You do not have permission to edit this review");
         }
 
@@ -106,8 +106,8 @@ public class ReviewService {
     }
 
     public void deleteById(long id) {
-        String email = userService.getLoggedUser().email();
-        if (!canEditOrDeleteReview(id, email)) {
+        long userId = userService.getLoggedUser().id();
+        if (!canEditOrDeleteReview(id, userId)) {
             throw new SecurityException("You do not have permission to delete this review");
         }
 
@@ -153,11 +153,11 @@ public class ReviewService {
         return toDTOs(reviewRepository.findByPostId(postId));
     }
 
-    public boolean canEditOrDeleteReview(Long reviewId, String username) {
+    public boolean canEditOrDeleteReview(Long reviewId, Long userId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new NoSuchElementException("Review no encontrada"));
-        return review.getAuthor().getEmail().equals(username)
-                || userService.hasRole(username, "ADMIN");
+        return review.getAuthor().getId().equals(userId)
+                || userService.hasRoleById(userId, "ADMIN");
     }
 
     public boolean canModifyReview(Long reviewId) {
