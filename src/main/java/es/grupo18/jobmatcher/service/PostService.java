@@ -214,7 +214,8 @@ public class PostService {
     }
 
     public List<PostDTO> findFilteredPosts(String sort, LocalDateTime from, LocalDateTime to, String title) {
-        List<Post> posts = new ArrayList<>(postRepository.findAll());
+        //List<Post> posts = new ArrayList<>(postRepository.findAll());
+        List<Post> posts = new ArrayList<>(postRepository.searchPosts(title));
 
         if (from != null && to != null) {
             posts = posts.stream()
