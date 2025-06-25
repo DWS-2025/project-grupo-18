@@ -558,6 +558,17 @@ public class UserService {
         }
     }
 
+    public void updateCurrentUserAndLogout(HttpServletRequest request, HttpServletResponse response) {
+        clearAuthCookies(response);
+
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+    }
+
     public void removeImage(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
