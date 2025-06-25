@@ -137,7 +137,7 @@ public class ReviewService {
         return reviewDTO;
     }
 
-    private ReviewDTO toDTO(Review review) {
+    public ReviewDTO toDTO(Review review) {
         return reviewMapper.toDTO(review);
     }
 
