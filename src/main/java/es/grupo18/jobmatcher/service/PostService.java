@@ -215,44 +215,7 @@ public class PostService {
         Long me = userService.getLoggedUser().id();
         return canEditOrDeletePost(postId, me);
     }
-    /*
-     * public List<PostDTO> findFilteredPosts(String sort, LocalDateTime from,
-     * LocalDateTime to, String title) {
-     * // List<Post> posts = new ArrayList<>(postRepository.findAll());
-     * List<Post> posts = new ArrayList<>(postRepository.searchPosts(title));
-     * 
-     * if (from != null && to != null) {
-     * posts = posts.stream()
-     * .filter(p -> !p.getTimestamp().isBefore(from) &&
-     * !p.getTimestamp().isAfter(to))
-     * .collect(Collectors.toList());
-     * } else if (from != null) {
-     * posts = posts.stream()
-     * .filter(p -> !p.getTimestamp().isBefore(from))
-     * .collect(Collectors.toList());
-     * } else if (to != null) {
-     * posts = posts.stream()
-     * .filter(p -> !p.getTimestamp().isAfter(to))
-     * .collect(Collectors.toList());
-     * }
-     * 
-     * if (title != null && !title.isBlank()) {
-     * posts = posts.stream()
-     * .filter(p -> p.getTitle() != null &&
-     * p.getTitle().toLowerCase().contains(title.toLowerCase()))
-     * .collect(Collectors.toList());
-     * }
-     * 
-     * if ("desc".equals(sort)) {
-     * posts.sort((p1, p2) -> p2.getTimestamp().compareTo(p1.getTimestamp()));
-     * } else if ("asc".equals(sort)) {
-     * posts.sort(Comparator.comparing(Post::getTimestamp));
-     * }
-     * 
-     * return toDTOs(posts);
-     * }
-     * 
-     */
+    
 
     public PostDTO toDTO(Post post) {
         List<ReviewDTO> reviews = reviewService.findReviewsByPostId(post.getId());
@@ -311,34 +274,29 @@ public class PostService {
             LocalDateTime toDate,
             String title) {
 
-        /* ---------- 1. Construir el Example ---------- */
         Example<Post> example;
         if (title != null && !title.isBlank()) {
 
-            Post probe = new Post(); // “ejemplo” vacío
-            probe.setTitle(title); // mismo texto en título…
-            probe.setContent(title); // …y en contenido
+            Post probe = new Post();
+            probe.setTitle(title);
+            probe.setContent(title);
 
-            ExampleMatcher matcher = ExampleMatcher.matchingAny() // OR entre campos
-                    .withIgnoreCase() // sin distinción may./min.
+            ExampleMatcher matcher = ExampleMatcher.matchingAny()
+                    .withIgnoreCase()
                     .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains())
                     .withMatcher("content", ExampleMatcher.GenericPropertyMatchers.contains())
-                    // ignoramos campos que no intervienen en la comparación
                     .withIgnorePaths("id", "timestamp", "image", "author", "reviews");
 
             example = Example.of(probe, matcher);
 
         } else {
-            // Sin filtro por texto: ejemplo vacío → findAll()
             example = Example.of(new Post());
         }
 
-        /* ---------- 2. Obtener los posts ---------- */
         List<Post> posts = (title != null && !title.isBlank())
                 ? postRepository.findAll(example)
                 : postRepository.findAll();
 
-        /* ---------- 3. Filtrar por fecha ---------- */
         if (fromDate != null) {
             posts = posts.stream()
                     .filter(p -> p.getTimestamp() != null &&
@@ -354,7 +312,6 @@ public class PostService {
 
         }
 
-        /* ---------- 4. Ordenar ---------- */
         if ("asc".equalsIgnoreCase(sort)) {
             posts.sort(Comparator.comparing(Post::getTimestamp,
                     Comparator.nullsLast(Comparator.naturalOrder())));
@@ -363,7 +320,6 @@ public class PostService {
                     Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         }
 
-        /* ---------- 5. Convertir a DTO ---------- */
         return posts.stream()
                 .map(post -> new PostDTO(
                         post.getId(),
