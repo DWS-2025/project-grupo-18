@@ -2,6 +2,7 @@ package es.grupo18.jobmatcher.service;
 
 import es.grupo18.jobmatcher.dto.CompanyDTO;
 import es.grupo18.jobmatcher.dto.UserDTO;
+import es.grupo18.jobmatcher.exception.EmailAlreadyExistsException;
 import es.grupo18.jobmatcher.mapper.CompanyMapper;
 import es.grupo18.jobmatcher.mapper.UserMapper;
 import es.grupo18.jobmatcher.model.Company;
@@ -94,7 +95,7 @@ public class UserService {
             throw new RuntimeException("Email already exists");
 
         User user = new User();
-                
+
         String name = InputSanitizer.sanitizePlain(dto.name());
         ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
         user.setName(name);
@@ -114,7 +115,7 @@ public class UserService {
         user.setBio(bio);
 
         user.setExperience(dto.experience());
-        
+
         String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
         ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
         user.setCvFileName(cv);
@@ -155,7 +156,7 @@ public class UserService {
         user.setBio(bio);
 
         user.setExperience(dto.experience());
-        
+
         String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
         ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
         user.setCvFileName(cv);
@@ -216,8 +217,14 @@ public class UserService {
         ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
         existingUser.setName(name);
 
-        existingUser.setEmail(InputSanitizer.normalizeEmail(dto.email()));
+        String newEmail = InputSanitizer.normalizeEmail(dto.email());
+        if (!existingUser.getEmail().equalsIgnoreCase(newEmail)
+                && userRepository.existsByEmail(newEmail)) {
+            throw new RuntimeException(
+                    "Email already exists");
+        }
 
+        existingUser.setEmail(newEmail);
         String phone = InputSanitizer.sanitizePlain(dto.phone());
         ensureNotEmptyAfterSanitization("teléfono", dto.phone(), phone);
         existingUser.setPhone(phone);
@@ -233,14 +240,14 @@ public class UserService {
         String cv = InputSanitizer.sanitizePlain(dto.cvFileName());
         ensureNotEmptyAfterSanitization("nombre del CV", dto.cvFileName(), cv);
         existingUser.setExperience(dto.experience());
-        
+
         userRepository.save(existingUser);
         return toDTO(existingUser);
     }
 
     public UserDTO updateProfile(UserDTO dto) {
         User currentUser = userRepository.findById(getLoggedUser().id())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new EmailAlreadyExistsException("User not found"));
 
         String name = InputSanitizer.sanitizePlain(dto.name());
         ensureNotEmptyAfterSanitization("nombre", dto.name(), name);
@@ -653,11 +660,10 @@ public class UserService {
 
     private void ensureNotEmptyAfterSanitization(String fieldName, String original, String cleaned) {
         if (original != null
-            && !original.trim().isEmpty()
-            && (cleaned == null || cleaned.trim().isEmpty())) {
+                && !original.trim().isEmpty()
+                && (cleaned == null || cleaned.trim().isEmpty())) {
             throw new IllegalArgumentException(
-                String.format("El campo '%s' contiene caracteres no permitidos.", fieldName)
-            );
+                    String.format("El campo '%s' contiene caracteres no permitidos.", fieldName));
         }
     }
 }

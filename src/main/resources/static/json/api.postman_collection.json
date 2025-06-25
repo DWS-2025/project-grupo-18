@@ -765,7 +765,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.doe.updated@example.com\",\n    \"phone\": \"0987654321\",\n    \"location\": \"Barcelona\",\n    \"bio\": \"Senior software engineer with 6 years of experience\",\n    \"experience\": 6\n}"
+							"raw": "{\n    \"name\": \"Updated\",\n    \"email\": \"updated@example.com\",\n    \"phone\": \"0987654321\",\n    \"location\": \"Barcelona\",\n    \"bio\": \"Senior software engineer with 6 years of experience\",\n    \"experience\": 6\n}"
 						},
 						"url": {
 							"raw": "https://localhost:8443/api/users/2",
@@ -875,6 +875,63 @@
 								"users",
 								"3",
 								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Own Profile",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8443/api/users/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Own Profile",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"John Doe Updated\",\r\n    \"email\": \"john.doe.updated@example.com\",\r\n    \"phone\": \"0987654321\",\r\n    \"location\": \"Barcelona\",\r\n    \"bio\": \"Senior software engineer with 6 years of experience\",\r\n    \"experience\": 6\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8443/api/users/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8443",
+							"path": [
+								"api",
+								"users",
+								"me"
 							]
 						}
 					},
