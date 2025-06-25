@@ -111,8 +111,11 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/edit")
-    public String updateProfile(@ModelAttribute UserDTO updatedUser) {
+    public String updateProfile(@ModelAttribute UserDTO updatedUser,
+            HttpServletRequest req, HttpServletResponse res) {
         try {
+            UserDTO current = userService.getLoggedUser();
+            String oldEmail = current.email();
             if (updatedUser.bio() != null) {
                 if (updatedUser.bio().length() > 10000) {
                     return "redirect:/profile/edit?error="
@@ -133,6 +136,9 @@ public class ProfileController {
                         updatedUser.cvFileName());
             }
             userService.updateProfile(updatedUser);
+            if (!oldEmail.equals(updatedUser.email())) {
+                userService.updateCurrentUserAndLogout(req, res);
+            }
             return "redirect:/profile";
         } catch (Exception e) {
             return "redirect:/profile/edit?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);

@@ -5,6 +5,7 @@ import es.grupo18.jobmatcher.security.jwt.AuthResponse;
 import es.grupo18.jobmatcher.security.jwt.RegisterRequest;
 import es.grupo18.jobmatcher.security.jwt.UserLoginService;
 import es.grupo18.jobmatcher.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -66,9 +67,12 @@ public class UserRestController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @userService.isOwner(#id)")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto, HttpServletRequest request,
+            HttpServletResponse response) {
         try {
+            UserDTO current = userService.getLoggedUser();
+            String oldEmail = current.email();
             UserDTO sanitizedDto = new UserDTO(
                     dto.id(),
                     dto.name(),
@@ -82,9 +86,51 @@ public class UserRestController {
                     dto.roles(),
                     dto.cvFileName());
             userService.update(id, sanitizedDto);
+            if (!oldEmail.equals(sanitizedDto.email()) && id.equals(1)) {
+                userLoginService.logout(request, response);
+            }
             return ResponseEntity.ok(userService.findById(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> getSelf() {
+        return ResponseEntity.ok(userService.getLoggedUser());
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> updateSelf(@RequestBody UserDTO dto, HttpServletRequest request,
+            HttpServletResponse response) {
+        try {
+            UserDTO current = userService.getLoggedUser();
+            String oldEmail = current.email();
+            Long myId = current.id();
+            UserDTO sanitizedDto = new UserDTO(
+                    myId,
+                    dto.name(),
+                    dto.email(),
+                    dto.phone(),
+                    dto.location(),
+                    dto.bio(),
+                    dto.experience(),
+                    dto.image(),
+                    dto.imageContentType(),
+                    current.roles(),
+                    current.cvFileName());
+
+            userService.update(myId, sanitizedDto);
+            if (!oldEmail.equals(sanitizedDto.email())) {
+                userLoginService.logout(request, response);
+            }
+            return ResponseEntity.ok(userService.findById(myId));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
